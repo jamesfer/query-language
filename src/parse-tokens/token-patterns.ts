@@ -72,6 +72,10 @@ export const patterns: TokenTest[] = [
     type: TokenKind.RangeOperator,
   },
   {
+    test: /^=>/,
+    type: TokenKind.FatArrow,
+  },
+  {
     test: /^in/,
     type: TokenKind.InOperator,
   },
