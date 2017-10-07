@@ -1,4 +1,13 @@
 {
+  "name": "query-language",
+  "version": "0.1.0",
+  "description": "An intuitive and powerful query language for the web",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+  },
+  "author": "James Ferguson",
+  "license": "MIT",
   "dependencies": {
     "@types/chai": "^4.0.2",
     "@types/lodash": "^4.14.72",
