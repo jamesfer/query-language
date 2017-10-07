@@ -73,7 +73,7 @@ export function buildArrayLiteralExpression(tokens: Token[]): ArrayLiteralExpres
 
     let elements: Expression[] = [];
     let messages: Message[] = [];
-    while (!tokenArrayMatches(tokens, TokenKind.CloseBracket)) {
+    while (tokens.length && !tokenArrayMatches(tokens, TokenKind.CloseBracket)) {
       let nextElement = buildExpression(tokens);
       tokens = tokens.slice(nextElement.tokens.length);
       elements.push(nextElement);
