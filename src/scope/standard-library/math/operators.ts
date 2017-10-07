@@ -1,6 +1,6 @@
 import { Library, LibraryEntry } from '../../library';
 import { FloatType, makeFunctionType } from '../../../type.model';
-import { bindFloatFunction } from 'scope/prepare-function';
+import { bindFloatFunction } from '../../prepare-function';
 
 
 
