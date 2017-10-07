@@ -1,7 +1,6 @@
 import { some, every, reduce, reduceRight } from 'lodash';
 import { assertNever } from './utils';
 
-import 'typescript';
 
 // TODO turn into an enum
 export type TypeKind = 'Integer'

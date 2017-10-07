@@ -1,7 +1,7 @@
 import { Token, TokenKind } from './token.model';
 
 export declare function assertType<T>(x: T): never;
-export declare function assertNever(x: never): never;
+export function assertNever(x: never): never { return x; }
 
 export function exhaustIterator<T>(it: Iterator<T>): T[] {
   let el: IteratorResult<T> = it.next();

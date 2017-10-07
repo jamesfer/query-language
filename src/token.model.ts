@@ -18,7 +18,7 @@
 //   | 'InOperator'
 //   | 'SpreadOperator';
 
-export const enum TokenKind {
+export enum TokenKind {
   Identifier,
   NumericLiteral,
   StringLiteral,
@@ -39,6 +39,7 @@ export const enum TokenKind {
   InOperator,
   SpreadOperator,
   RangeOperator,
+  FatArrow,
 }
 
 export class Token {
