@@ -10,8 +10,10 @@ export interface TokenList {
 
 export function parseTokens(code: string): TokenList {
   let tokens: Token[] = [];
+  let messages: Message[] = [];
   let startIndex = 0;
   let remaining = code.substr(startIndex);
+  let unrecognisedCharacters = '';
 
   while (remaining.length) {
     // Skip any white space
@@ -22,13 +24,18 @@ export function parseTokens(code: string): TokenList {
       continue;
     }
 
+    // Parse a token an attempt to detect unrecognised tokens
     let nextToken = parseNextToken(remaining);
-    if (!nextToken) {
-      return {
-        tokens,
-        messages: [makeMessage('Error', 'Failed to parse the token at position ' + startIndex + '.')],
-        failed: true,
-      }
+    while (!nextToken) {
+      unrecognisedCharacters += remaining[0];
+      remaining = remaining.substr(1);
+      nextToken = parseNextToken(remaining);
+    }
+    if (unrecognisedCharacters.length) {
+      messages.push(makeMessage('Error', 'Unrecognised token ' + unrecognisedCharacters + '.'));
+      startIndex += unrecognisedCharacters.length;
+      unrecognisedCharacters = '';
+      continue;
     }
 
     // Remove the matched part of the token
@@ -44,7 +51,7 @@ export function parseTokens(code: string): TokenList {
 
   return {
     tokens,
-    messages: [],
+    messages,
   };
 }
 
