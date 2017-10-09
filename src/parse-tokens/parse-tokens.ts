@@ -11,42 +11,17 @@ export interface TokenList {
 export function parseTokens(code: string): TokenList {
   let tokens: Token[] = [];
   let messages: Message[] = [];
-  let startIndex = 0;
-  let remaining = code.substr(startIndex);
-  let unrecognisedCharacters = '';
+  let remaining = code;
 
   while (remaining.length) {
-    // Skip any white space
-    let whitespace = remaining.match(whitespacePattern);
-    if (whitespace && whitespace.length) {
-      remaining = remaining.slice(whitespace[0].length);
-      startIndex += whitespace[0].length;
-      continue;
+    remaining = skipWhitespace(remaining);
+
+    let result = nextToken(remaining, code.length - remaining.length);
+    if (result.token) {
+      tokens.push(result.token);
     }
-
-    // Parse a token an attempt to detect unrecognised tokens
-    let nextToken = parseNextToken(remaining);
-    while (!nextToken) {
-      unrecognisedCharacters += remaining[0];
-      remaining = remaining.substr(1);
-      nextToken = parseNextToken(remaining);
-    }
-    if (unrecognisedCharacters.length) {
-      messages.push(makeMessage('Error', 'Unrecognised token ' + unrecognisedCharacters + '.'));
-      startIndex += unrecognisedCharacters.length;
-      unrecognisedCharacters = '';
-      continue;
-    }
-
-    // Remove the matched part of the token
-    remaining = remaining.substr(nextToken.end);
-
-    // Make the begin and end relative to the original code string
-    nextToken.begin += startIndex;
-    nextToken.end += startIndex;
-    startIndex = nextToken.end;
-
-    tokens.push(nextToken);
+    messages = messages.concat(result.messages);
+    remaining = remaining.substr(result.skip);
   }
 
   return {
@@ -55,18 +30,53 @@ export function parseTokens(code: string): TokenList {
   };
 }
 
-function parseNextToken(code: string): Token | null {
+function skipWhitespace(code: string): string {
+  let whitespace = code.match(whitespacePattern);
+  if (whitespace && whitespace.length) {
+    return code.slice(whitespace[0].length);
+  }
+  return code;
+}
+
+function nextToken(code: string, pos: number): { token: Token | null, messages: Message[], skip: number } {
+  let unrecognisedCharacters = '';
+  let messages: Message[] = [];
+
+  // Collect unrecognized characters until a token is found or the string ends
+  let token = parseNextToken(code, pos);
+  while (!token && code.length) {
+    unrecognisedCharacters += code[0];
+    code = code.substr(1);
+    token = parseNextToken(code, pos + unrecognisedCharacters.length);
+  }
+
+  if (unrecognisedCharacters.length) {
+    messages.push(makeMessage('Error', 'Unrecognised token ' + unrecognisedCharacters));
+  }
+
+  return {
+    token,
+    messages,
+    skip: unrecognisedCharacters.length + tokenLength(token),
+  };
+}
+
+function parseNextToken(code: string, pos: number): Token | null {
   for (let tokenTest of patterns) {
     let matches = code.match(tokenTest.test);
     if (matches !== null) {
       return {
         kind: tokenTest.type,
         value: matches[0],
-        begin: matches.index || 0,
-        end: (matches.index || 0) + matches[0].length,
+        begin: pos + (matches.index || 0),
+        end: pos + (matches.index || 0) + matches[0].length,
       };
     }
   }
   return null;
+}
+
+function tokenLength(token: Token | null): number {
+  return token ? token.end - token.begin : 0
 }
 
