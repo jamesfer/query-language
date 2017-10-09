@@ -1,9 +1,9 @@
 import { Token, TokenKind } from '../../token.model';
 import { Expression, ExpressionInterface } from '../../expression.model';
-import { tokenArrayMatches } from '../../utils';
-import { buildExpression } from '../build-expression';
 import { sortBy, flatten, map } from 'lodash';
-import { makeMessage, Message } from '../../message.model';
+import { Message } from '../../message.model';
+import { buildList } from './util/list';
+import { interleaveTokens } from './util/interleave-tokens';
 
 export const FunctionCallPrecedence = 100;
 
@@ -15,8 +15,7 @@ export interface FunctionCallExpression extends ExpressionInterface<'FunctionCal
 export function makeFunctionCallExpression(functionExpression: Expression, args: (Expression | null)[], extraTokens: Token[] = [], messages: Message[] = []): FunctionCallExpression {
   let tokens: Token[] = sortBy([
     ...functionExpression.tokens,
-    ...flatten(map(args, arg => arg ? arg.tokens : [])),
-    ...extraTokens,
+    ...interleaveTokens(map(args, arg => arg ? arg.tokens : []), extraTokens),
   ], 'begin');
 
   return {
@@ -28,35 +27,13 @@ export function makeFunctionCallExpression(functionExpression: Expression, args:
   };
 }
 
+let buildArguments = buildList(TokenKind.OpenParen, TokenKind.CloseParen, TokenKind.Comma);
+
 export function buildFunctionCallExpression(tokens: Token[], prevExpression: Expression | null, operatorPrecedence: number): FunctionCallExpression | undefined {
-  if (tokenArrayMatches(tokens, TokenKind.OpenParen) && operatorPrecedence < FunctionCallPrecedence && prevExpression !== null) {
-    let extraTokens = [tokens[0]];
-    tokens = tokens.slice(1);
-
-    let args: Expression[] = [];
-    let messages: Message[] = [];
-    while (!tokenArrayMatches(tokens, TokenKind.CloseParen)) {
-      let nextArg = buildExpression(tokens);
-      tokens = tokens.slice(nextArg.tokens.length);
-      args.push(nextArg);
-
-      if (nextArg.kind === 'Unrecognized') {
-        messages.push(makeMessage('Error', 'Malformed expression passed to function.'));
-        break;
-      }
-
-      if (tokenArrayMatches(tokens, TokenKind.Comma)) {
-        extraTokens.push(tokens[0]);
-        tokens = tokens.slice(1);
-      }
-      else if (!tokenArrayMatches(tokens, TokenKind.CloseParen)) {
-        messages.push(makeMessage('Error', 'Missing comma between arguments.'));
-      }
+  if (operatorPrecedence < FunctionCallPrecedence && prevExpression !== null) {
+    let args = buildArguments(tokens);
+    if (args) {
+      return makeFunctionCallExpression(prevExpression, args.expressions, args.tokens, args.messages);
     }
-    if (tokenArrayMatches(tokens, TokenKind.CloseParen)) {
-      extraTokens.push(tokens[0]);
-    }
-
-    return makeFunctionCallExpression(prevExpression, args, extraTokens, messages);
   }
 }

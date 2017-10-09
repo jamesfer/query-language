@@ -21,24 +21,24 @@ function runExpressionBuilders(tokens: Token[], prevExpression: Expression | nul
   }
 }
 
-export function  buildExpression(tokens: Token[], prevExpression: Expression | null = null, operatorPrecedence: number = 0): Expression {
-  let result: Expression | null = null;
+export function buildExpression(tokens: Token[], prevExpression: Expression | null = null, operatorPrecedence: number = 0): Expression | null {
+  let result: Expression | undefined;
   let expressionPart = runExpressionBuilders(tokens, prevExpression, operatorPrecedence);
-
   while (expressionPart) {
     let unusedTokens = tokens.slice(expressionPart.tokens.length);
     result = expressionPart;
     expressionPart = runExpressionBuilders(unusedTokens, expressionPart, operatorPrecedence);
   }
-
-  if (!result) {
-    console.log('Unrecognized');
-    result = makeUnrecognizedExpression(tokens);
-  }
-  return result;
+  return result || null;
 }
 
-// TODO return a syntax tree object that can specify success or failure
-export function buildSyntaxTree(tokens: Token[]): Expression {
-  return buildExpression(tokens);
+export function buildSyntaxTree(tokens: Token[]): Expression[] {
+  let expressions: Expression[] = [];
+  let remainingTokens = tokens;
+  while (remainingTokens.length) {
+    let result = buildExpression(tokens) || makeUnrecognizedExpression(tokens);
+    remainingTokens = remainingTokens.slice(result.tokens.length);
+    expressions.push(result);
+  }
+  return expressions;
 }
