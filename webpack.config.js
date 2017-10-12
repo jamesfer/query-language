@@ -7,7 +7,7 @@ module.exports = env => {
   return {
     context: path.resolve(__dirname, 'src'),
     devtool: 'source',
-    entry: './index.ts',
+    entry: './qlang.ts',
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: 'qlang.js',
