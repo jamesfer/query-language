@@ -36,7 +36,8 @@ export function buildSyntaxTree(tokens: Token[]): Expression[] {
   let expressions: Expression[] = [];
   let remainingTokens = tokens;
   while (remainingTokens.length) {
-    let result = buildExpression(tokens) || makeUnrecognizedExpression(tokens);
+    let result = buildExpression(remainingTokens)
+      || makeUnrecognizedExpression(remainingTokens);
     remainingTokens = remainingTokens.slice(result.tokens.length);
     expressions.push(result);
   }
