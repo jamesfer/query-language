@@ -2,7 +2,7 @@
   "name": "query-language",
   "version": "0.1.0",
   "description": "An intuitive and powerful query language for the web",
-  "main": "src/index.ts",
+  "main": "dist/qlang.js",
   "scripts": {
     "build": "webpack --progress",
     "watch": "webpack --progress --watch",

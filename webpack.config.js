@@ -22,6 +22,7 @@ module.exports = env => {
           options: {
             silent: true,
             sourceMap: true,
+            declaration: production,
           },
         },
         exclude: [ /node_modules/ ],

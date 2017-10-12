@@ -1,7 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./build",
+    "outDir": "dist",
     "baseUrl": "src",
     "sourceMap": true,
     "declaration": false,
@@ -21,8 +21,5 @@
     "lib": [
       "es2016"
     ]
-  },
-  "files": [
-    "./src/index.ts"
-  ]
+  }
 }
