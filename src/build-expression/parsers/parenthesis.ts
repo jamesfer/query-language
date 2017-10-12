@@ -5,46 +5,43 @@ import { buildExpression } from '../build-expression';
 import { makeUnrecognizedExpression } from './unrecognized';
 import { makeMessage, Message } from '../../message.model';
 
-export interface ParenthesisExpression extends ExpressionInterface<'Parenthesis'> {
-  internalExpression: Expression | null;
-}
+// export interface ParenthesisExpression extends ExpressionInterface<'Parenthesis'> {
+//   internalExpression: Expression | null;
+// }
+//
+// export function makeParenthesisExpression(openParen: Token, internalExpression: Expression, closeParen: Token | null, messages: Message[] = []): ParenthesisExpression {
+//   let tokens = [openParen, ...internalExpression.tokens];
+//   if (closeParen) {
+//     tokens = [...tokens, closeParen];
+//   }
+//
+//   return {
+//     kind: 'Parenthesis',
+//     internalExpression,
+//     tokens,
+//     messages,
+//   };
+// }
 
-export function makeParenthesisExpression(openParen: Token, internalExpression: Expression, closeParen: Token | null, messages: Message[] = []): ParenthesisExpression {
-  let tokens = [openParen, ...internalExpression.tokens];
-  if (closeParen) {
-    tokens = [...tokens, closeParen];
-  }
-
-  return {
-    kind: 'Parenthesis',
-    internalExpression,
-    tokens,
-    messages,
-  };
-}
-
-export function buildParenthesisExpression(tokens: Token[], prevExpression: Expression | null, operatorPrecedence: number): ParenthesisExpression | undefined {
+export function buildParenthesisExpression(tokens: Token[], prevExpression: Expression | null, operatorPrecedence: number): Expression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.OpenParen) && prevExpression === null) {
     let openParen = tokens[0];
     tokens = tokens.slice(1);
-    let messages: Message[] = [];
-
     let expression = buildExpression(tokens);
-    if (!expression) {
-      expression = makeUnrecognizedExpression([]);
-    }
-
-    tokens = tokens.slice(expression.tokens.length);
-    let closeParen: Token | null = null;
-    if (tokenArrayMatches(tokens, TokenKind.CloseParen)) {
-      if (expression.tokens.length === 0) {
-        messages.push(makeMessage('Error', 'Parenthesis expression had an empty body.'))
+    if (expression) {
+      expression.tokens = [openParen, ...expression.tokens];
+      tokens = tokens.slice(expression.tokens.length);
+      if (tokenArrayMatches(tokens, TokenKind.CloseParen)) {
+        // if (!expression) {
+        //   messages.push(makeMessage('Error', 'Parenthesis expression had an empty body.'))
+        // }
+        expression.tokens.push(tokens[0]);
       }
-      closeParen = tokens[0];
+      else {
+        expression.messages.push(makeMessage('Error', 'Missing closing parenthesis.'));
+      }
+      return expression;
     }
-    else {
-      messages.push(makeMessage('Error', 'Missing closing parenthesis.'));
-    }
-    return makeParenthesisExpression(openParen, expression, closeParen, messages);
+    // return makeParenthesisExpression(openParen, expression, closeParen, messages);
   }
 }

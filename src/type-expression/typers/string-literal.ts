@@ -1,7 +1,7 @@
 import { TypedScope } from '../typed-scope.model';
 import { TypedExpressionInterface } from '../../typed-expression.model';
-import { StringType } from 'type.model';
 import { StringLiteralExpression } from '../../build-expression/parsers/literal/string-literal';
+import { StringType } from '../../type.model';
 
 export interface TypedStringLiteralExpression extends TypedExpressionInterface<'StringLiteral'> {
   resultType: StringType;

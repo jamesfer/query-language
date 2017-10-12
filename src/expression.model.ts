@@ -7,7 +7,7 @@ import { ArrayLiteralExpression } from './build-expression/parsers/literal/array
 import { FunctionCallExpression } from './build-expression/parsers/function-call';
 import { NoneExpression } from './build-expression/parsers/none';
 import { Message } from './message.model';
-import { ParenthesisExpression } from './build-expression/parsers/parenthesis';
+// import { ParenthesisExpression } from './build-expression/parsers/parenthesis';
 
 export interface ExpressionInterface<K> {
   kind: K;
@@ -20,6 +20,6 @@ export type Expression = FunctionCallExpression
   | NumericLiteralExpression
   | ArrayLiteralExpression
   | IdentifierExpression
-  | ParenthesisExpression
+  // | ParenthesisExpression
   | UnrecognizedExpression
   | NoneExpression;

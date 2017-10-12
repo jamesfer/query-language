@@ -6,7 +6,7 @@ import { TypedFloatLiteralExpression, TypedIntegerLiteralExpression } from './ty
 import { TypedFunctionCallExpression } from './type-expression/typers/function-call';
 import { TypedIdentifierExpression } from './type-expression/typers/identifier';
 import { TypedArrayLiteralExpression } from './type-expression/typers/array-literal';
-import { TypedParenthesisExpression } from './type-expression/typers/parenthesis';
+// import { TypedParenthesisExpression } from './type-expression/typers/parenthesis';
 
 export interface TypedExpressionInterface<K extends string, E extends Expression = Expression> {
   kind: K;
@@ -21,7 +21,7 @@ export type TypedExpression = TypedFunctionCallExpression
   | TypedFloatLiteralExpression
   | TypedNoneLiteralExpression
   | TypedIntegerLiteralExpression
-  | TypedParenthesisExpression
+  // | TypedParenthesisExpression
   | TypedArrayLiteralExpression
   | TypedUnrecognizedExpression;
 
