@@ -4,13 +4,13 @@ import { mapValues } from 'lodash';
 import {
   FunctionValue,
   PlainFunctionValue,
-  ValueFunction,
+  LazyValue,
 } from '../value.model';
 import { EvaluationScope } from '../evaluate-expression/evaluation-scope';
 
 export interface ScopeEntry {
   type: Type,
-  value: ValueFunction,
+  value: LazyValue,
 }
 
 export interface Scope {

@@ -2,7 +2,7 @@ import { map } from 'lodash';
 import {
   FloatValue,
   PlainFunctionValue, Value,
-  ValueFunction,
+  LazyValue,
   makeFloatValue,
 } from '../value.model';
 
@@ -12,7 +12,7 @@ function createLibraryFunctionWrap<R>(
   kind: string,
 ): (func: LibraryFunc<R>) => PlainFunctionValue {
   return (libraryFunction) => {
-    return (...evaluatedArgs: ValueFunction[]): Value => {
+    return (...evaluatedArgs: LazyValue[]): Value => {
       return {
         kind,
         value: libraryFunction(...map(evaluatedArgs, arg => arg())) as any,
@@ -28,10 +28,10 @@ export const wrapNoneLibraryFunction = createLibraryFunctionWrap<null>('None');
 export const wrapArrayLibraryFunction = createLibraryFunctionWrap<Iterator<Value>>('Array');
 
 export function evaluateArguments(func: LibraryFunc<Value>): PlainFunctionValue {
-  return (...args: ValueFunction[]): Value => func(...map(args, arg => arg()));
+  return (...args: LazyValue[]): Value => func(...map(args, arg => arg()));
 }
 
 export function bindFloatFunction(func: (...args: number[]) => number)
-: (...args: ValueFunction<FloatValue>[]) => FloatValue {
+: (...args: LazyValue<FloatValue>[]) => FloatValue {
   return (...args) => makeFloatValue(func(...map(args, a => a().value)));
 }

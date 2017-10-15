@@ -1,5 +1,5 @@
-import { ValueFunction } from '../value.model';
+import { LazyValue } from '../value.model';
 
 export type EvaluationScope = {
-  [k: string]: ValueFunction,
+  [k: string]: LazyValue,
 };

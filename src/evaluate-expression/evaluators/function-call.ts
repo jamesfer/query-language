@@ -6,7 +6,7 @@ import { TypedFunctionCallExpression } from '../../type-expression/typers/functi
 import { map, partial, filter } from 'lodash';
 import { FunctionType } from 'type.model';
 import { TypedExpression } from '../../typed-expression.model';
-import { Value, ValueFunction } from '../../value.model';
+import { Value, LazyValue } from '../../value.model';
 import { EvaluationScope } from '../evaluation-scope';
 
 interface Placeholder {
@@ -15,7 +15,7 @@ interface Placeholder {
 }
 
 
-function evaluateFunctionExpression(scope: EvaluationScope, expression: TypedExpression): (...args: ValueFunction[]) => Value {
+function evaluateFunctionExpression(scope: EvaluationScope, expression: TypedExpression): (...args: LazyValue[]) => Value {
   // Evaluate the function expression
   let lazyFunc = evaluateExpression(scope, expression);
   if (!lazyFunc) {
@@ -31,9 +31,9 @@ function evaluateFunctionExpression(scope: EvaluationScope, expression: TypedExp
   return func.value;
 }
 
-function evaluateArguments(scope: EvaluationScope, expressions: (TypedExpression | null)[]): (ValueFunction | PartialPlaceholder)[] {
+function evaluateArguments(scope: EvaluationScope, expressions: (TypedExpression | null)[]): (LazyValue | PartialPlaceholder)[] {
   // Evaluate each of the arguments
-  let args: (ValueFunction | undefined)[] = map(expressions, arg => {
+  let args: (LazyValue | undefined)[] = map(expressions, arg => {
     return arg ? evaluateExpression(scope, arg) : undefined;
   });
 
@@ -43,7 +43,7 @@ function evaluateArguments(scope: EvaluationScope, expressions: (TypedExpression
   });
 }
 
-export function evaluateFunctionCall(scope: EvaluationScope, expression: TypedFunctionCallExpression): ValueFunction {
+export function evaluateFunctionCall(scope: EvaluationScope, expression: TypedFunctionCallExpression): LazyValue {
   const argCount = filter(expression.args, arg => !!arg).length;
   const arity = (expression.functionExpression.resultType as FunctionType).argTypes.length;
 
@@ -51,10 +51,10 @@ export function evaluateFunctionCall(scope: EvaluationScope, expression: TypedFu
   let args = evaluateArguments(scope, expression.args);
 
   if (argCount === arity) {
-    return () => func(...args as ValueFunction[]);
+    return () => func(...args as LazyValue[]);
   }
   else if (argCount < arity) {
-    let value = partial(func, args) as (...args: ValueFunction[]) => Value;
+    let value = partial(func, args) as (...args: LazyValue[]) => Value;
     return () => ({
       kind: 'Function',
       value,

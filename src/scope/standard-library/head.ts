@@ -1,11 +1,11 @@
-import { ArrayValue, Value, ValueFunction } from '../../value.model';
+import { ArrayValue, Value, LazyValue } from '../../value.model';
 import {
   makeArrayType, makeFunctionType,
   makeGenericType,
 } from '../../type.model';
 import { LibraryEntry } from '../library';
 
-function headFunc(list: ValueFunction<ArrayValue>): Value {
+function headFunc(list: LazyValue<ArrayValue>): Value {
   return list().value.next().value;
 }
 

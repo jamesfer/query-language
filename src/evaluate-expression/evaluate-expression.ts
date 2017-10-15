@@ -6,12 +6,12 @@ import { map } from 'lodash';
 import { evaluateArrayLiteral } from './evaluators/array-literal';
 import { evaluateFunctionCall } from './evaluators/function-call';
 import { evaluateIdentifier } from './evaluators/identifier';
-import { ValueFunction, Value } from '../value.model';
+import { LazyValue, Value } from '../value.model';
 import { EvaluationScope } from './evaluation-scope';
 
 export type PartialPlaceholder = {};
 
-export function evaluateExpression(scope: EvaluationScope, expression: TypedExpression): ValueFunction | undefined {
+export function evaluateExpression(scope: EvaluationScope, expression: TypedExpression): LazyValue | undefined {
   switch (expression.kind) {
     case 'StringLiteral':
       return evaluateStringLiteral(scope, expression);

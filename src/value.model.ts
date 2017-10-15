@@ -6,7 +6,7 @@ export type ValueKind = 'String'
   | 'Array'
   | 'Function';
 
-export type PlainFunctionValue = ((...args: ValueFunction[]) => Value);
+export type PlainFunctionValue = ((...args: LazyValue[]) => Value);
 export type PlainValue = string
   | number
   | boolean
@@ -36,7 +36,7 @@ export type Value = StringValue
   | FunctionValue
   | ArrayValue;
 
-export type ValueFunction<T extends Value = Value> = () => T;
+export type LazyValue<T extends Value = Value> = () => T;
 
 
 export const NoneValue: NoneValue = { kind: 'None', value: null };
