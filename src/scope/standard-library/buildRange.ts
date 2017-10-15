@@ -7,7 +7,7 @@ import {
   IntegerType, makeArrayType,
   makeFunctionType, makeUnionType, NoneType,
 } from '../../type.model';
-import { evaluateArguments } from '../prepare-function';
+import { evaluateArguments } from '../library-utils';
 import { LibraryEntry } from '../library';
 
 
@@ -20,7 +20,7 @@ export function buildRangeFunc(a: IntegerValue | NoneValue, b: IntegerValue | No
 
   let iterate = function* () {
     while (delta > 0 ? index <= end : index >= end) {
-      yield makeIntegerValue(index);
+      yield Promise.resolve(makeIntegerValue(index));
       index += delta;
     }
   };

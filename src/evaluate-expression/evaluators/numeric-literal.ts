@@ -1,20 +1,16 @@
 import { TypedFloatLiteralExpression, TypedIntegerLiteralExpression } from '../../type-expression/typers/numeric-literal';
 import { toNumber } from 'lodash';
-import { FloatValue, IntegerValue, LazyValue } from '../../value.model';
+import {
+  FloatValue, IntegerValue, LazyValue, makeLazyFloatValue,
+  makeLazyIntegerValue,
+} from '../../value.model';
 import { EvaluationScope } from '../evaluation-scope';
 
 export function evaluateIntegerLiteral(scope: EvaluationScope, expression: TypedIntegerLiteralExpression): LazyValue<IntegerValue> {
-  let value = toNumber(expression.expression.contents);
-  return () => ({
-    kind: 'Integer',
-    value,
-  });
+  return makeLazyIntegerValue(toNumber(expression.expression.contents));
 }
 
 export function evaluateFloatLiteral(scope: EvaluationScope, expression: TypedFloatLiteralExpression): LazyValue<FloatValue> {
-  let value = toNumber(expression.expression.contents);
-  return () => ({
-    kind: 'Float',
-    value,
-  });
+  return makeLazyFloatValue(toNumber(expression.expression.contents));
+
 }

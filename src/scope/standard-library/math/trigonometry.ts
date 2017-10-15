@@ -1,6 +1,6 @@
 import { FloatType, makeFunctionType } from '../../../type.model';
 import { Library, LibraryEntry } from '../../library';
-import { bindFloatFunction } from '../../prepare-function';
+import { bindFloatFunction } from '../../library-utils';
 
 
 const tan: LibraryEntry = {

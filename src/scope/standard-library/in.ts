@@ -1,30 +1,66 @@
-import { evaluateArguments } from '../prepare-function';
 import {
   BooleanType, FloatType, makeArrayType,
   makeFunctionType,
 } from '../../type.model';
 import {
-  ArrayValue, BooleanFalseValue, BooleanTrueValue, BooleanValue,
+  ArrayValue, BooleanFalseValue, BooleanTrueValue, BooleanValue, LazyValue,
   Value,
 } from '../../value.model';
 import { LibraryEntry } from '../library';
 
-function inFunc(a: Value, b: ArrayValue): BooleanValue {
-  let aValue = a.value;
-  let iterator = b.value;
-  let { value: element, done } = iterator.next();
+function inFunc(a: LazyValue, b: LazyValue<ArrayValue>): LazyValue<BooleanValue> {
+  return () => Promise.all([a(), b()]).then(([item, list]) => {
+    let iterator = list.value as Iterator<Promise<Value>>;
+    let { value: element, done } = iterator.next();
 
-  while (!done) {
-    if (element.value === aValue) {
-      return BooleanTrueValue;
-    }
-    ({ value: element, done } = iterator.next());
-  }
-  return BooleanFalseValue;
+    return new Promise<BooleanValue>(resolve => {
+      if (done) {
+        resolve(BooleanTrueValue);
+      }
+      else {
+        let promise: Promise<Value | undefined>;
+        let checkValue = (el: Value | undefined) => {
+          if (!el) {
+            resolve(BooleanFalseValue);
+            return;
+          }
+
+          if (el.value === item.value) {
+            resolve(BooleanTrueValue);
+            return;
+          }
+
+          let next = iterator.next();
+          if (next.done) {
+            resolve(BooleanFalseValue);
+            return;
+          }
+
+          promise = promise.then<Value | undefined>(checkValue);
+          return next.value;
+        };
+        promise = Promise.resolve(element).then<Value | undefined>(checkValue);
+      }
+    });
+  });
 }
+
+// function inFunc(a: Value, b: ArrayValue): BooleanValue {
+//   let aValue = a.value;
+//   let iterator = b.value;
+//   let { value: element, done } = iterator.next();
+//
+//   while (!done) {
+//     if (element.value === aValue) {
+//       return BooleanTrueValue;
+//     }
+//     ({ value: element, done } = iterator.next());
+//   }
+//   return BooleanFalseValue;
+// }
 
 export const inArray: LibraryEntry = {
   // TODO fix type
   type: makeFunctionType([ FloatType, makeArrayType(FloatType) ], BooleanType),
-  impl: evaluateArguments(inFunc),
+  impl: inFunc,
 };

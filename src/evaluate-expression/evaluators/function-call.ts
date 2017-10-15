@@ -4,10 +4,13 @@ import {
 } from '../evaluate-expression';
 import { TypedFunctionCallExpression } from '../../type-expression/typers/function-call';
 import { map, partial, filter } from 'lodash';
-import { FunctionType } from 'type.model';
 import { TypedExpression } from '../../typed-expression.model';
-import { Value, LazyValue } from '../../value.model';
+import {
+  Value, LazyValue, PlainFunctionValue,
+  makeFunctionValue,
+} from '../../value.model';
 import { EvaluationScope } from '../evaluation-scope';
+import { FunctionType } from '../../type.model';
 
 interface Placeholder {
   (...a: any[]): any;
@@ -15,31 +18,33 @@ interface Placeholder {
 }
 
 
-function evaluateFunctionExpression(scope: EvaluationScope, expression: TypedExpression): (...args: LazyValue[]) => Value {
-  // Evaluate the function expression
+function evaluateFunctionExpression(scope: EvaluationScope, expression: TypedExpression): Promise<PlainFunctionValue> {
+  // TODO Remove synchronous throws
   let lazyFunc = evaluateExpression(scope, expression);
   if (!lazyFunc) {
     throw new Error('Attempted to call an unrecognized expression.');
   }
 
-  let func = lazyFunc();
-  if (func.kind !== 'Function') {
-    throw new Error('Attempted to call an expression that is not a function');
+  let promiseFunc = lazyFunc();
+  if (!(promiseFunc instanceof Promise)) {
+    throw new Error('Attempted to call an array.');
   }
-  // TODO check the result is not null
-  // TODO check that value is is a function type
-  return func.value;
+
+  return promiseFunc.then(func => {
+    if (func.kind !== 'Function') {
+      throw new Error('Attempted to call an expression that is not a function');
+    }
+    // TODO check the result is not null
+    // TODO check that value is is a function type
+    return func.value;
+  });
 }
 
 function evaluateArguments(scope: EvaluationScope, expressions: (TypedExpression | null)[]): (LazyValue | PartialPlaceholder)[] {
   // Evaluate each of the arguments
-  let args: (LazyValue | undefined)[] = map(expressions, arg => {
-    return arg ? evaluateExpression(scope, arg) : undefined;
-  });
-
-  // Replace empty args with placeholder
-  return map(args, arg => {
-    return arg === undefined ? (partial as Placeholder).placeholder : arg;
+  return map(expressions, (arg): LazyValue | PartialPlaceholder => {
+    let result = arg ? evaluateExpression(scope, arg) : null;
+    return result || (partial as Placeholder).placeholder;
   });
 }
 
@@ -51,16 +56,16 @@ export function evaluateFunctionCall(scope: EvaluationScope, expression: TypedFu
   let args = evaluateArguments(scope, expression.args);
 
   if (argCount === arity) {
-    return () => func(...args as LazyValue[]);
+    return () => func.then(f => f(...args as LazyValue[])());
   }
   else if (argCount < arity) {
-    let value = partial(func, args) as (...args: LazyValue[]) => Value;
-    return () => ({
-      kind: 'Function',
-      value,
+    return () => func.then(f => {
+      let partialFunc = partial(f, args) as PlainFunctionValue;
+      return makeFunctionValue(partialFunc);
     });
   }
   else {
+    // TODO remove synchronous throw
     throw new Error('Too many arguments');
   }
 }

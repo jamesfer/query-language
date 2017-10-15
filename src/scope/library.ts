@@ -1,5 +1,8 @@
 import { Type } from '../type.model';
-import { FunctionValue, PlainFunctionValue } from '../value.model';
+import {
+  makeLazyFunctionValue,
+  PlainFunctionValue,
+} from '../value.model';
 import { Scope } from './scope';
 import { mapValues } from 'lodash';
 
@@ -15,9 +18,6 @@ export interface Library {
 export function convertToScope(library: Library): Scope {
   return mapValues(library, entry => ({
     type: entry.type,
-    value: (): FunctionValue => ({
-      kind: 'Function',
-      value: entry.impl,
-    }),
+    value: makeLazyFunctionValue(entry.impl),
   }));
 }

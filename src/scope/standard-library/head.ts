@@ -5,8 +5,8 @@ import {
 } from '../../type.model';
 import { LibraryEntry } from '../library';
 
-function headFunc(list: LazyValue<ArrayValue>): Value {
-  return list().value.next().value;
+function headFunc(list: LazyValue<ArrayValue>): LazyValue {
+  return () => list().then(it => it.value.next().value);
 }
 
 export const head: LibraryEntry = {

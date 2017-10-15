@@ -24,7 +24,7 @@ export type CompilationResult = {
 
 export interface EvaluationResult {
   messages: Message[],
-  result?: Value,
+  result?: Promise<any>,
   evaluated: boolean,
 }
 
