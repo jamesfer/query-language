@@ -7,7 +7,6 @@ import { evaluateArrayLiteral } from './evaluators/array-literal';
 import { evaluateFunctionCall } from './evaluators/function-call';
 import { evaluateIdentifier } from './evaluators/identifier';
 import { ValueFunction, Value } from '../value.model';
-// import { evaluateParenthesis } from './evaluators/parenthesis';
 import { EvaluationScope } from './evaluation-scope';
 
 export type PartialPlaceholder = {};
@@ -24,8 +23,6 @@ export function evaluateExpression(scope: EvaluationScope, expression: TypedExpr
       return evaluateArrayLiteral(scope, expression);
     case 'FunctionCall':
       return evaluateFunctionCall(scope, expression);
-    // case 'Parenthesis':
-    //   return evaluateParenthesis(scope, expression);
     case 'Identifier':
       return evaluateIdentifier(scope, expression);
     case 'NoneLiteral':

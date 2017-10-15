@@ -5,24 +5,6 @@ import { buildExpression } from '../build-expression';
 import { makeUnrecognizedExpression } from './unrecognized';
 import { makeMessage, Message } from '../../message.model';
 
-// export interface ParenthesisExpression extends ExpressionInterface<'Parenthesis'> {
-//   internalExpression: Expression | null;
-// }
-//
-// export function makeParenthesisExpression(openParen: Token, internalExpression: Expression, closeParen: Token | null, messages: Message[] = []): ParenthesisExpression {
-//   let tokens = [openParen, ...internalExpression.tokens];
-//   if (closeParen) {
-//     tokens = [...tokens, closeParen];
-//   }
-//
-//   return {
-//     kind: 'Parenthesis',
-//     internalExpression,
-//     tokens,
-//     messages,
-//   };
-// }
-
 export function buildParenthesisExpression(tokens: Token[], prevExpression: Expression | null, operatorPrecedence: number): Expression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.OpenParen) && prevExpression === null) {
     let openParen = tokens[0];
