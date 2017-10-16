@@ -1,11 +1,11 @@
-import { exhaustIterator } from '../../utils';
+import { exhaustIterator } from '../../../utils';
 import { sum as lodashSum, map } from 'lodash';
-import { FloatType, makeArrayType, makeFunctionType } from '../../type.model';
+import { FloatType, makeArrayType, makeFunctionType } from '../../../type.model';
 import {
   ArrayValue, FloatValue, LazyValue,
   makeFloatValue, PromiseValue,
-} from '../../value.model';
-import { LibraryEntry } from '../library';
+} from '../../../value.model';
+import { LibraryEntry } from '../../library';
 
 function sumFunc(list: LazyValue<ArrayValue>): PromiseValue<FloatValue> {
   return list().then(list => {

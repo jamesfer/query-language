@@ -1,9 +1,9 @@
-import { ArrayValue, LazyValue, PromiseValue } from '../../value.model';
+import { ArrayValue, LazyValue, PromiseValue } from '../../../value.model';
 import {
   makeArrayType, makeFunctionType,
   makeGenericType,
-} from '../../type.model';
-import { LibraryEntry } from '../library';
+} from '../../../type.model';
+import { LibraryEntry } from '../../library';
 
 function headFunc(list: LazyValue<ArrayValue>): PromiseValue {
   return list().then(arr => arr.value.next().value);

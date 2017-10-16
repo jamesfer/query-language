@@ -1,7 +1,7 @@
-import { sum } from './standard-library/sum';
-import { inArray } from './standard-library/in';
-import { buildRange } from './standard-library/buildRange';
-import { head } from './standard-library/head';
+import { sum } from './standard-library/array/sum';
+import { inArray } from './standard-library/array/in';
+import { buildRange } from './standard-library/array/buildRange';
+import { head } from './standard-library/array/head';
 import { Library } from './library';
 import { math } from './standard-library/math/math';
 

@@ -1,14 +1,14 @@
 import {
   BooleanType, FloatType, makeArrayType,
   makeFunctionType,
-} from '../../type.model';
+} from '../../../type.model';
 import {
   ArrayValue, BooleanFalseValue, BooleanTrueValue, BooleanValue, LazyValue,
   PromiseValue,
   Value,
-} from '../../value.model';
-import { LibraryEntry } from '../library';
-import { evaluateArguments } from '../library-utils';
+} from '../../../value.model';
+import { LibraryEntry } from '../../library';
+import { evaluateArguments } from '../../library-utils';
 
 function inFunc(item: Value, list: ArrayValue): PromiseValue<BooleanValue> {
   // return Promise.all([a(), b()]).then(([item, list]) => {

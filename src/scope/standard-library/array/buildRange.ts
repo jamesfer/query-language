@@ -2,13 +2,13 @@ import {
   ArrayValue,
   IntegerValue, makeArrayValue, makeIntegerValue,
   NoneValue,
-} from '../../value.model';
+} from '../../../value.model';
 import {
   IntegerType, makeArrayType,
   makeFunctionType, makeUnionType, NoneType,
-} from '../../type.model';
-import { evaluateArguments } from '../library-utils';
-import { LibraryEntry } from '../library';
+} from '../../../type.model';
+import { evaluateArguments } from '../../library-utils';
+import { LibraryEntry } from '../../library';
 
 
 export function buildRangeFunc(a: IntegerValue | NoneValue, b: IntegerValue | NoneValue): ArrayValue {
