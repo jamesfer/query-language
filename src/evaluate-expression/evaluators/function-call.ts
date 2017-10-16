@@ -56,7 +56,7 @@ export function evaluateFunctionCall(scope: EvaluationScope, expression: TypedFu
   let args = evaluateArguments(scope, expression.args);
 
   if (argCount === arity) {
-    return () => func.then(f => f(...args as LazyValue[])());
+    return () => func.then(f => f(...args as LazyValue[]));
   }
   else if (argCount < arity) {
     return () => func.then(f => {

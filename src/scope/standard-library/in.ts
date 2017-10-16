@@ -4,13 +4,15 @@ import {
 } from '../../type.model';
 import {
   ArrayValue, BooleanFalseValue, BooleanTrueValue, BooleanValue, LazyValue,
+  PromiseValue,
   Value,
 } from '../../value.model';
 import { LibraryEntry } from '../library';
+import { evaluateArguments } from '../library-utils';
 
-function inFunc(a: LazyValue, b: LazyValue<ArrayValue>): LazyValue<BooleanValue> {
-  return () => Promise.all([a(), b()]).then(([item, list]) => {
-    let iterator = list.value as Iterator<Promise<Value>>;
+function inFunc(item: Value, list: ArrayValue): PromiseValue<BooleanValue> {
+  // return Promise.all([a(), b()]).then(([item, list]) => {
+    let iterator = list.value/* as Iterator<Promise<Value>>*/;
     let { value: element, done } = iterator.next();
 
     return new Promise<BooleanValue>(resolve => {
@@ -42,7 +44,7 @@ function inFunc(a: LazyValue, b: LazyValue<ArrayValue>): LazyValue<BooleanValue>
         promise = Promise.resolve(element).then<Value | undefined>(checkValue);
       }
     });
-  });
+  // });
 }
 
 // function inFunc(a: Value, b: ArrayValue): BooleanValue {
@@ -62,5 +64,5 @@ function inFunc(a: LazyValue, b: LazyValue<ArrayValue>): LazyValue<BooleanValue>
 export const inArray: LibraryEntry = {
   // TODO fix type
   type: makeFunctionType([ FloatType, makeArrayType(FloatType) ], BooleanType),
-  impl: inFunc,
+  impl: evaluateArguments(inFunc),
 };

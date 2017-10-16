@@ -6,7 +6,7 @@ export type ValueKind = 'String'
   | 'Array'
   | 'Function';
 
-export type PlainFunctionValue<R extends Value = Value> = (...args: LazyValue[]) => LazyValue<R>;
+export type PlainFunctionValue<R extends Value = Value> = (...args: LazyValue[]) => PromiseValue<R>;
 export type PlainValue = string
   | number
   | boolean
@@ -35,7 +35,8 @@ export type Value = StringValue
   | FunctionValue
   | ArrayValue;
 
-export type LazyValue<T extends Value = Value> = () => Promise<T>;
+export type PromiseValue<T extends Value = Value> = Promise<T>;
+export type LazyValue<T extends Value = Value> = () => PromiseValue<T>;
 
 
 // Type constants

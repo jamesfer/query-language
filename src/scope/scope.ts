@@ -17,18 +17,6 @@ export interface Scope {
   [k: string]: ScopeEntry,
 }
 
-// TODO Get rid of this
-// export function makeLibraryFunction(type: Type, value: PlainFunctionValue): ScopeEntry {
-//   let entry: FunctionValue = {
-//     kind: 'Function',
-//     value,
-//   };
-//   return {
-//     type,
-//     value: () => entry,
-//   };
-// }
-
 export function extractTypedScope(scope: Scope): TypedScope {
   return mapValues(scope, val => val.type);
 }
