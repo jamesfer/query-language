@@ -21,7 +21,7 @@ const multiply: LibraryEntry = {
 
 const divide: LibraryEntry = {
   type: makeFunctionType([ FloatType, FloatType ], FloatType),
-  impl: bindFloatFunction((a, b) => a - b),
+  impl: bindFloatFunction((a, b) => a / b),
 };
 
 const modulo: LibraryEntry = {
