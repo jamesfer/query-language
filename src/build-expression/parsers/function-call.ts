@@ -12,10 +12,10 @@ export interface FunctionCallExpression extends ExpressionInterface<'FunctionCal
   args: (Expression | null)[];
 }
 
-export function makeFunctionCallExpression(functionExpression: Expression, args: (Expression | null)[], extraTokens: Token[] = [], messages: Message[] = []): FunctionCallExpression {
+export function makeFunctionCallExpression(functionExpression: Expression, args: (Expression | null)[], argTokens: Token[] = [], messages: Message[] = []): FunctionCallExpression {
   let tokens: Token[] = sortBy([
     ...functionExpression.tokens,
-    ...interleaveTokens(map(args, arg => arg ? arg.tokens : []), extraTokens),
+    ...argTokens,
   ], 'begin');
 
   return {

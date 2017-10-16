@@ -11,11 +11,11 @@ export interface ArrayLiteralExpression extends ExpressionInterface<'ArrayLitera
   elements: Expression[];
 }
 
-function makeArrayLiteralExpression(elements: Expression[], extraTokens: Token[] = [], messages: Message[] = []) : ArrayLiteralExpression {
+function makeArrayLiteralExpression(elements: Expression[], tokens: Token[] = [], messages: Message[] = []) : ArrayLiteralExpression {
   return {
     kind: 'ArrayLiteral',
     elements,
-    tokens: interleaveTokens(map(elements, 'tokens'), extraTokens),
+    tokens,
     messages,
   }
 }

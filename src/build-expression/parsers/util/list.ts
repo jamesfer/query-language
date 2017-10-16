@@ -23,6 +23,7 @@ function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]
   let expressions: Expression[] = [];
   let usedTokens: Token[] = [];
 
+  console.log('Consuming array');
   while (tokens.length && !tokenArrayMatches(tokens, closeToken)) {
     let { expression, sep } = consumeElementAndSep(sepToken, tokens);
 
@@ -30,6 +31,7 @@ function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]
       expressions.push(expression);
       tokens = tokens.slice(expression.tokens.length);
       usedTokens = usedTokens.concat(expression.tokens);
+      console.log('Expression valid', usedTokens);
 
       if (!sep && !tokenArrayMatches(tokens, closeToken)) {
         messages.push(makeMessage('Error', 'Missing separator between items'));
@@ -38,6 +40,7 @@ function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]
     if (sep) {
       usedTokens.push(tokens[0]);
       tokens = tokens.slice(1);
+      console.log('Sep valid', usedTokens);
 
       if (!expression) {
         messages.push(makeMessage('Error', 'Unneeded separator between items'));
@@ -51,6 +54,7 @@ function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]
     }
   }
 
+  console.log('Finally', usedTokens);
   return {
     messages,
     expressions,
