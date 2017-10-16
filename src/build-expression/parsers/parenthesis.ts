@@ -11,8 +11,8 @@ export function buildParenthesisExpression(tokens: Token[], prevExpression: Expr
     tokens = tokens.slice(1);
     let expression = buildExpression(tokens);
     if (expression) {
-      expression.tokens = [openParen, ...expression.tokens];
       tokens = tokens.slice(expression.tokens.length);
+      expression.tokens = [openParen, ...expression.tokens];
       if (tokenArrayMatches(tokens, TokenKind.CloseParen)) {
         // if (!expression) {
         //   messages.push(makeMessage('Error', 'Parenthesis expression had an empty body.'))
