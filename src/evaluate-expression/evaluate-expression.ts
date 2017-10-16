@@ -5,8 +5,9 @@ import { evaluateFloatLiteral, evaluateIntegerLiteral } from './evaluators/numer
 import { evaluateArrayLiteral } from './evaluators/array-literal';
 import { evaluateFunctionCall } from './evaluators/function-call';
 import { evaluateIdentifier } from './evaluators/identifier';
-import { LazyValue, NoneValue, Value } from '../value.model';
+import { LazyValue, NoneValue, Value, PromiseValue } from '../value.model';
 import { EvaluationScope } from './evaluation-scope';
+import { map } from 'lodash';
 
 export type PartialPlaceholder = {};
 
@@ -36,30 +37,24 @@ export function evaluateExpression(scope: EvaluationScope, expression: TypedExpr
 export function evaluateSyntaxTree(scope: EvaluationScope, expression: TypedExpression): Promise<any> | undefined {
   let lazy = evaluateExpression(scope, expression);
   if (lazy) {
-    return lazy().then((valueObj: Value): any => {
-      const value = valueObj.value;
-      if (typeof value === "object" && value !== null) {
-        return Promise.all<Value>(exhaustIterator(value));
-      }
-      return value;
-    });
+    return stripValue(lazy());
   }
 }
 
-// export function stripValue(val: Value): any {
-//   switch (val.kind) {
-//     case 'Float':
-//     case 'Integer':
-//     case 'String':
-//     case 'Boolean':
-//       return val.value;
-//     case 'Function':
-//       return undefined;
-//     // case 'Array':
-//     //   return map(exhaustIterator(val.value), f => stripValue(f));
-//     case 'None':
-//       return null;
-//     default:
-//       return assertNever(val);
-//   }
-// }
+export function stripValue(valuePromise: PromiseValue): Promise<any> | undefined {
+  return valuePromise.then((valueObj): any => {
+    switch (valueObj.kind) {
+      case 'Float':
+      case 'Integer':
+      case 'String':
+      case 'Boolean':
+      case 'Function':
+      case 'None':
+        return valueObj.value;
+      case 'Array':
+        return Promise.all(map(exhaustIterator(valueObj.value), f => stripValue(f)));
+      default:
+        return assertNever(valueObj);
+    }
+  });
+}
