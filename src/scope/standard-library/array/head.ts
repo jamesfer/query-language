@@ -1,12 +1,15 @@
-import { ArrayValue, LazyValue, PromiseValue } from '../../../value.model';
+import {
+  ArrayValue, LazyValue, makeArrayValue,
+} from '../../../value.model';
 import {
   makeArrayType, makeFunctionType,
   makeGenericType,
 } from '../../../type.model';
 import { LibraryEntry } from '../../library';
+import 'rxjs/add/operator/first'
 
-function headFunc(list: LazyValue<ArrayValue>): PromiseValue {
-  return list().then(arr => arr.value.next().value);
+function headFunc(list: LazyValue<ArrayValue>): LazyValue {
+  return list.map(arrValue => makeArrayValue(arrValue.value.first()));
 }
 
 export const head: LibraryEntry = {

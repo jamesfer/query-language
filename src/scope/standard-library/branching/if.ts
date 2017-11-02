@@ -1,14 +1,13 @@
-import { BooleanValue, LazyValue, PromiseValue } from '../../../value.model';
+import { BooleanValue, LazyValue } from '../../../value.model';
 import { LibraryEntry } from '../../library';
 import {
   BooleanType, makeFunctionType, makeGenericType,
   makeUnionType,
 } from '../../../type.model';
 
-function ifFunc(condition: LazyValue<BooleanValue>, truth: LazyValue, fallacy: LazyValue): PromiseValue {
-  return condition().then(result => result.value ? truth() : fallacy());
+function ifFunc(condition: LazyValue<BooleanValue>, truth: LazyValue, fallacy: LazyValue): LazyValue {
+  return condition.switchMap(c => c ? truth : fallacy);
 }
-
 
 export const ifBranch: LibraryEntry = {
   type: makeFunctionType([

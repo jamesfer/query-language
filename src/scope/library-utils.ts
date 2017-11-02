@@ -2,20 +2,20 @@ import { map } from 'lodash';
 import {
   FloatValue,
   PlainFunctionValue, Value,
-  makeFloatValue, PromiseValue,
+  LazyValue, makeLazyFloatValue,
 } from '../value.model';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/switch';
 
-export type LibraryFunc = (...args: Value[]) => PromiseValue | Value;
+export type LibraryFunc = (...args: Value[]) => LazyValue;
 
-export function evaluateArguments<R extends (Value | PromiseValue) = Value>(func: LibraryFunc): PlainFunctionValue {
-  return (...args) => {
-    return Promise.all(map(args, a => a()))
-      .then(plainArgs => func(...plainArgs));
-  }
+export function evaluateArguments<R extends (Value | LazyValue) = Value>(func: LibraryFunc): PlainFunctionValue {
+  return (...args) => Observable.combineLatest(...args, func).switch();
 }
 
 export function bindFloatFunction(func: (...args: number[]) => number) {
   return evaluateArguments((...args: FloatValue[]) => {
-    return makeFloatValue(func(...map(args, 'value')))
+    return makeLazyFloatValue(func(...map(args, 'value')))
   });
 }

@@ -1,6 +1,6 @@
 import {
   ArrayValue,
-  IntegerValue, makeArrayValue, makeIntegerValue,
+  IntegerValue, LazyValue, makeArrayValue, makeIntegerValue,
   NoneValue,
 } from '../../../value.model';
 import {
@@ -9,22 +9,26 @@ import {
 } from '../../../type.model';
 import { evaluateArguments } from '../../library-utils';
 import { LibraryEntry } from '../../library';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/range';
 
 
-export function buildRangeFunc(a: IntegerValue | NoneValue, b: IntegerValue | NoneValue): ArrayValue {
-  let start: number = a.value !== null ? a.value : 1;
+export function buildRangeFunc(a: IntegerValue | NoneValue, b: IntegerValue | NoneValue): LazyValue<ArrayValue> {
+  let start: number = a.value !== null ? a.value : 0;
   let end: number = b.value !== null ? b.value : Infinity;
-
-  let index = start;
   let delta = start < end ? 1 : -1;
-
-  let iterate = function* () {
-    while (delta > 0 ? index <= end : index >= end) {
-      yield Promise.resolve(makeIntegerValue(index));
-      index += delta;
-    }
-  };
-  return makeArrayValue(iterate());
+  let count = end === Infinity ? Infinity : Math.abs(start - end);
+  let arr = Observable.range(0, count)
+    .map(val => val * delta)
+    .map(makeIntegerValue);
+  return Observable.of(makeArrayValue(arr));
+  // return Observable.create((obs: Observer<number>) => {
+  //   while (delta < 0 ? index > end : index < end) {
+  //     obs.next(index);
+  //     index += delta;
+  //   }
+  //   obs.complete();
+  // }).map(makeArrayValue);
 }
 
 

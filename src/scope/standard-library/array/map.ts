@@ -1,6 +1,6 @@
 import {
-  ArrayValue, FunctionValue, makeArrayValue,
-  PromiseValue,
+  ArrayValue, FunctionValue, LazyValue, makeArrayValue, makeLazyArrayValue,
+  PromiseValue, Value,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
 import {
@@ -8,16 +8,12 @@ import {
   makeGenericType,
 } from '../../../type.model';
 import { evaluateArguments } from '../../library-utils';
+import { of } from 'rxjs/observable/of';
+import { Observable } from 'rxjs/Observable';
 
-function mapFunc(func: FunctionValue, list: ArrayValue): PromiseValue<ArrayValue> {
-  const iterate = function*() {
-    let result = list.value.next();
-    while (!result.done) {
-      yield func.value(() => result.value);
-      result = list.value.next();
-    }
-  };
-  return Promise.resolve(makeArrayValue(iterate()));
+function mapFunc(func: FunctionValue, list: ArrayValue): LazyValue<ArrayValue> {
+  let mapped = list.value.map(of).map(value => func.value(value)).switch();
+  return makeLazyArrayValue(mapped);
 }
 
 export const map: LibraryEntry = {

@@ -1,19 +1,15 @@
-import { exhaustIterator } from '../../../utils';
-import { sum as lodashSum, map } from 'lodash';
 import { FloatType, makeArrayType, makeFunctionType } from '../../../type.model';
 import {
-  ArrayValue, FloatValue, LazyValue,
-  makeFloatValue, PromiseValue,
+  ArrayValue, FloatValue, LazyValue, makeFloatValue,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
+import 'rxjs/add/operator/reduce';
 
-function sumFunc(list: LazyValue<ArrayValue>): PromiseValue<FloatValue> {
-  return list().then(list => {
-    let values = exhaustIterator(list.value);
-    return Promise.all(values).then(values => {
-      return makeFloatValue(lodashSum(map(values, 'value')));
-    });
-  });
+function sumFunc(list: LazyValue<ArrayValue>): LazyValue<FloatValue> {
+  return list.switchMap(list => {
+    return list.value.reduce((sum, { value }) => sum + (value as number), 0)
+      .map(value => makeFloatValue(value));
+  })
 }
 
 export const sum: LibraryEntry = {

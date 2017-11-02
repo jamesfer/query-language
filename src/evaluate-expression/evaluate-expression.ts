@@ -1,13 +1,16 @@
 import { TypedExpression } from '../typed-expression.model';
-import { assertNever, exhaustIterator } from '../utils';
+import { assertNever } from '../utils';
 import { evaluateStringLiteral } from './evaluators/string-literal';
 import { evaluateFloatLiteral, evaluateIntegerLiteral } from './evaluators/numeric-literal';
 import { evaluateArrayLiteral } from './evaluators/array-literal';
 import { evaluateFunctionCall } from './evaluators/function-call';
 import { evaluateIdentifier } from './evaluators/identifier';
-import { LazyValue, NoneValue, Value, PromiseValue } from '../value.model';
+import { LazyValue, LazyNoneValue } from '../value.model';
 import { EvaluationScope } from './evaluation-scope';
-import { map } from 'lodash';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeAll';
+import 'rxjs/add/operator/toArray';
 
 export type PartialPlaceholder = {};
 
@@ -26,7 +29,7 @@ export function evaluateExpression(scope: EvaluationScope, expression: TypedExpr
     case 'Identifier':
       return evaluateIdentifier(scope, expression);
     case 'NoneLiteral':
-      return () => Promise.resolve<NoneValue>({ kind: 'None', value: null });
+      return LazyNoneValue;
     case 'Unrecognized':
       return undefined;
     default:
@@ -34,27 +37,27 @@ export function evaluateExpression(scope: EvaluationScope, expression: TypedExpr
   }
 }
 
-export function evaluateSyntaxTree(scope: EvaluationScope, expression: TypedExpression): Promise<any> | undefined {
-  let lazy = evaluateExpression(scope, expression);
-  if (lazy) {
-    return stripValue(lazy());
+export function evaluateSyntaxTree(scope: EvaluationScope, expression: TypedExpression): Observable<any> | undefined {
+  let lazyValue = evaluateExpression(scope, expression);
+  if (lazyValue) {
+    return stripValue(lazyValue);
   }
 }
 
-export function stripValue(valuePromise: PromiseValue): Promise<any> | undefined {
-  return valuePromise.then((valueObj): any => {
-    switch (valueObj.kind) {
+export function stripValue(lazyValue: LazyValue): any | undefined {
+  return lazyValue.map(value => {
+    switch (value.kind) {
       case 'Float':
       case 'Integer':
       case 'String':
       case 'Boolean':
       case 'Function':
       case 'None':
-        return valueObj.value;
+        return Observable.of(value.value);
       case 'Array':
-        return Promise.all(map(exhaustIterator(valueObj.value), f => stripValue(f)));
+        return value.value.toArray();
       default:
-        return assertNever(valueObj);
+        return assertNever(value);
     }
-  });
+  }).mergeAll();
 }

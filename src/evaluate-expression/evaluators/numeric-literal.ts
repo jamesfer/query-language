@@ -12,5 +12,4 @@ export function evaluateIntegerLiteral(scope: EvaluationScope, expression: Typed
 
 export function evaluateFloatLiteral(scope: EvaluationScope, expression: TypedFloatLiteralExpression): LazyValue<FloatValue> {
   return makeLazyFloatValue(toNumber(expression.expression.contents));
-
 }

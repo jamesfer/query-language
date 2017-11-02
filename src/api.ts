@@ -1,7 +1,6 @@
 import { Token } from './token.model';
 import { TypedExpression } from './typed-expression.model';
 import { Message } from './message.model';
-import { Value } from './value.model';
 import {
   extractEvaluationScope, extractTypedScope,
   Scope,
@@ -13,6 +12,7 @@ import { typeSyntaxTree } from './type-expression/type-expression';
 import { convertToScope } from './scope/library';
 import { standardLibrary } from './scope/standard-library';
 import { evaluateSyntaxTree } from './evaluate-expression/evaluate-expression';
+import { Observable } from 'rxjs/Observable';
 
 
 export type CompilationResult = {
@@ -24,7 +24,7 @@ export type CompilationResult = {
 
 export interface EvaluationResult {
   messages: Message[],
-  result?: Promise<any>,
+  result?: Observable<any>,
   evaluated: boolean,
 }
 
@@ -79,7 +79,7 @@ export function execute(code: string, scope?: Scope): ExecutionResult {
       ...compRes,
       ...evalRes,
       messages: compRes.messages.concat(evalRes.messages),
-    };
+    } as ExecutionResult;
   }
-  return compRes;
+  return compRes as ExecutionResult;
 }
