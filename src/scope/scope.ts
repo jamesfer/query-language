@@ -1,12 +1,12 @@
 import { Type } from '../type.model';
-import { TypedScope } from '../type-expression/typed-scope.model';
+import { TypedScope } from '../compile/type/typed-scope.model';
 import { mapValues } from 'lodash';
 import {
   FunctionValue,
   PlainFunctionValue,
   LazyValue,
 } from '../value.model';
-import { EvaluationScope } from '../evaluate-expression/evaluation-scope';
+import { EvaluationScope } from '../evaluate/evaluation-scope';
 
 export interface ScopeEntry {
   type: Type,

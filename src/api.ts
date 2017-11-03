@@ -5,13 +5,13 @@ import {
   extractEvaluationScope, extractTypedScope,
   Scope,
 } from './scope/scope';
-import { parseTokens } from './parse-tokens/parse-tokens';
-import { buildSyntaxTree } from './build-expression/build-expression';
+import { parseTokens } from './compile/parse/parse-tokens';
+import { buildSyntaxTree } from './compile/interpret/interpret-expression';
 import { some } from 'lodash';
-import { typeSyntaxTree } from './type-expression/type-expression';
+import { typeSyntaxTree } from './compile/type/type-expression';
 import { convertToScope } from './scope/library';
 import { standardLibrary } from './scope/standard-library';
-import { evaluateSyntaxTree } from './evaluate-expression/evaluate-expression';
+import { evaluateSyntaxTree } from './evaluate/evaluate-expression';
 import { Observable } from 'rxjs/Observable';
 
 
