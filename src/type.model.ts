@@ -49,6 +49,7 @@ export interface UnionType extends TypeInterface<'Union'> {
 
 export interface GenericType extends TypeInterface<'Generic'> {
   name: string;
+  derives: Type | null;
 }
 
 // Type constants
@@ -84,9 +85,10 @@ export function makeArrayType(elementType: Type | null): ArrayType {
   };
 }
 
-export function makeGenericType(name: string): GenericType {
+export function makeGenericType(name: string, derives: Type | null = null): GenericType {
   return {
     kind: 'Generic',
+    derives,
     name,
   };
 }
@@ -204,5 +206,14 @@ function isSubtypeOfUnion(base: UnionType, subtype: Type): boolean {
 }
 
 function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
+  if (base.derives) {
+    if (subtype.kind === 'Generic') {
+      if (subtype.derives) {
+        return isTypeOf(base.derives, subtype.derives);
+      }
+      return false;
+    }
+    return isTypeOf(base.derives, subtype);
+  }
   return true;
 }
