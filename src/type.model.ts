@@ -133,7 +133,7 @@ export function makeUnionType(types: Type[]): UnionType {
 }
 
 // Type tests
-export function isTypeOf(base: Type, subtype?: Type): boolean {
+export function isTypeOf(base: Type, subtype?: Type | null): boolean {
   if (!subtype) {
     return false;
   }
@@ -225,13 +225,8 @@ function isSubtypeOfUnion(base: UnionType, subtype: Type): boolean {
 
 function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
   if (base.derives) {
-    if (subtype.kind === 'Generic') {
-      if (subtype.derives) {
-        return isTypeOf(base.derives, subtype.derives);
-      }
-      return false;
-    }
-    return isTypeOf(base.derives, subtype);
+    let type = subtype.kind === 'Generic' ? subtype.derives : subtype;
+    return isTypeOf(base.derives, type);
   }
   return true;
 }
