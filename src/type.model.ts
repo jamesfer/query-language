@@ -11,7 +11,8 @@ export type TypeKind = 'Integer'
   | 'Array'
   | 'Function'
   | 'Union'
-  | 'Generic';
+  | 'Generic'
+  | 'Record';
 
 export interface TypeInterface<K extends TypeKind> {
   kind: K;
@@ -25,7 +26,8 @@ export type Type = IntegerType
   | ArrayType
   | FunctionType
   | UnionType
-  | GenericType;
+  | GenericType
+  | RecordType;
 
 // Basic types
 export interface IntegerType extends TypeInterface<'Integer'> {}
@@ -35,6 +37,9 @@ export interface BooleanType extends TypeInterface<'Boolean'> {}
 export interface NoneType extends TypeInterface<'None'> {} // TODO change to placeholder
 export interface ArrayType extends TypeInterface<'Array'> {
   elementType: Type | null;
+}
+export interface RecordType extends TypeInterface<'Record'> {
+  fields: Record<string, Type>;
 }
 
 // Advanced types
@@ -93,6 +98,13 @@ export function makeGenericType(name: string, derives: Type | null = null): Gene
   };
 }
 
+export function makeRecordType(fields: Record<string, Type>): RecordType {
+  return {
+    kind: 'Record',
+    fields,
+  };
+}
+
 export function makeUnionType(types: Type[]): UnionType {
   function flattenUnionTypes(types: Type[]): Type[] {
     return reduce(types, (list, type): Type[] => {
@@ -121,7 +133,11 @@ export function makeUnionType(types: Type[]): UnionType {
 }
 
 // Type tests
-export function isTypeOf(base: Type, subtype: Type): boolean {
+export function isTypeOf(base: Type, subtype?: Type): boolean {
+  if (!subtype) {
+    return false;
+  }
+
   switch (base.kind) {
     case 'Integer':
       return isSubtypeOfInteger(subtype);
@@ -141,6 +157,8 @@ export function isTypeOf(base: Type, subtype: Type): boolean {
       return isSubtypeOfNone(subtype);
     case 'Generic':
       return isSubtypeOfGeneric(base, subtype);
+    case 'Record':
+      return isSubtypeOfRecord(base, subtype);
     default:
       return assertNever(base);
   }
@@ -216,4 +234,11 @@ function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
     return isTypeOf(base.derives, subtype);
   }
   return true;
+}
+
+function isSubtypeOfRecord(base: RecordType, subtype: Type) {
+  if (subtype.kind === 'Record') {
+    return every(base.fields, (field, key) => isTypeOf(field, subtype.fields[key]));
+  }
+  return false;
 }
