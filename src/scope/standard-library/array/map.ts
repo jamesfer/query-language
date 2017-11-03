@@ -1,6 +1,6 @@
 import {
   ArrayValue, FunctionValue, LazyValue, makeArrayValue, makeLazyArrayValue,
-  PromiseValue, Value,
+  Value,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
 import {
