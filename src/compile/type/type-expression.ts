@@ -8,7 +8,6 @@ import { parseArrayLiteral } from './typers/array-literal';
 import { parseIdentifierExpression } from './typers/identifier';
 import { parseFunctionCallExpression } from './typers/function-call';
 import { NoneExpression } from '../interpret/interpreters/none';
-// import { parseParenthesisExpression } from './typers/parenthesis';
 
 
 export function typeSyntaxTree(scope: TypedScope, expression: Expression): TypedExpression {
@@ -23,8 +22,6 @@ export function typeSyntaxTree(scope: TypedScope, expression: Expression): Typed
       return parseIdentifierExpression(scope, expression);
     case 'FunctionCall':
       return parseFunctionCallExpression(scope, expression);
-    // case 'Parenthesis':
-    //   return parseParenthesisExpression(scope, expression);
     case 'NoneLiteral':
       return makeNoneExpression(scope, expression);
     case 'Unrecognized':

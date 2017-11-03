@@ -24,6 +24,5 @@ export function buildParenthesisExpression(tokens: Token[], prevExpression: Expr
       }
       return expression;
     }
-    // return makeParenthesisExpression(openParen, expression, closeParen, messages);
   }
 }
