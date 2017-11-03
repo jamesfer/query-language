@@ -190,7 +190,7 @@ function isSubtypeOfFunction(base: FunctionType, subtype: Type): boolean {
     return false;
   }
 
-  if (some(subtype.argTypes, (type, index) => !isTypeOf(type, base.argTypes[index]))) {
+  if (!every(subtype.argTypes, (type, index) => isTypeOf(type, base.argTypes[index]))) {
     return false;
   }
 
