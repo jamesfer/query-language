@@ -1,6 +1,6 @@
 import { Token, TokenKind } from '../../../token.model';
 import { Expression, ExpressionInterface } from '../../../expression.model';
-import { sortBy, flatten, map } from 'lodash';
+import { sortBy, reduce, flatten, map } from 'lodash';
 import { Message } from '../../../message.model';
 import { buildList } from './util/list';
 import { interleaveTokens } from './util/interleave-tokens';
@@ -12,7 +12,13 @@ export interface FunctionCallExpression extends ExpressionInterface<'FunctionCal
   args: (Expression | null)[];
 }
 
-export function makeFunctionCallExpression(functionExpression: Expression, args: (Expression | null)[], argTokens: Token[] = [], messages: Message[] = []): FunctionCallExpression {
+export function makeFunctionCallExpression(functionExpression: Expression, args: (Expression | null)[], argTokens?: Token[], messages: Message[] = []): FunctionCallExpression {
+  if (!argTokens) {
+    argTokens = reduce(args, (tokens, arg) => {
+      return arg ? [...tokens, ...arg.tokens] : tokens;
+    }, []);
+  }
+
   let tokens: Token[] = sortBy([
     ...functionExpression.tokens,
     ...argTokens,

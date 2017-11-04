@@ -40,6 +40,10 @@ export const patterns: TokenTest[] = [
     type: TokenKind.Colon,
   },
   {
+    test: /^&/,
+    type: TokenKind.ComposeOperator,
+  },
+  {
     test: /^\+/,
     type: TokenKind.AddOperator,
   },

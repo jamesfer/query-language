@@ -40,6 +40,7 @@ export enum TokenKind {
   SpreadOperator,
   RangeOperator,
   FatArrow,
+  ComposeOperator,
 }
 
 export class Token {

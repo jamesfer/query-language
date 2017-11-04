@@ -6,7 +6,8 @@ import { FunctionCallExpression, makeFunctionCallExpression } from '../function-
 import { makeIdentifierExpression } from '../identifier';
 
 // From Wikipedia:
-// 13 () [] .       Function call, scope, array/member access
+// 99 ()            Function call,
+// 13 [] . &        Array/member access, function composition
 // 12 -             Unary minus
 // 11 **            Exponentiation
 // 10 ! - +         (most) unary operators, sizeof and type casts (right to left)
@@ -28,6 +29,7 @@ export interface InfixOperator {
 }
 
 const operators: InfixOperator[] = [
+  { type: TokenKind.ComposeOperator, associativity: 'Right', precedence: 13 },
   { type: TokenKind.PowerOperator, associativity: 'Right', precedence: 11 },
   { type: TokenKind.MultiplyOperator, associativity: 'Left', precedence: 10 },
   { type: TokenKind.DivideOperator, associativity: 'Left', precedence: 10 },
