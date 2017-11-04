@@ -11,6 +11,7 @@ import { fromPairs, map } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeAll';
+import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toArray';
 
 export type PartialPlaceholder = {};
@@ -59,7 +60,7 @@ export function stripValue(value: Value): Observable<any> {
     case 'None':
       return Observable.of(value.value);
     case 'Array':
-      return value.value.toArray();
+      return value.value.mergeMap(stripValue).toArray();
     case 'Record':
       let properties = map(value.value, (property, key) => {
         return stripValue(property).map(stripped => [key, stripped]);
