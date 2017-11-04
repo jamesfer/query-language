@@ -7,7 +7,7 @@ import {
 } from './scope/scope';
 import { parseTokens } from './compile/parse/parse-tokens';
 import { buildSyntaxTree } from './compile/interpret/interpret-expression';
-import { some } from 'lodash';
+import { every } from 'lodash';
 import { typeSyntaxTree } from './compile/type/type-expression';
 import { convertToScope } from './scope/library';
 import { standardLibrary } from './scope/standard-library';
@@ -44,7 +44,7 @@ export function compile(code: string, scope?: Scope): CompilationResult {
   if (result.compiled) {
     let expressions = buildSyntaxTree(tokenResult.tokens);
     result.compiled = expressions.length !== 0
-      && !some(expressions, e => e.kind === 'Unrecognized');
+      && every(expressions, e => e.kind !== 'Unrecognized');
 
     // Type syntax tree
     if (result.compiled) {
