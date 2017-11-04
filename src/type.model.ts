@@ -1,4 +1,4 @@
-import { some, every, reduce, reduceRight } from 'lodash';
+import { some, every, reduce, reduceRight, map, mapValues } from 'lodash';
 import { assertNever } from './utils';
 
 
@@ -57,6 +57,15 @@ export interface GenericType extends TypeInterface<'Generic'> {
   derives: Type | null;
 }
 
+export type TypeShorthand = string | Type;
+
+function evaluateShorthand(type: TypeShorthand): Type {
+  if (typeof type === 'string') {
+    return makeGenericType(type);
+  }
+  return type;
+}
+
 // Type constants
 export const IntegerType: IntegerType = {
   kind: 'Integer',
@@ -75,33 +84,33 @@ export const NoneType: NoneType = {
 };
 
 // Utility Functions
-export function makeFunctionType(argTypes: Type[], returnType: Type): FunctionType {
+export function makeFunctionType(argTypes: TypeShorthand[], returnType: TypeShorthand): FunctionType {
   return {
     kind: 'Function',
-    argTypes,
-    returnType
+    argTypes: map(argTypes, evaluateShorthand),
+    returnType: evaluateShorthand(returnType),
   };
 }
 
-export function makeArrayType(elementType: Type | null): ArrayType {
+export function makeArrayType(elementType: TypeShorthand | null): ArrayType {
   return {
     kind: 'Array',
-    elementType,
+    elementType: elementType ? evaluateShorthand(elementType) : null,
   };
 }
 
-export function makeGenericType(name: string, derives: Type | null = null): GenericType {
+export function makeGenericType(name: string, derives: TypeShorthand | null = null): GenericType {
   return {
     kind: 'Generic',
-    derives,
+    derives: derives ? evaluateShorthand(derives) : null,
     name,
   };
 }
 
-export function makeRecordType(fields: Record<string, Type>): RecordType {
+export function makeRecordType(fields: Record<string, TypeShorthand>): RecordType {
   return {
     kind: 'Record',
-    fields,
+    fields: mapValues(fields, evaluateShorthand),
   };
 }
 
