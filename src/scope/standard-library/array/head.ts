@@ -9,7 +9,7 @@ import { LibraryEntry } from '../../library';
 import 'rxjs/add/operator/first'
 
 function headFunc(list: LazyValue<ArrayValue>): LazyValue {
-  return list.map(arrValue => makeArrayValue(arrValue.value.first()));
+  return list.switchMap(arrValue => arrValue.value.first());
 }
 
 export const head: LibraryEntry = {
