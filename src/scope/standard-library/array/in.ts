@@ -70,8 +70,7 @@ import { evaluateArguments } from '../../library-utils';
 // }
 
 function inFunc(item: Value, list: ArrayValue): LazyValue<BooleanValue> {
-  return list.value.find(el => el.value === item.value)
-    .isEmpty()
+  return list.value.first(el => el.value === item.value, () => true, false)
     .map(makeBooleanValue);
 }
 
