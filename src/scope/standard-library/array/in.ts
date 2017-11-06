@@ -1,10 +1,7 @@
 import 'rxjs/add/operator/combineLatest';
-import 'rxjs/add/operator/find';
 import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/isEmpty';
 import {
   BooleanType,
-  FloatType,
   makeArrayType,
   makeFunctionType,
 } from '../../../type.model';
@@ -75,7 +72,6 @@ function inFunc(item: Value, list: ArrayValue): LazyValue<BooleanValue> {
 }
 
 export const inArray: LibraryEntry = {
-  // TODO fix type
-  type: makeFunctionType([ FloatType, makeArrayType(FloatType) ], BooleanType),
+  type: makeFunctionType([ 'T', makeArrayType('T') ], BooleanType),
   impl: evaluateArguments(inFunc),
 };
