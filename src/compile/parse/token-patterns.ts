@@ -44,6 +44,10 @@ export const patterns: TokenTest[] = [
     type: TokenKind.ComposeOperator,
   },
   {
+    test: /^\*\*/,
+    type: TokenKind.PowerOperator,
+  },
+  {
     test: /^\+/,
     type: TokenKind.AddOperator,
   },
@@ -62,10 +66,6 @@ export const patterns: TokenTest[] = [
   {
     test: /^\//,
     type: TokenKind.DivideOperator,
-  },
-  {
-    test: /^\*\*/,
-    type: TokenKind.PowerOperator,
   },
   {
     test: /^\.\.\./,
