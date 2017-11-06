@@ -2,7 +2,6 @@ import { of } from 'rxjs/observable/of';
 import {
   makeArrayType,
   makeFunctionType,
-  makeGenericType,
 } from '../../../type.model';
 import {
   ArrayValue,
@@ -20,8 +19,8 @@ function mapFunc(func: FunctionValue, list: ArrayValue): LazyValue<ArrayValue> {
 
 export const map: LibraryEntry = {
   type: makeFunctionType([
-    makeFunctionType([makeGenericType('T')], makeGenericType('R')),
-    makeArrayType(makeGenericType('T')),
-  ], makeArrayType(makeGenericType('T'))),
+    makeFunctionType(['T'], 'R'),
+    makeArrayType('T'),
+  ], makeArrayType('T')),
   impl: evaluateArguments(mapFunc),
 };
