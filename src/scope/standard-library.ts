@@ -1,5 +1,5 @@
 import { Library } from './library';
-import { buildRange } from './standard-library/array/buildRange';
+import { buildRange } from './standard-library/array/build-range';
 import { head } from './standard-library/array/head';
 import { inArray } from './standard-library/array/in';
 import { map } from './standard-library/array/map';
