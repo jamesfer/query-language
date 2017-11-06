@@ -28,13 +28,6 @@ export function buildRangeFunc(a: IntegerValue | NoneValue, b: IntegerValue | No
     .map(val => val * delta)
     .map(makeIntegerValue);
   return Observable.of(makeArrayValue(arr));
-  // return Observable.create((obs: Observer<number>) => {
-  //   while (delta < 0 ? index > end : index < end) {
-  //     obs.next(index);
-  //     index += delta;
-  //   }
-  //   obs.complete();
-  // }).map(makeArrayValue);
 }
 
 
