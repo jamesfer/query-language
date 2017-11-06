@@ -13,7 +13,7 @@ import { LibraryEntry } from '../../library';
 import { evaluateArguments } from '../../library-utils';
 
 function mapFunc(func: FunctionValue, list: ArrayValue): LazyValue<ArrayValue> {
-  let mapped = list.value.map(of).map(value => func.value(value)).switch();
+  let mapped = list.value.map(el => of(el)).switchMap(value => func.value(value));
   return makeLazyArrayValue(mapped);
 }
 
