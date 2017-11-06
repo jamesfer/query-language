@@ -1,9 +1,12 @@
-import { TypedExpression, TypedExpressionInterface } from '../../../typed-expression.model';
-import { ArrayType, isTypeOf, makeUnionType, Type } from '../../../type.model';
-import { TypedScope } from '../typed-scope.model';
 import { Message } from '../../../message.model';
-import { typeSyntaxTree } from '../type-expression';
+import { ArrayType, isTypeOf, makeUnionType, Type } from '../../../type.model';
+import {
+  TypedExpression,
+  TypedExpressionInterface,
+} from '../../../typed-expression.model';
 import { ArrayLiteralExpression } from '../../interpret/interpreters/literal/array-literal';
+import { typeSyntaxTree } from '../type-expression';
+import { TypedScope } from '../typed-scope.model';
 
 export interface TypedArrayLiteralExpression extends TypedExpressionInterface<'ArrayLiteral'> {
   resultType: ArrayType;

@@ -1,16 +1,22 @@
+import 'rxjs/add/observable/range';
+import { Observable } from 'rxjs/Observable';
+import {
+  IntegerType,
+  makeArrayType,
+  makeFunctionType,
+  makeUnionType,
+  NoneType,
+} from '../../../type.model';
 import {
   ArrayValue,
-  IntegerValue, LazyValue, makeArrayValue, makeIntegerValue,
+  IntegerValue,
+  LazyValue,
+  makeArrayValue,
+  makeIntegerValue,
   NoneValue,
 } from '../../../value.model';
-import {
-  IntegerType, makeArrayType,
-  makeFunctionType, makeUnionType, NoneType,
-} from '../../../type.model';
-import { evaluateArguments } from '../../library-utils';
 import { LibraryEntry } from '../../library';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/range';
+import { evaluateArguments } from '../../library-utils';
 
 
 export function buildRangeFunc(a: IntegerValue | NoneValue, b: IntegerValue | NoneValue): LazyValue<ArrayValue> {

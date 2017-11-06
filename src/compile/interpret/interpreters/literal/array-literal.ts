@@ -1,11 +1,7 @@
-import { Token, TokenKind } from '../../../../token.model';
-import { tokenArrayMatches } from '../../../../utils';
 import { Expression, ExpressionInterface } from '../../../../expression.model';
-import { buildExpression } from '../../interpret-expression';
-import { sortBy, sum, map } from 'lodash';
-import { makeMessage, Message } from '../../../../message.model';
+import { Message } from '../../../../message.model';
+import { Token, TokenKind } from '../../../../token.model';
 import { buildList } from '../util/list';
-import { interleaveTokens } from '../util/interleave-tokens';
 
 export interface ArrayLiteralExpression extends ExpressionInterface<'ArrayLiteral'> {
   elements: Expression[];

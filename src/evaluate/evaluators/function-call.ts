@@ -1,18 +1,16 @@
-import {
-  PartialPlaceholder,
-  evaluateExpression
-} from '../evaluate-expression';
-import { TypedFunctionCallExpression } from '../../compile/type/typers/function-call';
-import { map, partial, filter } from 'lodash';
-import { TypedExpression } from '../../typed-expression.model';
-import {
-  LazyValue, PlainFunctionValue,
-  makeFunctionValue, FunctionValue,
-} from '../../value.model';
-import { EvaluationScope } from '../evaluation-scope';
-import { FunctionType } from '../../type.model';
+import { filter, map, partial } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
+import { TypedFunctionCallExpression } from '../../compile/type/typers/function-call';
+import { FunctionType } from '../../type.model';
+import { TypedExpression } from '../../typed-expression.model';
+import {
+  LazyValue,
+  makeFunctionValue,
+  PlainFunctionValue,
+} from '../../value.model';
+import { evaluateExpression, PartialPlaceholder } from '../evaluate-expression';
+import { EvaluationScope } from '../evaluation-scope';
 
 interface Placeholder {
   (...a: any[]): any;

@@ -1,6 +1,6 @@
+import { makeMessage, Message } from '../../message.model';
 import { Token } from '../../token.model';
 import { patterns, whitespacePattern } from './token-patterns';
-import { makeMessage, Message } from '../../message.model';
 
 export interface TokenList {
   tokens: Token[],

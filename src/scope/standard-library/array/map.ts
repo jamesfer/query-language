@@ -1,15 +1,17 @@
+import { of } from 'rxjs/observable/of';
 import {
-  ArrayValue, FunctionValue, LazyValue, makeArrayValue, makeLazyArrayValue,
-  Value,
-} from '../../../value.model';
-import { LibraryEntry } from '../../library';
-import {
-  makeArrayType, makeFunctionType,
+  makeArrayType,
+  makeFunctionType,
   makeGenericType,
 } from '../../../type.model';
+import {
+  ArrayValue,
+  FunctionValue,
+  LazyValue,
+  makeLazyArrayValue,
+} from '../../../value.model';
+import { LibraryEntry } from '../../library';
 import { evaluateArguments } from '../../library-utils';
-import { of } from 'rxjs/observable/of';
-import { Observable } from 'rxjs/Observable';
 
 function mapFunc(func: FunctionValue, list: ArrayValue): LazyValue<ArrayValue> {
   let mapped = list.value.map(of).map(value => func.value(value)).switch();

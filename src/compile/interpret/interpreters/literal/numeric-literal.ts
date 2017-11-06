@@ -1,7 +1,7 @@
-import { Token, TokenKind } from '../../../../token.model';
-import { tokenArrayMatches } from '../../../../utils';
 import { ExpressionInterface } from '../../../../expression.model';
 import { makeMessage, Message } from '../../../../message.model';
+import { Token, TokenKind } from '../../../../token.model';
+import { tokenArrayMatches } from '../../../../utils';
 
 export interface NumericLiteralExpression extends ExpressionInterface<'NumericLiteral'> {
   contents: string;

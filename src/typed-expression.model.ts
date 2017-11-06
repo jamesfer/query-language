@@ -1,11 +1,14 @@
-import { Message } from './message.model';
-import { Expression } from './expression.model';
-import { NoneType, Type } from './type.model';
-import { TypedStringLiteralExpression } from './compile/type/typers/string-literal';
-import { TypedFloatLiteralExpression, TypedIntegerLiteralExpression } from './compile/type/typers/numeric-literal';
+import { TypedArrayLiteralExpression } from './compile/type/typers/array-literal';
 import { TypedFunctionCallExpression } from './compile/type/typers/function-call';
 import { TypedIdentifierExpression } from './compile/type/typers/identifier';
-import { TypedArrayLiteralExpression } from './compile/type/typers/array-literal';
+import {
+  TypedFloatLiteralExpression,
+  TypedIntegerLiteralExpression,
+} from './compile/type/typers/numeric-literal';
+import { TypedStringLiteralExpression } from './compile/type/typers/string-literal';
+import { Expression } from './expression.model';
+import { Message } from './message.model';
+import { NoneType, Type } from './type.model';
 
 export interface TypedExpressionInterface<K extends string, E extends Expression = Expression> {
   kind: K;

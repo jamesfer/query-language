@@ -1,9 +1,8 @@
-import { Expression, ExpressionInterface } from '../../../expression.model';
+import { Expression } from '../../../expression.model';
+import { makeMessage } from '../../../message.model';
 import { Token, TokenKind } from '../../../token.model';
 import { tokenArrayMatches } from '../../../utils';
 import { buildExpression } from '../interpret-expression';
-import { makeUnrecognizedExpression } from './unrecognized';
-import { makeMessage, Message } from '../../../message.model';
 
 export function buildParenthesisExpression(tokens: Token[], prevExpression: Expression | null, operatorPrecedence: number): Expression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.OpenParen) && prevExpression === null) {

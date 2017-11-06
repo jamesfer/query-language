@@ -1,8 +1,11 @@
 import { keyBy } from 'lodash';
-import { buildExpression } from '../../interpret-expression';
-import { Token, TokenKind } from '../../../../token.model';
 import { Expression } from '../../../../expression.model';
-import { FunctionCallExpression, makeFunctionCallExpression } from '../function-call';
+import { Token, TokenKind } from '../../../../token.model';
+import { buildExpression } from '../../interpret-expression';
+import {
+  FunctionCallExpression,
+  makeFunctionCallExpression,
+} from '../function-call';
 import { makeIdentifierExpression } from '../identifier';
 
 // From Wikipedia:

@@ -1,6 +1,6 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
 import { Dictionary } from 'lodash';
+import 'rxjs/add/observable/of';
+import { Observable } from 'rxjs/Observable';
 
 export type ValueKind = 'String'
   | 'Integer'

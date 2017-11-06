@@ -1,5 +1,5 @@
-import { Library, LibraryEntry } from '../../library';
 import { FloatType, makeFunctionType } from '../../../type.model';
+import { Library, LibraryEntry } from '../../library';
 import { bindFloatFunction } from '../../library-utils';
 
 

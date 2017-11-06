@@ -1,6 +1,6 @@
-import { Token, TokenKind } from '../../../../token.model';
 import { Expression } from '../../../../expression.model';
 import { makeMessage, Message } from '../../../../message.model';
+import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
 import { buildExpression } from '../../interpret-expression';
 

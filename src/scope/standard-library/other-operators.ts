@@ -1,6 +1,6 @@
-import { Library, LibraryEntry } from '../library';
 import { makeFunctionType } from '../../type.model';
 import { FunctionValue, makeLazyFunctionValue } from '../../value.model';
+import { Library, LibraryEntry } from '../library';
 import { evaluateArguments } from '../library-utils';
 
 const compose: LibraryEntry = {

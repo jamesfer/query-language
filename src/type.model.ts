@@ -1,4 +1,4 @@
-import { some, every, reduce, reduceRight, map, mapValues } from 'lodash';
+import { every, map, mapValues, reduce, reduceRight, some } from 'lodash';
 import { assertNever } from './utils';
 
 

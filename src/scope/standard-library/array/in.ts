@@ -1,17 +1,22 @@
+import 'rxjs/add/operator/combineLatest';
+import 'rxjs/add/operator/find';
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/isEmpty';
 import {
-  BooleanType, FloatType, makeArrayType,
+  BooleanType,
+  FloatType,
+  makeArrayType,
   makeFunctionType,
 } from '../../../type.model';
 import {
-  ArrayValue, BooleanValue, LazyValue,
-  Value, makeBooleanValue,
+  ArrayValue,
+  BooleanValue,
+  LazyValue,
+  makeBooleanValue,
+  Value,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
 import { evaluateArguments } from '../../library-utils';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/combineLatest';
-import 'rxjs/add/operator/find';
-import 'rxjs/add/operator/isEmpty';
 
 // function inFunc(item: Value, list: ArrayValue): PromiseValue<BooleanValue> {
 //   // return Promise.all([a(), b()]).then(([item, list]) => {

@@ -1,9 +1,8 @@
-import { Token, TokenKind } from '../../../token.model';
+import { reduce, sortBy } from 'lodash';
 import { Expression, ExpressionInterface } from '../../../expression.model';
-import { sortBy, reduce, flatten, map } from 'lodash';
 import { Message } from '../../../message.model';
+import { Token, TokenKind } from '../../../token.model';
 import { buildList } from './util/list';
-import { interleaveTokens } from './util/interleave-tokens';
 
 export const FunctionCallPrecedence = 100;
 

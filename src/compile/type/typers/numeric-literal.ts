@@ -1,9 +1,9 @@
-import { TypedExpressionInterface } from '../../../typed-expression.model';
-import { FloatType, IntegerType } from '../../../type.model';
-import { TypedScope } from '../typed-scope.model';
 import { isInteger, isNaN } from 'lodash';
 import { makeMessage } from '../../../message.model';
+import { FloatType, IntegerType } from '../../../type.model';
+import { TypedExpressionInterface } from '../../../typed-expression.model';
 import { NumericLiteralExpression } from '../../interpret/interpreters/literal/numeric-literal';
+import { TypedScope } from '../typed-scope.model';
 
 export interface TypedIntegerLiteralExpression extends TypedExpressionInterface<'IntegerLiteral', NumericLiteralExpression> {
   resultType: IntegerType;

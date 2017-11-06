@@ -1,12 +1,14 @@
 import { map } from 'lodash';
-import {
-  FloatValue,
-  PlainFunctionValue, Value,
-  LazyValue, makeLazyFloatValue,
-} from '../value.model';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/switch';
+import { Observable } from 'rxjs/Observable';
+import {
+  FloatValue,
+  LazyValue,
+  makeLazyFloatValue,
+  PlainFunctionValue,
+  Value,
+} from '../value.model';
 
 export type LibraryFunc = (...args: Value[]) => LazyValue;
 

@@ -1,7 +1,7 @@
+import { makeMessage, Message } from '../../../message.model';
 import { TypedExpressionInterface } from '../../../typed-expression.model';
 import { IdentifierExpression } from '../../interpret/interpreters/identifier';
 import { TypedScope } from '../typed-scope.model';
-import { makeMessage, Message } from '../../../message.model';
 
 export interface TypedIdentifierExpression extends TypedExpressionInterface<'Identifier'> {
   expression: IdentifierExpression;

@@ -1,7 +1,7 @@
 import { ExpressionInterface } from '../../../expression.model';
+import { Message } from '../../../message.model';
 import { Token, TokenKind } from '../../../token.model';
 import { tokenArrayMatches } from '../../../utils';
-import { Message } from '../../../message.model';
 
 export interface IdentifierExpression extends ExpressionInterface<'Identifier'> {
   name: string;

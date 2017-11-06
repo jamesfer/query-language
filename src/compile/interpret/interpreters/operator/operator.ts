@@ -1,8 +1,8 @@
-import { Token } from '../../../../token.model';
 import { Expression } from '../../../../expression.model';
+import { Token } from '../../../../token.model';
 import { firstResult } from '../../../../utils';
-import { buildInfixOperatorExpression } from './basic-infix-operator';
 import { buildArrayAccessOperatorExpression } from './array-access-operator';
+import { buildInfixOperatorExpression } from './basic-infix-operator';
 import { buildRangeOperatorExpression } from './range-operator';
 import { buildUnaryMinusOperatorExpression } from './unary-minus';
 

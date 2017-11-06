@@ -1,12 +1,12 @@
-import { Token } from '../../token.model';
 import { Expression } from '../../expression.model';
+import { Token } from '../../token.model';
 import { firstResult } from '../../utils';
-import { makeUnrecognizedExpression } from './interpreters/unrecognized';
-import { buildLiteralExpression } from './interpreters/literal/literal';
 import { buildFunctionCallExpression } from './interpreters/function-call';
-import { buildOperatorExpression } from './interpreters/operator/operator';
 import { buildIdentifierExpression } from './interpreters/identifier';
+import { buildLiteralExpression } from './interpreters/literal/literal';
+import { buildOperatorExpression } from './interpreters/operator/operator';
 import { buildParenthesisExpression } from './interpreters/parenthesis';
+import { makeUnrecognizedExpression } from './interpreters/unrecognized';
 
 
 function runExpressionBuilders(tokens: Token[], prevExpression: Expression | null = null, operatorPrecedence: number = 0): Expression | undefined {

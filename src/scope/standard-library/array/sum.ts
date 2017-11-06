@@ -1,9 +1,16 @@
-import { FloatType, makeArrayType, makeFunctionType } from '../../../type.model';
+import 'rxjs/add/operator/reduce';
 import {
-  ArrayValue, FloatValue, LazyValue, makeFloatValue,
+  FloatType,
+  makeArrayType,
+  makeFunctionType,
+} from '../../../type.model';
+import {
+  ArrayValue,
+  FloatValue,
+  LazyValue,
+  makeFloatValue,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
-import 'rxjs/add/operator/reduce';
 
 function sumFunc(list: LazyValue<ArrayValue>): LazyValue<FloatValue> {
   return list.switchMap(list => {

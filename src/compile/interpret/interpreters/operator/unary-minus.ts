@@ -1,13 +1,13 @@
-import { Token, TokenKind } from '../../../../token.model';
 import { Expression } from '../../../../expression.model';
+import { Token, TokenKind } from '../../../../token.model';
+import { tokenArrayMatches } from '../../../../utils';
+import { buildExpression } from '../../interpret-expression';
 import {
   FunctionCallExpression,
   makeFunctionCallExpression,
 } from '../function-call';
-import { tokenArrayMatches } from '../../../../utils';
 import { makeIdentifierExpression } from '../identifier';
 import { makeCustomNumericLiteralExpression } from '../literal/numeric-literal';
-import { buildExpression } from '../../interpret-expression';
 
 const UnaryMinusPrecedence = 12;
 

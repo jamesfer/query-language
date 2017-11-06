@@ -1,8 +1,8 @@
-import { Token, TokenKind } from '../../../../token.model';
-import { Expression, ExpressionInterface } from '../../../../expression.model';
-import { tokenArrayMatches } from '../../../../utils';
-import { makeMessage, Message } from '../../../../message.model';
 import { head, last } from 'lodash';
+import { Expression, ExpressionInterface } from '../../../../expression.model';
+import { makeMessage, Message } from '../../../../message.model';
+import { Token, TokenKind } from '../../../../token.model';
+import { tokenArrayMatches } from '../../../../utils';
 
 export interface StringLiteralExpression extends ExpressionInterface<'StringLiteral'> {
   contents: string;

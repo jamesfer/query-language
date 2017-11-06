@@ -1,18 +1,19 @@
-import { Token } from './token.model';
-import { TypedExpression } from './typed-expression.model';
+import { every } from 'lodash';
+import { Observable } from 'rxjs/Observable';
+import { buildSyntaxTree } from './compile/interpret/interpret-expression';
+import { parseTokens } from './compile/parse/parse-tokens';
+import { typeSyntaxTree } from './compile/type/type-expression';
+import { evaluateSyntaxTree } from './evaluate/evaluate-expression';
 import { Message } from './message.model';
+import { convertToScope } from './scope/library';
 import {
-  extractEvaluationScope, extractTypedScope,
+  extractEvaluationScope,
+  extractTypedScope,
   Scope,
 } from './scope/scope';
-import { parseTokens } from './compile/parse/parse-tokens';
-import { buildSyntaxTree } from './compile/interpret/interpret-expression';
-import { every } from 'lodash';
-import { typeSyntaxTree } from './compile/type/type-expression';
-import { convertToScope } from './scope/library';
 import { standardLibrary } from './scope/standard-library';
-import { evaluateSyntaxTree } from './evaluate/evaluate-expression';
-import { Observable } from 'rxjs/Observable';
+import { Token } from './token.model';
+import { TypedExpression } from './typed-expression.model';
 
 
 export type CompilationResult = {

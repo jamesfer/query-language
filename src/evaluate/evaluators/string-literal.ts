@@ -1,7 +1,7 @@
-import { TypedStringLiteralExpression } from '../../compile/type/typers/string-literal';
-import { StringValue, LazyValue, makeStringValue } from '../../value.model';
-import { EvaluationScope } from '../evaluation-scope';
 import { Observable } from 'rxjs/Observable';
+import { TypedStringLiteralExpression } from '../../compile/type/typers/string-literal';
+import { LazyValue, makeStringValue, StringValue } from '../../value.model';
+import { EvaluationScope } from '../evaluation-scope';
 
 export function evaluateStringLiteral(scope: EvaluationScope, expression: TypedStringLiteralExpression): LazyValue<StringValue> {
   let value = expression.expression.tokens[0].value;

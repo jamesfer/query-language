@@ -1,9 +1,12 @@
-import { Token, TokenKind } from '../../../../token.model';
-import { FunctionCallExpression, makeFunctionCallExpression } from '../function-call';
-import { Expression } from '../../../../expression.model';
-import { makeCustomIdentifierExpression } from '../identifier';
 import { every } from 'lodash';
+import { Expression } from '../../../../expression.model';
 import { makeMessage } from '../../../../message.model';
+import { Token, TokenKind } from '../../../../token.model';
+import {
+  FunctionCallExpression,
+  makeFunctionCallExpression,
+} from '../function-call';
+import { makeCustomIdentifierExpression } from '../identifier';
 import { buildList } from '../util/list';
 
 const ArrayAccessPrecedence = 12;

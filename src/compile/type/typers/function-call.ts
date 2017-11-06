@@ -1,10 +1,13 @@
-import { TypedExpression, TypedExpressionInterface } from '../../../typed-expression.model';
-import { TypedScope } from '../typed-scope.model';
-import { typeSyntaxTree } from '../type-expression';
-import { map, filter } from 'lodash';
+import { filter, map } from 'lodash';
 import { makeMessage, Message } from '../../../message.model';
 import { isTypeOf, makeFunctionType, Type } from '../../../type.model';
+import {
+  TypedExpression,
+  TypedExpressionInterface,
+} from '../../../typed-expression.model';
 import { FunctionCallExpression } from '../../interpret/interpreters/function-call';
+import { typeSyntaxTree } from '../type-expression';
+import { TypedScope } from '../typed-scope.model';
 
 export interface TypedFunctionCallExpression extends TypedExpressionInterface<'FunctionCall'> {
   functionExpression: TypedExpression;

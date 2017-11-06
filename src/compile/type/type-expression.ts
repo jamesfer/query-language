@@ -1,13 +1,16 @@
 import { Expression } from '../../expression.model';
-import { TypedScope } from './typed-scope.model';
-import { TypedExpression, TypedNoneLiteralExpression } from '../../typed-expression.model';
+import {
+  TypedExpression,
+  TypedNoneLiteralExpression,
+} from '../../typed-expression.model';
 import { assertNever } from '../../utils';
-import { parseStringLiteral } from './typers/string-literal';
-import { parseNumericLiteral } from './typers/numeric-literal';
-import { parseArrayLiteral } from './typers/array-literal';
-import { parseIdentifierExpression } from './typers/identifier';
-import { parseFunctionCallExpression } from './typers/function-call';
 import { NoneExpression } from '../interpret/interpreters/none';
+import { TypedScope } from './typed-scope.model';
+import { parseArrayLiteral } from './typers/array-literal';
+import { parseFunctionCallExpression } from './typers/function-call';
+import { parseIdentifierExpression } from './typers/identifier';
+import { parseNumericLiteral } from './typers/numeric-literal';
+import { parseStringLiteral } from './typers/string-literal';
 
 
 export function typeSyntaxTree(scope: TypedScope, expression: Expression): TypedExpression {

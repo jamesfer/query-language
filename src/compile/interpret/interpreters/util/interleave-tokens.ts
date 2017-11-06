@@ -1,5 +1,5 @@
+import { map, sortBy, sum } from 'lodash';
 import { Token } from '../../../../token.model';
-import { sum, map, sortBy } from 'lodash';
 
 function arrayInsert<T>(array: T[], index: number, elements: T[]) {
   let i = -1;

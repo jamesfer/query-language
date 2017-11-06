@@ -1,7 +1,13 @@
-import { TypedFloatLiteralExpression, TypedIntegerLiteralExpression } from '../../compile/type/typers/numeric-literal';
 import { toNumber } from 'lodash';
 import {
-  FloatValue, IntegerValue, LazyValue, makeLazyFloatValue,
+  TypedFloatLiteralExpression,
+  TypedIntegerLiteralExpression,
+} from '../../compile/type/typers/numeric-literal';
+import {
+  FloatValue,
+  IntegerValue,
+  LazyValue,
+  makeLazyFloatValue,
   makeLazyIntegerValue,
 } from '../../value.model';
 import { EvaluationScope } from '../evaluation-scope';

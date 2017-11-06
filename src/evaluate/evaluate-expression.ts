@@ -1,18 +1,21 @@
-import { TypedExpression } from '../typed-expression.model';
-import { assertNever } from '../utils';
-import { evaluateStringLiteral } from './evaluators/string-literal';
-import { evaluateFloatLiteral, evaluateIntegerLiteral } from './evaluators/numeric-literal';
-import { evaluateArrayLiteral } from './evaluators/array-literal';
-import { evaluateFunctionCall } from './evaluators/function-call';
-import { evaluateIdentifier } from './evaluators/identifier';
-import { LazyValue, LazyNoneValue, Value } from '../value.model';
-import { EvaluationScope } from './evaluation-scope';
 import { fromPairs, map } from 'lodash';
-import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toArray';
+import { Observable } from 'rxjs/Observable';
+import { TypedExpression } from '../typed-expression.model';
+import { assertNever } from '../utils';
+import { LazyNoneValue, LazyValue, Value } from '../value.model';
+import { EvaluationScope } from './evaluation-scope';
+import { evaluateArrayLiteral } from './evaluators/array-literal';
+import { evaluateFunctionCall } from './evaluators/function-call';
+import { evaluateIdentifier } from './evaluators/identifier';
+import {
+  evaluateFloatLiteral,
+  evaluateIntegerLiteral,
+} from './evaluators/numeric-literal';
+import { evaluateStringLiteral } from './evaluators/string-literal';
 
 export type PartialPlaceholder = {};
 
