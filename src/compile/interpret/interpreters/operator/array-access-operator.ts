@@ -23,7 +23,7 @@ export function buildArrayAccessOperatorExpression(tokens: Token[], leftExpressi
       }
 
       const identifier = makeCustomIdentifierExpression('[]', []);
-      return makeFunctionCallExpression(identifier, list.expressions, list.tokens, list.messages);
+      return makeFunctionCallExpression(identifier, list.expressions, list.messages, list.tokens);
     }
   }
 }

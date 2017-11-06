@@ -26,7 +26,7 @@ export function buildRangeOperatorExpression(tokens: Token[], leftExpression: Ex
     }
 
     const identifier = makeCustomIdentifierExpression('..', [rangeToken]);
-    return makeFunctionCallExpression(identifier, [start, end], [], messages);
+    return makeFunctionCallExpression(identifier, [start, end], messages);
   }
 }
 
