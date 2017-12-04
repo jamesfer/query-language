@@ -1,6 +1,10 @@
 import { filter, map } from 'lodash';
 import { makeMessage, Message } from '../../../message.model';
-import { isTypeOf, makeFunctionType, Type } from '../../../type.model';
+import {
+  applyGenericMap,
+  createGenericMap, isTypeOf, makeFunctionType,
+  Type,
+} from '../../../type.model';
 import {
   TypedExpression,
   TypedExpressionInterface,
@@ -119,31 +123,35 @@ function getNextArgType(partial: PartialApplication | null): Type | null {
 
 function applyArg(partial: PartialApplication | null, arg: Type | null): PartialApplication | null {
   if (partial) {
+    let expectedArg = getNextArgType(partial);
     partial.suppliedArgs.push(arg);
-    partial.genericMap = recalculateGenericMap(partial);
+    partial.genericMap = {
+      ...partial.genericMap,
+      ...createGenericMap(expectedArg, arg),
+    };
     return partial;
   }
   return null;
 }
-
-function recalculateGenericMap(partial: PartialApplication): { [name: string]: Type } {
-  let index = -1;
-  let argCount = Math.max(partial.expectedArgs.length, partial.suppliedArgs.length);
-  let genericMap = {};
-
-  while (++index < argCount) {
-    let expectedArg = partial.expectedArgs[index];
-    let suppliedArg = partial.suppliedArgs[index];
-
-    if (expectedArg.kind === 'Generic' && suppliedArg) {
-      if (genericMap[expectedArg.name] === undefined
-        || isTypeOf(suppliedArg, genericMap[expectedArg.name])) {
-        genericMap[expectedArg.name] = suppliedArg;
-      }
-    }
-  }
-  return genericMap;
-}
+//
+// function recalculateGenericMap(partial: PartialApplication): { [name: string]: Type } {
+//   let index = -1;
+//   let argCount = Math.max(partial.expectedArgs.length, partial.suppliedArgs.length);
+//   let genericMap = {};
+//
+//   while (++index < argCount) {
+//     let expectedArg = partial.expectedArgs[index];
+//     let suppliedArg = partial.suppliedArgs[index];
+//
+//     if (expectedArg.kind === 'Generic' && suppliedArg) {
+//       if (genericMap[expectedArg.name] === undefined
+//         || isTypeOf(suppliedArg, genericMap[expectedArg.name])) {
+//         genericMap[expectedArg.name] = suppliedArg;
+//       }
+//     }
+//   }
+//   return genericMap;
+// }
 
 function inlineFunctionApplication(partial: PartialApplication | null): Type | null {
   if (partial) {
@@ -154,16 +162,16 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
 
     // Replace generic args with their actual type if known.
     unsuppliedArgs = map(unsuppliedArgs, arg => {
-      if (arg.kind === 'Generic' && partial.genericMap[arg.name]) {
-        return partial.genericMap[arg.name];
-      }
-      return arg;
+      return applyGenericMap(arg, partial.genericMap);
     });
 
+    // Apply generic map to return type
+    let returnType = applyGenericMap(partial.returnType, partial.genericMap);
+
     if (unsuppliedArgs.length) {
-      return makeFunctionType(unsuppliedArgs, partial.returnType);
+      return makeFunctionType(unsuppliedArgs, returnType);
     }
-    return partial.returnType;
+    return returnType;
   }
   return null;
 }

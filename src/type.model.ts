@@ -1,4 +1,4 @@
-import { every, map, mapValues, reduce, reduceRight, some } from 'lodash';
+import { every, map, mapValues, reduce, reduceRight, some, assign, get, Dictionary } from 'lodash';
 import { assertNever } from './utils';
 
 
@@ -245,4 +245,103 @@ function isSubtypeOfRecord(base: RecordType, subtype: Type) {
     return every(base.fields, (field, key) => isTypeOf(field, subtype.fields[key]));
   }
   return false;
+}
+
+
+export function createGenericMap(generic: Type | null, concrete: Type | null): Dictionary<Type> {
+  if (!generic
+    || !concrete
+    || generic.kind !== 'Generic' && generic.kind !== concrete.kind) {
+    return {};
+  }
+
+  switch(generic.kind) {
+    case 'Generic':
+      return {
+        [generic.name]: concrete,
+      };
+
+    case 'Array':
+      const genericElement = generic.elementType;
+      const concreteElement = (concrete as ArrayType).elementType;
+      return createGenericMap(genericElement, concreteElement);
+
+    case 'Function':
+      // Create a generic map of the arguments
+      let genericMap = {};
+      let genericArgs = generic.argTypes;
+      let concreteArgs = (concrete as FunctionType).argTypes;
+      let i = -1;
+      while (++i < genericArgs.length && i < concreteArgs.length) {
+        genericMap = assign(
+          genericMap,
+          createGenericMap(genericArgs[i], concreteArgs[i])
+        );
+      }
+
+      // Create a generic map of the return types
+      const concreteReturnType = (concrete as FunctionType).returnType;
+      genericMap = assign(
+        genericMap,
+        createGenericMap(generic.returnType, concreteReturnType),
+      );
+      return genericMap;
+
+    case 'Record':
+      // TODO
+      return {};
+
+    case 'Union':
+      // TODO
+      return {};
+
+    case 'Integer':
+    case 'Float':
+    case 'Boolean':
+    case 'String':
+    case 'None':
+      return {};
+
+    default:
+      return assertNever(generic);
+  }
+}
+
+export function applyGenericMap(generic: Type, genericMap: Dictionary<Type>): Type {
+  switch (generic.kind) {
+    case 'Generic':
+      return get(genericMap, generic.name, generic);
+
+    case 'Array':
+      const elementType = generic.elementType;
+      if (elementType) {
+        return makeArrayType(applyGenericMap(elementType, genericMap));
+      }
+      return generic;
+
+    case 'Function':
+      let returnType = applyGenericMap(generic.returnType, genericMap);
+      let argTypes = map(generic.argTypes, arg => {
+        return applyGenericMap(arg, genericMap);
+      });
+      return makeFunctionType(argTypes, returnType);
+
+    case 'Union':
+      // TODO
+      return generic;
+
+    case 'Record':
+      // TODO
+      return generic;
+
+    case 'Integer':
+    case 'Float':
+    case 'String':
+    case 'Boolean':
+    case 'None':
+      return generic;
+
+    default:
+      return assertNever(generic);
+  }
 }
