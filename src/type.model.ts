@@ -335,7 +335,6 @@ export function applyGenericMap(generic: Type, genericMap: Dictionary<Type>): Ty
       return makeFunctionType(argTypes, returnType);
 
     case 'Union':
-      console.log('apply union map', genericMap, generic);
       return makeUnionType(map(generic.types, type => {
         return applyGenericMap(type, genericMap)
       }));
