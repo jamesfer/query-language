@@ -18,77 +18,6 @@ export interface TypedFunctionCallExpression extends TypedExpressionInterface<'F
   args: (TypedExpression | null)[];
 }
 
-// function applyArgument(scope: TypedScope, expression: Expression, functionType: FunctionType, resultType: FunctionType): { functionType: FunctionType, resultType: Type } {
-//
-// }
-//
-// function applyArguments(scope: TypedScope, args: (Expression | null)[], functionType: FunctionType) {
-//
-//   let arg1 = typeSyntaxTree(scope, args[0]);
-// }
-
-// export interface ApplicationResult {
-//   expectedArgs: Type[],
-//   returnType: Type,
-//   skippedArgs: Type[],
-//   genericMap: { [name: string]: Type },
-// }
-//
-// function makeInitialApplicationResult(funcType: Type | null): ApplicationResult | null {
-//   if (funcType && funcType.kind === 'Function') {
-//     return {
-//       expectedArgs: funcType.argTypes,
-//       returnType: funcType.returnType,
-//       skippedArgs: [],
-//       genericMap: {},
-//     };
-//   }
-// }
-//
-// function getFirstArgType(appRes: ApplicationResult | null): Type | null {
-//   if (appRes) {
-//     // TODO look up generic map.
-//     return appRes.expectedArgs[0];
-//   }
-//   return null;
-// }
-//
-// function expandFirstGenericArg(appRes: ApplicationResult | null, actualType: Type | null): ApplicationResult | null {
-//   if (appRes && actualType) {
-//     let expectedArg = appRes.expectedArgs[0];
-//     if (expectedArg.kind === 'Generic') {
-//       let expectedType = getFirstArgType(appRes) as Type;
-//       if (!isTypeOf(expectedType, actualType) && isTypeOf(actualType, expectedType)) {
-//         appRes.genericMap[expectedArg.name] = actualType;
-//       }
-//     }
-//   }
-//   return appRes;
-// }
-//
-// function inlinePartialApplication(appRes: ApplicationResult | null): Type | null {
-//   if (appRes) {
-//     let remainingArgs = [
-//       ...appRes.skippedArgs,
-//       ...appRes.expectedArgs,
-//     ];
-//     if (remainingArgs.length === 0) {
-//       return appRes.returnType;
-//     }
-//     else {
-//       return makeFunctionType(remainingArgs, appRes.returnType);
-//     }
-//   }
-//   return null;
-// }
-
-// function getArgType(funcType: Type | null, index: number = 0): Type | null {
-//   if (funcType && funcType.kind === 'Function') {
-//     return funcType.argTypes[index];
-//   }
-//   return null;
-// }
-
 interface PartialApplication {
   expectedArgs: Type[],
   suppliedArgs: (Type | null)[],
@@ -133,25 +62,6 @@ function applyArg(partial: PartialApplication | null, arg: Type | null): Partial
   }
   return null;
 }
-//
-// function recalculateGenericMap(partial: PartialApplication): { [name: string]: Type } {
-//   let index = -1;
-//   let argCount = Math.max(partial.expectedArgs.length, partial.suppliedArgs.length);
-//   let genericMap = {};
-//
-//   while (++index < argCount) {
-//     let expectedArg = partial.expectedArgs[index];
-//     let suppliedArg = partial.suppliedArgs[index];
-//
-//     if (expectedArg.kind === 'Generic' && suppliedArg) {
-//       if (genericMap[expectedArg.name] === undefined
-//         || isTypeOf(suppliedArg, genericMap[expectedArg.name])) {
-//         genericMap[expectedArg.name] = suppliedArg;
-//       }
-//     }
-//   }
-//   return genericMap;
-// }
 
 function inlineFunctionApplication(partial: PartialApplication | null): Type | null {
   if (partial) {
@@ -224,70 +134,4 @@ export function parseFunctionCallExpression(scope: TypedScope, expression: Funct
     expression,
     messages,
   };
-
-  // const args = map(expression.args, arg => arg ? typeSyntaxTree(scope, arg) : null);
-  //
-  // // Check type of arguments.
-  // const functionType = funcExp.resultType;
-  // if (functionType) {
-  //   // Bail if function type is not a function
-  //   // if (functionType.kind !== 'Function') {
-  //   //   return {
-  //   //     kind: 'FunctionCall',
-  //   //     expression,
-  //   //     resultType: null,
-  //   //     messages: [makeMessage('Error', 'Cannot call an expression that is not a function.')],
-  //   //     funcExp,
-  //   //     args: []
-  //   //   }
-  //   // }
-  //
-  //   let messages: Message[] = [];
-  //   let resultType: Type | null = null;
-  //     if (functionType.kind === 'Function') {
-  //       const maxArgs = Math.min(args.length, functionType.argTypes.length);
-  //       let resultArgs: Type[] = [];
-  //       let index = -1;
-  //       while (++index < maxArgs) {
-  //         const arg = args[index];
-  //         if (arg) {
-  //           if (arg.resultType && !isTypeOf(functionType.argTypes[index], arg.resultType)) {
-  //             messages.push(makeMessage('Error', 'Argument ' + index + ' is not a compatible type.'));
-  //           }
-  //         }
-  //         else {
-  //           resultArgs.push(functionType.argTypes[index]);
-  //         }
-  //       }
-  //
-  //       // Check if there are too many arguments
-  //       if (args.length > maxArgs) {
-  //         messages.push(makeMessage('Error', 'Too many arguments were passed to function.'));
-  //       }
-  //
-  //       // Determine the result type
-  //       if (resultArgs.length) {
-  //         resultType = {
-  //           kind: 'Function',
-  //           argTypes: resultArgs,
-  //           returnType: functionType.returnType,
-  //         };
-  //       }
-  //       else {
-  //         resultType = functionType.returnType;
-  //       }
-  //     }
-  //   else {
-  //     messages.push(makeMessage('Error', 'Cannot call an expression that is not a function.'));
-  //   }
-  // }
-  //
-  // return {
-  //   kind: 'FunctionCall',
-  //   expression,
-  //   resultType,
-  //   messages: messages,
-  //   funcExp,
-  //   args,
-  // };
 }
