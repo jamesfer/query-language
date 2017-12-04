@@ -1,11 +1,7 @@
-import { ExpressionInterface } from '../../../expression.model';
+import { IdentifierExpression, } from '../../../expression.model';
 import { Message } from '../../../message.model';
 import { Token, TokenKind } from '../../../token.model';
 import { tokenArrayMatches } from '../../../utils';
-
-export interface IdentifierExpression extends ExpressionInterface<'Identifier'> {
-  name: string;
-}
 
 export function makeIdentifierExpression(token: Token): IdentifierExpression {
   return makeCustomIdentifierExpression(token.value, [token]);
@@ -14,7 +10,7 @@ export function makeIdentifierExpression(token: Token): IdentifierExpression {
 export function makeCustomIdentifierExpression(name: string, tokens: Token[], messages: Message[] = []): IdentifierExpression {
   return {
     kind: 'Identifier',
-    name,
+    value: name,
     tokens,
     messages,
   }

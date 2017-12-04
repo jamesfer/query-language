@@ -1,15 +1,13 @@
 import { reduce, sortBy } from 'lodash';
-import { Expression, ExpressionInterface } from '../../../expression.model';
+import {
+  Expression, ExpressionInterface,
+  FunctionCallExpression,
+} from '../../../expression.model';
 import { Message } from '../../../message.model';
 import { Token, TokenKind } from '../../../token.model';
 import { buildList } from './util/list';
 
 export const FunctionCallPrecedence = 100;
-
-export interface FunctionCallExpression extends ExpressionInterface<'FunctionCall'> {
-  functionExpression: Expression;
-  args: (Expression | null)[];
-}
 
 export function makeFunctionCallExpression(functionExpression: Expression, args: (Expression | any)[], messages: Message[] = [], argTokens?: Token[]): FunctionCallExpression {
   if (!argTokens) {

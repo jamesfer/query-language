@@ -6,7 +6,7 @@ import { buildIdentifierExpression } from './interpreters/identifier';
 import { buildLiteralExpression } from './interpreters/literal/literal';
 import { buildOperatorExpression } from './interpreters/operator/operator';
 import { buildParenthesisExpression } from './interpreters/parenthesis';
-import { makeUnrecognizedExpression } from './interpreters/unrecognized';
+import { makeUnrecognizedExpression } from '../../expression.model';
 
 
 function runExpressionBuilders(tokens: Token[], prevExpression: Expression | null = null, operatorPrecedence: number = 0): Expression | undefined {

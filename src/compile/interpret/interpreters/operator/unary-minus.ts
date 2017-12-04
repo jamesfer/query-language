@@ -1,9 +1,11 @@
-import { Expression } from '../../../../expression.model';
+import {
+  Expression,
+  FunctionCallExpression,
+} from '../../../../expression.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
 import { buildExpression } from '../../interpret-expression';
 import {
-  FunctionCallExpression,
   makeFunctionCallExpression,
 } from '../function-call';
 import { makeIdentifierExpression } from '../identifier';

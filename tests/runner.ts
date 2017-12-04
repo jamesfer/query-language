@@ -21,8 +21,8 @@ import { Observable } from 'rxjs/Observable';
 import { Type } from '../src/type.model';
 import { assertNever } from '../src/utils';
 import { inspect } from 'util';
-import { StringLiteralExpression } from '../src/compile/interpret/interpreters/literal/string-literal';
-import { IdentifierExpression } from '../src/compile/interpret/interpreters/identifier';
+import { StringLiteralExpression } from '../src/expression.model';
+import { IdentifierExpression } from '../src/expression.model';
 
 
 export interface ValueExpressionExpectation {
@@ -108,7 +108,7 @@ function compareExpressions(actual: TypedExpression | null | undefined, expected
       const stringExpression = {
         resultType: actual.resultType,
         kind: actual.kind,
-        value: (actual.expression as StringLiteralExpression).contents,
+        value: (actual.expression as StringLiteralExpression).value,
       };
       expect(stringExpression).to.deep.equal(expected);
       break;
@@ -117,7 +117,7 @@ function compareExpressions(actual: TypedExpression | null | undefined, expected
       const identifierExpression = {
         resultType: actual.resultType,
         kind: actual.kind,
-        value: (actual.expression as IdentifierExpression).name,
+        value: (actual.expression as IdentifierExpression).value,
       };
       expect(identifierExpression).to.deep.equal(expected);
       break;

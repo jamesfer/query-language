@@ -2,7 +2,7 @@ import { isInteger, isNaN } from 'lodash';
 import { makeMessage } from '../../../message.model';
 import { FloatType, IntegerType } from '../../../type.model';
 import { TypedExpressionInterface } from '../../../typed-expression.model';
-import { NumericLiteralExpression } from '../../interpret/interpreters/literal/numeric-literal';
+import { NumericLiteralExpression } from '../../../expression.model';
 import { TypedScope } from '../typed-scope.model';
 
 export interface TypedIntegerLiteralExpression extends TypedExpressionInterface<'IntegerLiteral', NumericLiteralExpression> {
@@ -16,7 +16,7 @@ export interface TypedFloatLiteralExpression extends TypedExpressionInterface<'F
 }
 
 export function parseNumericLiteral(scope: TypedScope, expression: NumericLiteralExpression): TypedIntegerLiteralExpression | TypedFloatLiteralExpression {
-  let strValue = expression.contents;
+  let strValue = expression.value;
   let value = +strValue;
   if (isNaN(value)) {
     return {

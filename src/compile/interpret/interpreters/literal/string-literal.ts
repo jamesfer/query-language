@@ -1,12 +1,11 @@
 import { head, last } from 'lodash';
-import { Expression, ExpressionInterface } from '../../../../expression.model';
+import {
+  Expression,
+  StringLiteralExpression,
+} from '../../../../expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
-
-export interface StringLiteralExpression extends ExpressionInterface<'StringLiteral'> {
-  contents: string;
-}
 
 function makeStringLiteralExpression(token: Token, messages: Message[] = []): StringLiteralExpression {
   const value = token.value;
@@ -16,7 +15,7 @@ function makeStringLiteralExpression(token: Token, messages: Message[] = []): St
   return {
     kind: 'StringLiteral',
     tokens: [token],
-    contents,
+    value: contents,
     messages,
   };
 }

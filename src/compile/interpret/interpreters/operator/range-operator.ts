@@ -1,14 +1,16 @@
-import { Expression } from '../../../../expression.model';
+import {
+  Expression,
+  FunctionCallExpression,
+} from '../../../../expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
 import { buildExpression } from '../../interpret-expression';
 import {
-  FunctionCallExpression,
   makeFunctionCallExpression,
 } from '../function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
-import { makeNoneExpression } from '../none';
+import { makeNoneExpression } from '../../../../expression.model';
 
 const RangePrecedence = 6;
 

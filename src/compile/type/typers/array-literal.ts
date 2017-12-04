@@ -4,7 +4,7 @@ import {
   TypedExpression,
   TypedExpressionInterface,
 } from '../../../typed-expression.model';
-import { ArrayLiteralExpression } from '../../interpret/interpreters/literal/array-literal';
+import { ArrayLiteralExpression } from '../../../expression.model';
 import { typeSyntaxTree } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
 

@@ -1,11 +1,10 @@
-import { Expression, ExpressionInterface } from '../../../../expression.model';
+import {
+  ArrayLiteralExpression,
+  Expression,
+} from '../../../../expression.model';
 import { Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { buildList } from '../util/list';
-
-export interface ArrayLiteralExpression extends ExpressionInterface<'ArrayLiteral'> {
-  elements: Expression[];
-}
 
 function makeArrayLiteralExpression(elements: Expression[], tokens: Token[] = [], messages: Message[] = []) : ArrayLiteralExpression {
   return {

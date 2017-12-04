@@ -4,7 +4,7 @@ import {
   TypedNoneLiteralExpression,
 } from '../../typed-expression.model';
 import { assertNever } from '../../utils';
-import { NoneExpression } from '../interpret/interpreters/none';
+import { NoneExpression } from '../../expression.model';
 import { TypedScope } from './typed-scope.model';
 import { parseArrayLiteral } from './typers/array-literal';
 import { parseFunctionCallExpression } from './typers/function-call';

@@ -9,9 +9,9 @@ import {
   TypedExpression,
   TypedExpressionInterface,
 } from '../../../typed-expression.model';
-import { FunctionCallExpression } from '../../interpret/interpreters/function-call';
 import { typeSyntaxTree } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
+import { FunctionCallExpression } from 'expression.model';
 
 export interface TypedFunctionCallExpression extends TypedExpressionInterface<'FunctionCall'> {
   functionExpression: TypedExpression;

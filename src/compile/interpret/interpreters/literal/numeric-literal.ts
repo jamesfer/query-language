@@ -1,17 +1,13 @@
-import { ExpressionInterface } from '../../../../expression.model';
+import { NumericLiteralExpression, } from '../../../../expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
-
-export interface NumericLiteralExpression extends ExpressionInterface<'NumericLiteral'> {
-  contents: string;
-}
 
 export function makeNumericLiteralExpression(token: Token, messages: Message[] = []): NumericLiteralExpression {
   return {
     kind: 'NumericLiteral',
     tokens: [token],
-    contents: token.value,
+    value: token.value,
     messages,
   };
 }
@@ -20,7 +16,7 @@ export function makeCustomNumericLiteralExpression(contents: string, messages: M
   return {
     kind: 'NumericLiteral',
     tokens: [],
-    contents,
+    value: contents,
     messages,
   };
 }
