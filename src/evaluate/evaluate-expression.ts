@@ -10,12 +10,13 @@ import { LazyNoneValue, LazyValue, Value } from '../value.model';
 import { EvaluationScope } from './evaluation-scope';
 import { evaluateArrayLiteral } from './evaluators/array-literal';
 import { evaluateFunctionCall } from './evaluators/function-call';
-import { evaluateIdentifier } from './evaluators/identifier';
+import {
+  evaluateIdentifier,
+  evaluateIntegerLiteral, evaluateStringLiteral,
+} from './evaluators/simple-expressions';
 import {
   evaluateFloatLiteral,
-  evaluateIntegerLiteral,
-} from './evaluators/numeric-literal';
-import { evaluateStringLiteral } from './evaluators/string-literal';
+  } from './evaluators/simple-expressions';
 
 export type PartialPlaceholder = {};
 
