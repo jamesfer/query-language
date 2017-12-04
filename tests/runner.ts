@@ -201,24 +201,49 @@ function validateProgram(program: ExecutionResult, expected: EvaluationExpectati
 }
 
 
-export function evaluates(test: string, code: string, minimalExpected: MinimalEvaluationExpectation) {
-  it(test, function() {
-    let expected: EvaluationExpectation = assign({
-      messages: [],
-      compiled: true,
-      evaluated: true,
-    }, minimalExpected);
+function evaluateCode(code: string, minimalExpected: MinimalEvaluationExpectation) {
+  let expected: EvaluationExpectation = assign({
+    messages: [],
+    compiled: true,
+    evaluated: true,
+  }, minimalExpected);
 
-    // Correct relative token offsets
-    for (let i = 0; i < expected.tokens.length; i++) {
-      if (i !== 0) {
-        const offset = expected.tokens[i - 1].end;
-        expected.tokens[i].begin += offset;
-        expected.tokens[i].end += offset
-      }
+  // Correct relative token offsets
+  for (let i = 0; i < expected.tokens.length; i++) {
+    if (i !== 0) {
+      const offset = expected.tokens[i - 1].end;
+      expected.tokens[i].begin += offset;
+      expected.tokens[i].end += offset
     }
+  }
 
-    let program = execute(code);
-    return validateProgram(program, expected);
+  let program = execute(code);
+  return validateProgram(program, expected);
+}
+
+
+function evaluatesFunc(test: string, code: string, minimalExpected: MinimalEvaluationExpectation) {
+  it(test, function() {
+    return evaluateCode(code, minimalExpected);
   });
 }
+
+
+function skipEvaluates(test: string, code: string, minimalExpected: MinimalEvaluationExpectation) {
+  it.skip(test, function() {
+    return evaluateCode(code, minimalExpected);
+  });
+}
+
+
+function onlyEvaluates(test: string, code: string, minimalExpected: MinimalEvaluationExpectation) {
+  it.only(test, function() {
+    return evaluateCode(code, minimalExpected);
+  });
+}
+
+
+export const evaluates = assign(evaluatesFunc, {
+  skip: skipEvaluates,
+  only: onlyEvaluates,
+});
