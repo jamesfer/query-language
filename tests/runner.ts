@@ -1,30 +1,27 @@
-import { Token } from '../src/token.model';
-import { Message } from '../src/message.model';
-import { UntypedExpression } from '../src/untyped-expression.model';
-import { FunctionCallExpression } from '../src/expression.model';
-import { IdentifierExpression } from '../src/expression.model';
+import { AssertionError, expect } from 'chai';
 import {
-  IntegerLiteralExpression,
-  StringLiteralExpression,
-} from '../src/expression.model';
-import {
-  FloatLiteralExpression,
-  } from '../src/expression.model';
-import {
-  Expression,
-  NoneLiteralExpression,
-  UnrecognizedExpression,
-} from '../src/expression.model';
-import { ArrayLiteralExpression } from '../src/expression.model';
-import { assign, isFunction, isPlainObject, isArray, each, omit, join, split, map } from 'lodash';
-import { execute, ExecutionResult } from '../src/api';
-import { expect, AssertionError } from 'chai';
+  assign,
+  each,
+  isArray,
+  isFunction,
+  isPlainObject,
+  join,
+  map,
+  omit,
+  split,
+} from 'lodash';
 import { Observable } from 'rxjs/Observable';
+import { inspect } from 'util';
+import { execute, ExecutionResult } from '../src/api';
+import {
+  ArrayLiteralExpression,
+  Expression,
+  FunctionCallExpression,
+} from '../src/expression.model';
+import { Message } from '../src/message.model';
+import { Token } from '../src/token.model';
 import { Type } from '../src/type.model';
 import { assertNever } from '../src/utils';
-import { inspect } from 'util';
-import { UntypedStringLiteralExpression } from '../src/untyped-expression.model';
-import { UntypedIdentifierExpression } from '../src/untyped-expression.model';
 
 
 export interface ValueExpressionExpectation {
