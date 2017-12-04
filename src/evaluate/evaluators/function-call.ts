@@ -60,7 +60,7 @@ export function evaluateFunctionCall(scope: EvaluationScope, expression: TypedFu
   }
   else if (argCount < arity) {
     return func.map(f => {
-      let partialFunc = partial(f, args) as PlainFunctionValue;
+      let partialFunc = partial(f, ...args) as PlainFunctionValue;
       return makeFunctionValue(partialFunc);
     });
   }
