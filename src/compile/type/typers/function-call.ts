@@ -52,7 +52,7 @@ function getNextArgType(partial: PartialApplication | null): Type | null {
 
 function applyArg(partial: PartialApplication | null, arg: Type | null): PartialApplication | null {
   if (partial) {
-    let expectedArg = getNextArgType(partial);
+    let expectedArg = partial.expectedArgs[partial.suppliedArgs.length];
     partial.suppliedArgs.push(arg);
     partial.genericMap = {
       ...partial.genericMap,
