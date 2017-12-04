@@ -241,7 +241,7 @@ function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
     let type = subtype.kind === 'Generic' ? subtype.derives : subtype;
     return isTypeOf(base.derives, type);
   }
-  return true;
+  return false;
 }
 
 function isSubtypeOfRecord(base: RecordType, subtype: Type) {
