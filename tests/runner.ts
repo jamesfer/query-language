@@ -1,19 +1,21 @@
 import { Token } from '../src/token.model';
 import { Message } from '../src/message.model';
 import { Expression } from '../src/expression.model';
-import { TypedFunctionCallExpression } from '../src/compile/type/typers/function-call';
-import { TypedIdentifierExpression } from '../src/compile/type/typers/identifier';
-import { TypedStringLiteralExpression } from '../src/compile/type/typers/string-literal';
+import { TypedFunctionCallExpression } from '../src/typed-expression.model';
+import { TypedIdentifierExpression } from '../src/typed-expression.model';
+import {
+  TypedIntegerLiteralExpression,
+  TypedStringLiteralExpression,
+} from '../src/typed-expression.model';
 import {
   TypedFloatLiteralExpression,
-  TypedIntegerLiteralExpression,
-} from '../src/compile/type/typers/numeric-literal';
+  } from '../src/typed-expression.model';
 import {
   TypedExpression,
   TypedNoneLiteralExpression,
   TypedUnrecognizedExpression,
 } from '../src/typed-expression.model';
-import { TypedArrayLiteralExpression } from '../src/compile/type/typers/array-literal';
+import { TypedArrayLiteralExpression } from '../src/typed-expression.model';
 import { assign, isFunction, isPlainObject, isArray, each, omit, join, split, map } from 'lodash';
 import { execute, ExecutionResult } from '../src/api';
 import { expect, AssertionError } from 'chai';

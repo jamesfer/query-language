@@ -1,4 +1,4 @@
-import { TypedIdentifierExpression } from '../../compile/type/typers/identifier';
+import { TypedIdentifierExpression } from '../../typed-expression.model';
 import { LazyValue } from '../../value.model';
 import { EvaluationScope } from '../evaluation-scope';
 

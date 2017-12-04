@@ -1,7 +1,7 @@
 import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/filter';
 import { Observable } from 'rxjs/Observable';
-import { TypedArrayLiteralExpression } from '../../compile/type/typers/array-literal';
+import { TypedArrayLiteralExpression } from '../../typed-expression.model';
 import {
   ArrayValue,
   LazyValue,

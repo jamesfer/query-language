@@ -1,7 +1,7 @@
 import { filter, map, partial } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
-import { TypedFunctionCallExpression } from '../../compile/type/typers/function-call';
+import { TypedFunctionCallExpression } from '../../typed-expression.model';
 import { FunctionType } from '../../type.model';
 import { TypedExpression } from '../../typed-expression.model';
 import {

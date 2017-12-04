@@ -1,11 +1,7 @@
-import { makeMessage, Message } from '../../../message.model';
-import { TypedExpressionInterface } from '../../../typed-expression.model';
 import { IdentifierExpression } from '../../../expression.model';
+import { makeMessage, Message } from '../../../message.model';
+import { TypedIdentifierExpression, } from '../../../typed-expression.model';
 import { TypedScope } from '../typed-scope.model';
-
-export interface TypedIdentifierExpression extends TypedExpressionInterface<'Identifier'> {
-  expression: IdentifierExpression;
-}
 
 export function parseIdentifierExpression(scope: TypedScope, expression: IdentifierExpression): TypedIdentifierExpression {
   let resultType = scope[expression.value] || null;

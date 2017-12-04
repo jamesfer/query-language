@@ -1,22 +1,19 @@
+import { FunctionCallExpression } from 'expression.model';
 import { filter, map } from 'lodash';
 import { makeMessage, Message } from '../../../message.model';
 import {
   applyGenericMap,
-  createGenericMap, isTypeOf, makeFunctionType,
+  createGenericMap,
+  isTypeOf,
+  makeFunctionType,
   Type,
 } from '../../../type.model';
 import {
   TypedExpression,
-  TypedExpressionInterface,
+  TypedFunctionCallExpression,
 } from '../../../typed-expression.model';
 import { typeSyntaxTree } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
-import { FunctionCallExpression } from 'expression.model';
-
-export interface TypedFunctionCallExpression extends TypedExpressionInterface<'FunctionCall'> {
-  functionExpression: TypedExpression;
-  args: (TypedExpression | null)[];
-}
 
 interface PartialApplication {
   expectedArgs: Type[],

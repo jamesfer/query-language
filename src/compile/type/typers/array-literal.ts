@@ -1,17 +1,12 @@
-import { Message } from '../../../message.model';
-import { ArrayType, isTypeOf, makeUnionType, Type } from '../../../type.model';
-import {
-  TypedExpression,
-  TypedExpressionInterface,
-} from '../../../typed-expression.model';
 import { ArrayLiteralExpression } from '../../../expression.model';
+import { Message } from '../../../message.model';
+import { isTypeOf, makeUnionType, Type } from '../../../type.model';
+import {
+  TypedArrayLiteralExpression,
+  TypedExpression,
+} from '../../../typed-expression.model';
 import { typeSyntaxTree } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
-
-export interface TypedArrayLiteralExpression extends TypedExpressionInterface<'ArrayLiteral'> {
-  resultType: ArrayType;
-  elements: TypedExpression[];
-}
 
 export function parseArrayLiteral(scope: TypedScope, expression: ArrayLiteralExpression): TypedArrayLiteralExpression {
   let messages: Message[] = [];

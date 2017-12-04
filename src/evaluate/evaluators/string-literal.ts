@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { TypedStringLiteralExpression } from '../../compile/type/typers/string-literal';
+import { TypedStringLiteralExpression } from '../../typed-expression.model';
 import { LazyValue, makeStringValue, StringValue } from '../../value.model';
 import { EvaluationScope } from '../evaluation-scope';
 
