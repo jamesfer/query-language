@@ -9,10 +9,14 @@ export interface StringLiteralExpression extends ExpressionInterface<'StringLite
 }
 
 function makeStringLiteralExpression(token: Token, messages: Message[] = []): StringLiteralExpression {
+  const value = token.value;
+  const contents = last(value) === value[0]
+    ? value.slice(1, -1)
+    : value.slice(1);
   return {
     kind: 'StringLiteral',
     tokens: [token],
-    contents: token.value,
+    contents,
     messages,
   };
 }
