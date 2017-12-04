@@ -114,7 +114,9 @@ export function makeRecordType(fields: Record<string, TypeShorthand>): RecordTyp
   };
 }
 
-export function makeUnionType(types: Type[]): Type {
+export function makeUnionType(shortTypes: TypeShorthand[]): Type {
+  let types = map(shortTypes, evaluateShorthand);
+
   function flattenUnionTypes(types: Type[]): Type[] {
     return reduce(types, (list, type): Type[] => {
       if (type.kind === 'Union') {
