@@ -1,6 +1,6 @@
 import { UntypedIdentifierExpression } from '../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../message.model';
-import { IdentifierExpression, } from '../../../expression.model';
+import { addType, IdentifierExpression, } from '../../../expression.model';
 import { TypedScope } from '../typed-scope.model';
 
 export function parseIdentifierExpression(scope: TypedScope, expression: UntypedIdentifierExpression): IdentifierExpression {
@@ -9,11 +9,5 @@ export function parseIdentifierExpression(scope: TypedScope, expression: Untyped
     makeMessage('Error', `Unrecognized identifier ${expression.value}`),
   ];
 
-  return {
-    kind: 'Identifier',
-    resultType,
-    expression,
-    messages,
-    value: expression.value,
-  }
+  return addType(expression, resultType, messages);
 }

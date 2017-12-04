@@ -1,6 +1,9 @@
 import { UntypedArrayLiteralExpression } from '../../../untyped-expression.model';
 import { Message } from '../../../message.model';
-import { isTypeOf, makeUnionType, Type } from '../../../type.model';
+import {
+  isTypeOf, makeArrayType, makeUnionType,
+  Type,
+} from '../../../type.model';
 import {
   ArrayLiteralExpression,
   Expression,
@@ -37,13 +40,10 @@ export function parseArrayLiteral(scope: TypedScope, expression: UntypedArrayLit
   }
 
   return {
-    kind: 'ArrayLiteral',
-    resultType: {
-      kind: 'Array',
-      elementType,
-    },
+    kind: expression.kind,
+    tokens: expression.tokens,
+    resultType: makeArrayType(elementType),
+    messages: expression.messages.concat(messages),
     elements,
-    messages,
-    expression,
-  }
+  };
 }

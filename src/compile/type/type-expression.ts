@@ -1,5 +1,6 @@
 import { UntypedExpression } from '../../untyped-expression.model';
 import {
+  addType,
   Expression,
   NoneLiteralExpression,
 } from '../../expression.model';
@@ -11,6 +12,7 @@ import { parseFunctionCallExpression } from './typers/function-call';
 import { parseIdentifierExpression } from './typers/identifier';
 import { parseNumericLiteral } from './typers/numeric-literal';
 import { parseStringLiteral } from './typers/string-literal';
+import { NoneType } from '../../type.model';
 
 
 export function typeSyntaxTree(scope: TypedScope, expression: UntypedExpression): Expression {
@@ -35,21 +37,11 @@ export function typeSyntaxTree(scope: TypedScope, expression: UntypedExpression)
 }
 
 export function makeNoneExpression(scope: TypedScope, expression: UntypedNoneExpression): NoneLiteralExpression {
-  return {
-    kind: 'NoneLiteral',
-    resultType: { kind: 'None' },
-    messages: [],
-    expression,
-  };
+  return addType(expression, NoneType);
 }
 
 export function makeUnrecognizedExpression(scope: TypedScope, expression: UntypedExpression): Expression {
-  return {
-    kind: 'Unrecognized',
-    expression,
-    resultType: null,
-    messages: [],
-  }
+  return addType(expression, null);
 }
 
 

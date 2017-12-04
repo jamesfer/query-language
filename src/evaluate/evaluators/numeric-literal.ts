@@ -13,9 +13,9 @@ import { EvaluationScope } from '../evaluation-scope';
 import { IntegerLiteralExpression } from '../../expression.model';
 
 export function evaluateIntegerLiteral(scope: EvaluationScope, expression: IntegerLiteralExpression): LazyValue<IntegerValue> {
-  return makeLazyIntegerValue(toNumber(expression.expression.value));
+  return makeLazyIntegerValue(toNumber(expression.value));
 }
 
 export function evaluateFloatLiteral(scope: EvaluationScope, expression: FloatLiteralExpression): LazyValue<FloatValue> {
-  return makeLazyFloatValue(toNumber(expression.expression.value));
+  return makeLazyFloatValue(toNumber(expression.value));
 }

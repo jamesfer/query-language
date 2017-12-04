@@ -1,5 +1,5 @@
 import { UntypedFunctionCallExpression } from 'untyped-expression.model';
-import { filter, map } from 'lodash';
+import { filter, map, assign } from 'lodash';
 import { makeMessage, Message } from '../../../message.model';
 import {
   applyGenericMap,
@@ -7,8 +7,10 @@ import {
   isTypeOf,
   makeFunctionType,
   Type,
+  FunctionType,
 } from '../../../type.model';
 import {
+  addType,
   Expression,
   FunctionCallExpression,
 } from '../../../expression.model';
@@ -124,11 +126,11 @@ export function parseFunctionCallExpression(scope: TypedScope, expression: Untyp
   }
 
   return {
-    kind: 'FunctionCall',
+    kind: expression.kind,
     functionExpression: funcExp,
     args: typedArgs,
+    tokens: expression.tokens,
     resultType: inlineFunctionApplication(partial),
-    expression,
-    messages,
+    messages: expression.messages.concat(messages),
   };
 }

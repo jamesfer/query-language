@@ -110,7 +110,8 @@ function compareExpressions(actual: Expression | null | undefined, expected: Exp
     case 'Identifier':
     case 'IntegerLiteral':
     case 'FloatLiteral':
-      expect(omit(actual, ['expression', 'messages'])).to.deep.equal(expected);
+      const ignoreKeys = ['expression', 'messages', 'tokens'];
+      expect(omit(actual, ignoreKeys)).to.deep.equal(expected);
       break;
 
     default:
