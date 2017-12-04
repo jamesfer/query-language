@@ -296,8 +296,10 @@ export function createGenericMap(generic: Type | null, concrete: Type | null): D
       return {};
 
     case 'Union':
-      // TODO
-      return {};
+      let genericMaps = map(generic.types, type => {
+        return createGenericMap(type, concrete)
+      });
+      return assign({}, ...genericMaps);
 
     case 'Integer':
     case 'Float':
@@ -331,8 +333,10 @@ export function applyGenericMap(generic: Type, genericMap: Dictionary<Type>): Ty
       return makeFunctionType(argTypes, returnType);
 
     case 'Union':
-      // TODO
-      return generic;
+      console.log('apply union map', genericMap, generic);
+      return makeUnionType(map(generic.types, type => {
+        return applyGenericMap(type, genericMap)
+      }));
 
     case 'Record':
       // TODO
