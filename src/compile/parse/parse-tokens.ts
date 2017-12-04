@@ -8,34 +8,31 @@ export interface TokenList {
   failed?: boolean,
 }
 
-export function parseTokens(code: string): TokenList {
-  let tokens: Token[] = [];
-  let messages: Message[] = [];
-  let remaining = code;
-
-  while (remaining.length) {
-    remaining = skipWhitespace(remaining);
-
-    let result = nextToken(remaining, code.length - remaining.length);
-    if (result.token) {
-      tokens.push(result.token);
-    }
-    messages = messages.concat(result.messages);
-    remaining = remaining.substr(result.skip);
-  }
-
-  return {
-    tokens,
-    messages,
-  };
-}
-
 function skipWhitespace(code: string): string {
   let whitespace = code.match(whitespacePattern);
   if (whitespace && whitespace.length) {
     return code.slice(whitespace[0].length);
   }
   return code;
+}
+
+function parseNextToken(code: string, pos: number): Token | null {
+  for (let tokenTest of patterns) {
+    let matches = code.match(tokenTest.test);
+    if (matches !== null) {
+      return {
+        kind: tokenTest.type,
+        value: matches[0],
+        begin: pos + (matches.index || 0),
+        end: pos + (matches.index || 0) + matches[0].length,
+      };
+    }
+  }
+  return null;
+}
+
+function tokenLength(token: Token | null): number {
+  return token ? token.end - token.begin : 0
 }
 
 function nextToken(code: string, pos: number): { token: Token | null, messages: Message[], skip: number } {
@@ -61,22 +58,24 @@ function nextToken(code: string, pos: number): { token: Token | null, messages: 
   };
 }
 
-function parseNextToken(code: string, pos: number): Token | null {
-  for (let tokenTest of patterns) {
-    let matches = code.match(tokenTest.test);
-    if (matches !== null) {
-      return {
-        kind: tokenTest.type,
-        value: matches[0],
-        begin: pos + (matches.index || 0),
-        end: pos + (matches.index || 0) + matches[0].length,
-      };
+export function parseTokens(code: string): TokenList {
+  let tokens: Token[] = [];
+  let messages: Message[] = [];
+  let remaining = code;
+
+  while (remaining.length) {
+    remaining = skipWhitespace(remaining);
+
+    let result = nextToken(remaining, code.length - remaining.length);
+    if (result.token) {
+      tokens.push(result.token);
     }
+    messages = messages.concat(result.messages);
+    remaining = remaining.substr(result.skip);
   }
-  return null;
-}
 
-function tokenLength(token: Token | null): number {
-  return token ? token.end - token.begin : 0
+  return {
+    tokens,
+    messages,
+  };
 }
-
