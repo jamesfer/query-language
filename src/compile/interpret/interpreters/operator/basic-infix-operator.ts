@@ -1,6 +1,6 @@
 import { keyBy } from 'lodash';
 import {
-  Expression,
+  UntypedExpression,
   UntypedFunctionCallExpression,
 } from '../../../../untyped-expression.model';
 import { Token, TokenKind } from '../../../../token.model';
@@ -63,7 +63,7 @@ function hasHigherPrecedence(
 
 export function buildInfixOperatorExpression(
   tokens: Token[],
-  leftExpression: Expression | null,
+  leftExpression: UntypedExpression | null,
   operatorPrecedence: number
 ): UntypedFunctionCallExpression | undefined {
   const opToken = tokens[0];

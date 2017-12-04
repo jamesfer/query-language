@@ -1,6 +1,6 @@
 import { every } from 'lodash';
 import {
-  Expression,
+  UntypedExpression,
   UntypedFunctionCallExpression,
 } from '../../../../untyped-expression.model';
 import { makeMessage } from '../../../../message.model';
@@ -15,7 +15,7 @@ const ArrayAccessPrecedence = 12;
 
 let buildArrayAccessList = buildList(TokenKind.OpenBrace, TokenKind.CloseBrace, TokenKind.Comma, 3);
 
-export function buildArrayAccessOperatorExpression(tokens: Token[], leftExpression: Expression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
+export function buildArrayAccessOperatorExpression(tokens: Token[], leftExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (leftExpression && operatorPrecedence < ArrayAccessPrecedence) {
     let list = buildArrayAccessList(tokens);
     if (list) {

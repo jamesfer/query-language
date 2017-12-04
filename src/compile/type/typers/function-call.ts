@@ -9,9 +9,9 @@ import {
   Type,
 } from '../../../type.model';
 import {
-  TypedExpression,
-  TypedFunctionCallExpression,
-} from '../../../typed-expression.model';
+  Expression,
+  FunctionCallExpression,
+} from '../../../expression.model';
 import { typeSyntaxTree } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
 
@@ -83,7 +83,7 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
   return null;
 }
 
-export function parseFunctionCallExpression(scope: TypedScope, expression: UntypedFunctionCallExpression): TypedFunctionCallExpression {
+export function parseFunctionCallExpression(scope: TypedScope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
   let funcExp = typeSyntaxTree(scope, expression.functionExpression);
   let funcType = funcExp.resultType;
   let messages: Message[] = [];
@@ -92,7 +92,7 @@ export function parseFunctionCallExpression(scope: TypedScope, expression: Untyp
   }
 
   let partial = makeInitialPartial(funcType);
-  let typedArgs: (TypedExpression | null)[] = [];
+  let typedArgs: (Expression | null)[] = [];
   let index = -1;
   while (++index < expression.args.length) {
     let arg = expression.args[index];

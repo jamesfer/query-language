@@ -1,8 +1,8 @@
-import { Expression } from '../../untyped-expression.model';
+import { UntypedExpression } from '../../untyped-expression.model';
 import {
-  TypedExpression,
-  TypedNoneLiteralExpression,
-} from '../../typed-expression.model';
+  Expression,
+  NoneLiteralExpression,
+} from '../../expression.model';
 import { assertNever } from '../../utils';
 import { UntypedNoneExpression } from '../../untyped-expression.model';
 import { TypedScope } from './typed-scope.model';
@@ -13,7 +13,7 @@ import { parseNumericLiteral } from './typers/numeric-literal';
 import { parseStringLiteral } from './typers/string-literal';
 
 
-export function typeSyntaxTree(scope: TypedScope, expression: Expression): TypedExpression {
+export function typeSyntaxTree(scope: TypedScope, expression: UntypedExpression): Expression {
   switch (expression.kind) {
     case 'StringLiteral':
       return parseStringLiteral(scope, expression);
@@ -34,7 +34,7 @@ export function typeSyntaxTree(scope: TypedScope, expression: Expression): Typed
   }
 }
 
-export function makeNoneExpression(scope: TypedScope, expression: UntypedNoneExpression): TypedNoneLiteralExpression {
+export function makeNoneExpression(scope: TypedScope, expression: UntypedNoneExpression): NoneLiteralExpression {
   return {
     kind: 'NoneLiteral',
     resultType: { kind: 'None' },
@@ -43,7 +43,7 @@ export function makeNoneExpression(scope: TypedScope, expression: UntypedNoneExp
   };
 }
 
-export function makeUnrecognizedExpression(scope: TypedScope, expression: Expression): TypedExpression {
+export function makeUnrecognizedExpression(scope: TypedScope, expression: UntypedExpression): Expression {
   return {
     kind: 'Unrecognized',
     expression,

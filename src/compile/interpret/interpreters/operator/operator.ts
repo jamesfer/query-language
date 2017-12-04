@@ -1,4 +1,4 @@
-import { Expression } from '../../../../untyped-expression.model';
+import { UntypedExpression } from '../../../../untyped-expression.model';
 import { Token } from '../../../../token.model';
 import { firstResult } from '../../../../utils';
 import { buildArrayAccessOperatorExpression } from './array-access-operator';
@@ -7,7 +7,7 @@ import { buildRangeOperatorExpression } from './range-operator';
 import { buildUnaryMinusOperatorExpression } from './unary-minus';
 
 
-export function buildOperatorExpression(tokens: Token[], prevExpression: Expression | null, operatorPrecedence: number): Expression | undefined {
+export function buildOperatorExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
   return firstResult([
     buildUnaryMinusOperatorExpression,
     buildInfixOperatorExpression,

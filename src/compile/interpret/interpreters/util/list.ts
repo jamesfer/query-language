@@ -1,10 +1,10 @@
-import { Expression } from '../../../../untyped-expression.model';
+import { UntypedExpression } from '../../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
 import { buildExpression } from '../../interpret-expression';
 
-function consumeElementAndSep(sepToken: TokenKind, tokens: Token[]): { expression: Expression | null, sep: Token | null } {
+function consumeElementAndSep(sepToken: TokenKind, tokens: Token[]): { expression: UntypedExpression | null, sep: Token | null } {
   let expression = buildExpression(tokens);
   if (expression) {
     tokens = tokens.slice(expression.tokens.length);
@@ -18,9 +18,9 @@ function consumeElementAndSep(sepToken: TokenKind, tokens: Token[]): { expressio
   return { expression, sep };
 }
 
-function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]): { expressions: Expression[], tokens: Token[], messages: Message[] } {
+function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]): { expressions: UntypedExpression[], tokens: Token[], messages: Message[] } {
   let messages: Message[] = [];
-  let expressions: Expression[] = [];
+  let expressions: UntypedExpression[] = [];
   let usedTokens: Token[] = [];
 
   while (tokens.length && !tokenArrayMatches(tokens, closeToken)) {
@@ -59,7 +59,7 @@ function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]
 }
 
 export function buildList(openToken: TokenKind, closeToken: TokenKind, sepToken: TokenKind, maxItems: number = -1)
-: (tokens: Token[]) => { expressions: Expression[], tokens: Token[], messages: Message[] } | undefined {
+: (tokens: Token[]) => { expressions: UntypedExpression[], tokens: Token[], messages: Message[] } | undefined {
   return tokens => {
     if (tokenArrayMatches(tokens, openToken)) {
       let openingToken = tokens[0];

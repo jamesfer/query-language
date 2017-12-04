@@ -1,6 +1,6 @@
 import { head, last } from 'lodash';
 import {
-  Expression,
+  UntypedExpression,
   UntypedStringLiteralExpression,
 } from '../../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../../message.model';
@@ -20,7 +20,7 @@ function makeStringLiteralExpression(token: Token, messages: Message[] = []): Un
   };
 }
 
-export function buildStringLiteralExpression(tokens: Token[]): Expression | undefined {
+export function buildStringLiteralExpression(tokens: Token[]): UntypedExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.StringLiteral)) {
     let messages: Message[] = [];
     let strToken = tokens[0];

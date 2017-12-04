@@ -1,6 +1,6 @@
 import { reduce, sortBy } from 'lodash';
 import {
-  Expression,
+  UntypedExpression,
   UntypedFunctionCallExpression,
 } from '../../../untyped-expression.model';
 import { Message } from '../../../message.model';
@@ -9,7 +9,7 @@ import { buildList } from './util/list';
 
 export const FunctionCallPrecedence = 100;
 
-export function makeFunctionCallExpression(functionExpression: Expression, args: (Expression | any)[], messages: Message[] = [], argTokens?: Token[]): UntypedFunctionCallExpression {
+export function makeFunctionCallExpression(functionExpression: UntypedExpression, args: (UntypedExpression | any)[], messages: Message[] = [], argTokens?: Token[]): UntypedFunctionCallExpression {
   if (!argTokens) {
     argTokens = reduce(args, (tokens, arg) => {
       return arg ? [...tokens, ...arg.tokens] : tokens;
@@ -32,7 +32,7 @@ export function makeFunctionCallExpression(functionExpression: Expression, args:
 
 let buildArguments = buildList(TokenKind.OpenParen, TokenKind.CloseParen, TokenKind.Comma);
 
-export function buildFunctionCallExpression(tokens: Token[], prevExpression: Expression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
+export function buildFunctionCallExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (operatorPrecedence < FunctionCallPrecedence && prevExpression !== null) {
     let args = buildArguments(tokens);
     if (args) {

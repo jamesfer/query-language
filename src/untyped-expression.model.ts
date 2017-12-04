@@ -8,12 +8,12 @@ interface UntypedExpressionInterface<K> {
 }
 
 export interface UntypedFunctionCallExpression extends UntypedExpressionInterface<'FunctionCall'> {
-  functionExpression: Expression;
-  args: (Expression | null)[];
+  functionExpression: UntypedExpression;
+  args: (UntypedExpression | null)[];
 }
 
 export interface UntypedArrayLiteralExpression extends UntypedExpressionInterface<'ArrayLiteral'> {
-  elements: Expression[];
+  elements: UntypedExpression[];
 }
 
 export interface UntypedIdentifierExpression extends UntypedExpressionInterface<'Identifier'> {
@@ -32,7 +32,7 @@ export interface UntypedNoneExpression extends UntypedExpressionInterface<'NoneL
 
 export interface UntypedUnrecognizedExpression extends UntypedExpressionInterface<'Unrecognized'> {}
 
-export type Expression = UntypedFunctionCallExpression
+export type UntypedExpression = UntypedFunctionCallExpression
   | UntypedStringLiteralExpression
   | UntypedNumericLiteralExpression
   | UntypedArrayLiteralExpression

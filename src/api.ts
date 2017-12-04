@@ -13,13 +13,13 @@ import {
 } from './scope/scope';
 import { standardLibrary } from './scope/standard-library';
 import { Token } from './token.model';
-import { TypedExpression } from './typed-expression.model';
+import { Expression } from './expression.model';
 
 
 export type CompilationResult = {
   messages: Message[],
   tokens: Token[],
-  expression?: TypedExpression,
+  expression?: Expression,
   compiled: boolean,
 }
 
@@ -61,7 +61,7 @@ export function compile(code: string, scope?: Scope): CompilationResult {
   return result;
 }
 
-export function evaluate(expression: TypedExpression, scope?: Scope): EvaluationResult {
+export function evaluate(expression: Expression, scope?: Scope): EvaluationResult {
   scope = scope || convertToScope(standardLibrary);
   let evalScope = extractEvaluationScope(scope);
   return {

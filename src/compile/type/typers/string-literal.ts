@@ -1,8 +1,8 @@
 import { UntypedStringLiteralExpression } from '../../../untyped-expression.model';
-import { TypedStringLiteralExpression, } from '../../../typed-expression.model';
+import { StringLiteralExpression, } from '../../../expression.model';
 import { TypedScope } from '../typed-scope.model';
 
-export function parseStringLiteral(scope: TypedScope, expression: UntypedStringLiteralExpression): TypedStringLiteralExpression {
+export function parseStringLiteral(scope: TypedScope, expression: UntypedStringLiteralExpression): StringLiteralExpression {
   return {
     kind: 'StringLiteral',
     resultType: { kind: 'String' },

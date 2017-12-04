@@ -1,9 +1,9 @@
 import { filter, map, partial } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
-import { TypedFunctionCallExpression } from '../../typed-expression.model';
+import { FunctionCallExpression } from '../../expression.model';
 import { FunctionType } from '../../type.model';
-import { TypedExpression } from '../../typed-expression.model';
+import { Expression } from '../../expression.model';
 import {
   LazyValue,
   makeFunctionValue,
@@ -18,7 +18,7 @@ interface Placeholder {
 }
 
 
-function evaluateFunctionExpression(scope: EvaluationScope, expression: TypedExpression): Observable<PlainFunctionValue> {
+function evaluateFunctionExpression(scope: EvaluationScope, expression: Expression): Observable<PlainFunctionValue> {
   // TODO Remove synchronous throws
   let lazyFunc = evaluateExpression(scope, expression);
   if (!lazyFunc) {
@@ -40,7 +40,7 @@ function evaluateFunctionExpression(scope: EvaluationScope, expression: TypedExp
   });
 }
 
-function evaluateArguments(scope: EvaluationScope, expressions: (TypedExpression | null)[]): (LazyValue | PartialPlaceholder)[] {
+function evaluateArguments(scope: EvaluationScope, expressions: (Expression | null)[]): (LazyValue | PartialPlaceholder)[] {
   // Evaluate each of the arguments
   return map(expressions, (arg): LazyValue | PartialPlaceholder => {
     let result = arg ? evaluateExpression(scope, arg) : null;
@@ -48,7 +48,7 @@ function evaluateArguments(scope: EvaluationScope, expressions: (TypedExpression
   });
 }
 
-export function evaluateFunctionCall(scope: EvaluationScope, expression: TypedFunctionCallExpression): LazyValue {
+export function evaluateFunctionCall(scope: EvaluationScope, expression: FunctionCallExpression): LazyValue {
   const argCount = filter(expression.args, arg => !!arg).length;
   const arity = (expression.functionExpression.resultType as FunctionType).argTypes.length;
 

@@ -1,21 +1,21 @@
 import { Token } from '../src/token.model';
 import { Message } from '../src/message.model';
-import { Expression } from '../src/untyped-expression.model';
-import { TypedFunctionCallExpression } from '../src/typed-expression.model';
-import { TypedIdentifierExpression } from '../src/typed-expression.model';
+import { UntypedExpression } from '../src/untyped-expression.model';
+import { FunctionCallExpression } from '../src/expression.model';
+import { IdentifierExpression } from '../src/expression.model';
 import {
-  TypedIntegerLiteralExpression,
-  TypedStringLiteralExpression,
-} from '../src/typed-expression.model';
+  IntegerLiteralExpression,
+  StringLiteralExpression,
+} from '../src/expression.model';
 import {
-  TypedFloatLiteralExpression,
-  } from '../src/typed-expression.model';
+  FloatLiteralExpression,
+  } from '../src/expression.model';
 import {
-  TypedExpression,
-  TypedNoneLiteralExpression,
-  TypedUnrecognizedExpression,
-} from '../src/typed-expression.model';
-import { TypedArrayLiteralExpression } from '../src/typed-expression.model';
+  Expression,
+  NoneLiteralExpression,
+  UnrecognizedExpression,
+} from '../src/expression.model';
+import { ArrayLiteralExpression } from '../src/expression.model';
 import { assign, isFunction, isPlainObject, isArray, each, omit, join, split, map } from 'lodash';
 import { execute, ExecutionResult } from '../src/api';
 import { expect, AssertionError } from 'chai';
@@ -70,7 +70,7 @@ export type MinimalEvaluationExpectation
 
 
 
-function compareExpressions(actual: TypedExpression | null | undefined, expected: ExpressionExpectation | null | undefined) {
+function compareExpressions(actual: Expression | null | undefined, expected: ExpressionExpectation | null | undefined) {
   if (!actual  || !expected) {
     expect(actual).to.equal(expected);
     return;
@@ -81,7 +81,7 @@ function compareExpressions(actual: TypedExpression | null | undefined, expected
 
   switch (expected.kind) {
     case 'ArrayLiteral':
-      let actualArray = actual as TypedArrayLiteralExpression;
+      let actualArray = actual as ArrayLiteralExpression;
 
       // Compare elements
       expect(actualArray.elements.length).to.equal(expected.elements.length);
@@ -91,7 +91,7 @@ function compareExpressions(actual: TypedExpression | null | undefined, expected
       break;
 
     case 'FunctionCall':
-      let actualFunction = actual as TypedFunctionCallExpression;
+      let actualFunction = actual as FunctionCallExpression;
 
       // Compare function expression
       compareExpressions(

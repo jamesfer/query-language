@@ -4,7 +4,7 @@ import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toArray';
 import { Observable } from 'rxjs/Observable';
-import { TypedExpression } from '../typed-expression.model';
+import { Expression } from '../expression.model';
 import { assertNever } from '../utils';
 import { LazyNoneValue, LazyValue, Value } from '../value.model';
 import { EvaluationScope } from './evaluation-scope';
@@ -19,7 +19,7 @@ import { evaluateStringLiteral } from './evaluators/string-literal';
 
 export type PartialPlaceholder = {};
 
-export function evaluateExpression(scope: EvaluationScope, expression: TypedExpression): LazyValue | undefined {
+export function evaluateExpression(scope: EvaluationScope, expression: Expression): LazyValue | undefined {
   switch (expression.kind) {
     case 'StringLiteral':
       return evaluateStringLiteral(scope, expression);
@@ -42,7 +42,7 @@ export function evaluateExpression(scope: EvaluationScope, expression: TypedExpr
   }
 }
 
-export function evaluateSyntaxTree(scope: EvaluationScope, expression: TypedExpression): Observable<any> | undefined {
+export function evaluateSyntaxTree(scope: EvaluationScope, expression: Expression): Observable<any> | undefined {
   let lazyValue = evaluateExpression(scope, expression);
   if (lazyValue) {
     return stripLazyValue(lazyValue);

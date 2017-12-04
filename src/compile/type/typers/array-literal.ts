@@ -2,15 +2,15 @@ import { UntypedArrayLiteralExpression } from '../../../untyped-expression.model
 import { Message } from '../../../message.model';
 import { isTypeOf, makeUnionType, Type } from '../../../type.model';
 import {
-  TypedArrayLiteralExpression,
-  TypedExpression,
-} from '../../../typed-expression.model';
+  ArrayLiteralExpression,
+  Expression,
+} from '../../../expression.model';
 import { typeSyntaxTree } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
 
-export function parseArrayLiteral(scope: TypedScope, expression: UntypedArrayLiteralExpression): TypedArrayLiteralExpression {
+export function parseArrayLiteral(scope: TypedScope, expression: UntypedArrayLiteralExpression): ArrayLiteralExpression {
   let messages: Message[] = [];
-  let elements: TypedExpression[] = new Array(expression.elements.length);
+  let elements: Expression[] = new Array(expression.elements.length);
   let elementType: Type | null = null;
 
   // Process each element expression

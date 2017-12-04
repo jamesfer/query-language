@@ -1,12 +1,12 @@
 import {
   UntypedArrayLiteralExpression,
-  Expression,
+  UntypedExpression,
 } from '../../../../untyped-expression.model';
 import { Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { buildList } from '../util/list';
 
-function makeArrayLiteralExpression(elements: Expression[], tokens: Token[] = [], messages: Message[] = []) : UntypedArrayLiteralExpression {
+function makeArrayLiteralExpression(elements: UntypedExpression[], tokens: Token[] = [], messages: Message[] = []) : UntypedArrayLiteralExpression {
   return {
     kind: 'ArrayLiteral',
     elements,

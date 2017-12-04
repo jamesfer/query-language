@@ -1,5 +1,5 @@
 import {
-  Expression,
+  UntypedExpression,
   UntypedFunctionCallExpression,
 } from '../../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../../message.model';
@@ -14,7 +14,7 @@ import { makeUntypedNoneExpression } from '../../../../untyped-expression.model'
 
 const RangePrecedence = 6;
 
-export function buildRangeOperatorExpression(tokens: Token[], leftExpression: Expression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
+export function buildRangeOperatorExpression(tokens: Token[], leftExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.RangeOperator) && operatorPrecedence < RangePrecedence) {
     let rangeToken: Token = tokens[0];
     tokens = tokens.slice(1);

@@ -1,4 +1,4 @@
-import { Expression } from '../../untyped-expression.model';
+import { UntypedExpression } from '../../untyped-expression.model';
 import { Token } from '../../token.model';
 import { firstResult } from '../../utils';
 import { buildFunctionCallExpression } from './interpreters/function-call';
@@ -9,7 +9,7 @@ import { buildParenthesisExpression } from './interpreters/parenthesis';
 import { makeUntypedUnrecognizedExpression } from '../../untyped-expression.model';
 
 
-function runExpressionBuilders(tokens: Token[], prevExpression: Expression | null = null, operatorPrecedence: number = 0): Expression | undefined {
+function runExpressionBuilders(tokens: Token[], prevExpression: UntypedExpression | null = null, operatorPrecedence: number = 0): UntypedExpression | undefined {
   if (tokens.length) {
     return firstResult([
       buildParenthesisExpression,
@@ -21,8 +21,8 @@ function runExpressionBuilders(tokens: Token[], prevExpression: Expression | nul
   }
 }
 
-export function buildExpression(tokens: Token[], prevExpression: Expression | null = null, operatorPrecedence: number = 0): Expression | null {
-  let result: Expression | undefined;
+export function buildExpression(tokens: Token[], prevExpression: UntypedExpression | null = null, operatorPrecedence: number = 0): UntypedExpression | null {
+  let result: UntypedExpression | undefined;
   let expressionPart = runExpressionBuilders(tokens, prevExpression, operatorPrecedence);
   while (expressionPart) {
     let unusedTokens = tokens.slice(expressionPart.tokens.length);
@@ -32,8 +32,8 @@ export function buildExpression(tokens: Token[], prevExpression: Expression | nu
   return result || null;
 }
 
-export function buildSyntaxTree(tokens: Token[]): Expression[] {
-  let expressions: Expression[] = [];
+export function buildSyntaxTree(tokens: Token[]): UntypedExpression[] {
+  let expressions: UntypedExpression[] = [];
   let remainingTokens = tokens;
   while (remainingTokens.length) {
     let result = buildExpression(remainingTokens)

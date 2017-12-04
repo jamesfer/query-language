@@ -2,12 +2,12 @@ import { isInteger, isNaN } from 'lodash';
 import { UntypedNumericLiteralExpression } from '../../../untyped-expression.model';
 import { makeMessage } from '../../../message.model';
 import {
-  TypedFloatLiteralExpression,
-  TypedIntegerLiteralExpression,
-} from '../../../typed-expression.model';
+  FloatLiteralExpression,
+  IntegerLiteralExpression,
+} from '../../../expression.model';
 import { TypedScope } from '../typed-scope.model';
 
-export function parseNumericLiteral(scope: TypedScope, expression: UntypedNumericLiteralExpression): TypedIntegerLiteralExpression | TypedFloatLiteralExpression {
+export function parseNumericLiteral(scope: TypedScope, expression: UntypedNumericLiteralExpression): IntegerLiteralExpression | FloatLiteralExpression {
   let strValue = expression.value;
   let value = +strValue;
   if (isNaN(value)) {

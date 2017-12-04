@@ -1,7 +1,7 @@
-import { Expression } from '../../untyped-expression.model';
+import { UntypedExpression } from '../../untyped-expression.model';
 import { assertNever } from '../../utils';
 
-export function printExpression(expression: Expression): string {
+export function printExpression(expression: UntypedExpression): string {
   switch (expression.kind) {
     case 'NumericLiteral':
     case 'StringLiteral':
