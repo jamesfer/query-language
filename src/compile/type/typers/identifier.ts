@@ -14,5 +14,6 @@ export function parseIdentifierExpression(scope: TypedScope, expression: Identif
     resultType,
     expression,
     messages,
+    value: expression.value,
   }
 }

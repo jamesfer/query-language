@@ -107,23 +107,7 @@ function compareExpressions(actual: TypedExpression | null | undefined, expected
       break;
 
     case 'StringLiteral':
-      const stringExpression = {
-        resultType: actual.resultType,
-        kind: actual.kind,
-        value: (actual.expression as StringLiteralExpression).value,
-      };
-      expect(stringExpression).to.deep.equal(expected);
-      break;
-
     case 'Identifier':
-      const identifierExpression = {
-        resultType: actual.resultType,
-        kind: actual.kind,
-        value: (actual.expression as IdentifierExpression).value,
-      };
-      expect(identifierExpression).to.deep.equal(expected);
-      break;
-
     case 'IntegerLiteral':
     case 'FloatLiteral':
       expect(omit(actual, ['expression', 'messages'])).to.deep.equal(expected);

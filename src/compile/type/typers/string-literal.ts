@@ -6,6 +6,7 @@ export function parseStringLiteral(scope: TypedScope, expression: StringLiteralE
   return {
     kind: 'StringLiteral',
     resultType: { kind: 'String' },
+    value: expression.value,
     messages: [],
     expression,
   };

@@ -22,6 +22,7 @@ export interface TypedExpressionInterface<K extends string, E extends Expression
 
 export interface TypedStringLiteralExpression extends TypedExpressionInterface<'StringLiteral'> {
   resultType: StringType;
+  value: string;
 }
 
 export interface TypedIntegerLiteralExpression extends TypedExpressionInterface<'IntegerLiteral', NumericLiteralExpression> {
@@ -36,6 +37,7 @@ export interface TypedFloatLiteralExpression extends TypedExpressionInterface<'F
 
 export interface TypedIdentifierExpression extends TypedExpressionInterface<'Identifier'> {
   expression: IdentifierExpression;
+  value: string;
 }
 
 export interface TypedFunctionCallExpression extends TypedExpressionInterface<'FunctionCall'> {
