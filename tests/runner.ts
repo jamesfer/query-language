@@ -177,7 +177,7 @@ function stringifyProgram(program: ExecutionResult): string {
   if (program.result instanceof Observable) {
     (program.result as any)[inspect.custom] = () => 'Observable';
   }
-  return inspect(program);
+  return inspect(program, { depth: null, maxArrayLength: null });
 }
 
 
