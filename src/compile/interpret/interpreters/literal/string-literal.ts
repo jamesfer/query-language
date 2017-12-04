@@ -1,13 +1,13 @@
 import { head, last } from 'lodash';
 import {
   Expression,
-  StringLiteralExpression,
-} from '../../../../expression.model';
+  UntypedStringLiteralExpression,
+} from '../../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
 
-function makeStringLiteralExpression(token: Token, messages: Message[] = []): StringLiteralExpression {
+function makeStringLiteralExpression(token: Token, messages: Message[] = []): UntypedStringLiteralExpression {
   const value = token.value;
   const contents = last(value) === value[0]
     ? value.slice(1, -1)

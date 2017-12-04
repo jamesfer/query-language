@@ -1,5 +1,5 @@
 import { isInteger, isNaN } from 'lodash';
-import { NumericLiteralExpression } from '../../../expression.model';
+import { UntypedNumericLiteralExpression } from '../../../untyped-expression.model';
 import { makeMessage } from '../../../message.model';
 import {
   TypedFloatLiteralExpression,
@@ -7,7 +7,7 @@ import {
 } from '../../../typed-expression.model';
 import { TypedScope } from '../typed-scope.model';
 
-export function parseNumericLiteral(scope: TypedScope, expression: NumericLiteralExpression): TypedIntegerLiteralExpression | TypedFloatLiteralExpression {
+export function parseNumericLiteral(scope: TypedScope, expression: UntypedNumericLiteralExpression): TypedIntegerLiteralExpression | TypedFloatLiteralExpression {
   let strValue = expression.value;
   let value = +strValue;
   if (isNaN(value)) {

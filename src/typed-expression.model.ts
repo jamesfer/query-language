@@ -1,8 +1,8 @@
 import {
   Expression,
-  IdentifierExpression,
-  NumericLiteralExpression,
-} from './expression.model';
+  UntypedIdentifierExpression,
+  UntypedNumericLiteralExpression,
+} from './untyped-expression.model';
 import { Message } from './message.model';
 import {
   ArrayType,
@@ -25,18 +25,18 @@ export interface TypedStringLiteralExpression extends TypedExpressionInterface<'
   value: string;
 }
 
-export interface TypedIntegerLiteralExpression extends TypedExpressionInterface<'IntegerLiteral', NumericLiteralExpression> {
+export interface TypedIntegerLiteralExpression extends TypedExpressionInterface<'IntegerLiteral', UntypedNumericLiteralExpression> {
   resultType: IntegerType;
   value: number;
 }
 
-export interface TypedFloatLiteralExpression extends TypedExpressionInterface<'FloatLiteral', NumericLiteralExpression> {
+export interface TypedFloatLiteralExpression extends TypedExpressionInterface<'FloatLiteral', UntypedNumericLiteralExpression> {
   resultType: FloatType;
   value: number;
 }
 
 export interface TypedIdentifierExpression extends TypedExpressionInterface<'Identifier'> {
-  expression: IdentifierExpression;
+  expression: UntypedIdentifierExpression;
   value: string;
 }
 

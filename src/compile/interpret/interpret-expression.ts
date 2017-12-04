@@ -1,4 +1,4 @@
-import { Expression } from '../../expression.model';
+import { Expression } from '../../untyped-expression.model';
 import { Token } from '../../token.model';
 import { firstResult } from '../../utils';
 import { buildFunctionCallExpression } from './interpreters/function-call';
@@ -6,7 +6,7 @@ import { buildIdentifierExpression } from './interpreters/identifier';
 import { buildLiteralExpression } from './interpreters/literal/literal';
 import { buildOperatorExpression } from './interpreters/operator/operator';
 import { buildParenthesisExpression } from './interpreters/parenthesis';
-import { makeUnrecognizedExpression } from '../../expression.model';
+import { makeUntypedUnrecognizedExpression } from '../../untyped-expression.model';
 
 
 function runExpressionBuilders(tokens: Token[], prevExpression: Expression | null = null, operatorPrecedence: number = 0): Expression | undefined {
@@ -37,7 +37,7 @@ export function buildSyntaxTree(tokens: Token[]): Expression[] {
   let remainingTokens = tokens;
   while (remainingTokens.length) {
     let result = buildExpression(remainingTokens)
-      || makeUnrecognizedExpression(remainingTokens);
+      || makeUntypedUnrecognizedExpression(remainingTokens);
     remainingTokens = remainingTokens.slice(result.tokens.length);
     expressions.push(result);
   }

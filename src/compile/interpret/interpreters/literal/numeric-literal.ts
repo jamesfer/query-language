@@ -1,9 +1,9 @@
-import { NumericLiteralExpression, } from '../../../../expression.model';
+import { UntypedNumericLiteralExpression, } from '../../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
 
-export function makeNumericLiteralExpression(token: Token, messages: Message[] = []): NumericLiteralExpression {
+export function makeNumericLiteralExpression(token: Token, messages: Message[] = []): UntypedNumericLiteralExpression {
   return {
     kind: 'NumericLiteral',
     tokens: [token],
@@ -12,7 +12,7 @@ export function makeNumericLiteralExpression(token: Token, messages: Message[] =
   };
 }
 
-export function makeCustomNumericLiteralExpression(contents: string, messages: Message[] = []): NumericLiteralExpression {
+export function makeCustomNumericLiteralExpression(contents: string, messages: Message[] = []): UntypedNumericLiteralExpression {
   return {
     kind: 'NumericLiteral',
     tokens: [],
@@ -21,7 +21,7 @@ export function makeCustomNumericLiteralExpression(contents: string, messages: M
   };
 }
 
-export function buildNumericLiteralExpression(tokens: Token[]): NumericLiteralExpression | undefined {
+export function buildNumericLiteralExpression(tokens: Token[]): UntypedNumericLiteralExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.NumericLiteral)) {
     const token = tokens[0];
     const value = +token.value;

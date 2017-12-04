@@ -1,12 +1,12 @@
 import {
-  ArrayLiteralExpression,
+  UntypedArrayLiteralExpression,
   Expression,
-} from '../../../../expression.model';
+} from '../../../../untyped-expression.model';
 import { Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { buildList } from '../util/list';
 
-function makeArrayLiteralExpression(elements: Expression[], tokens: Token[] = [], messages: Message[] = []) : ArrayLiteralExpression {
+function makeArrayLiteralExpression(elements: Expression[], tokens: Token[] = [], messages: Message[] = []) : UntypedArrayLiteralExpression {
   return {
     kind: 'ArrayLiteral',
     elements,
@@ -17,7 +17,7 @@ function makeArrayLiteralExpression(elements: Expression[], tokens: Token[] = []
 
 let buildArrayList = buildList(TokenKind.OpenBracket, TokenKind.CloseBracket, TokenKind.Comma);
 
-export function buildArrayLiteralExpression(tokens: Token[]): ArrayLiteralExpression | undefined {
+export function buildArrayLiteralExpression(tokens: Token[]): UntypedArrayLiteralExpression | undefined {
   let list = buildArrayList(tokens);
   if (list) {
     return makeArrayLiteralExpression(list.expressions, list.tokens, list.messages);

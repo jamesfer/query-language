@@ -1,10 +1,10 @@
-import { Expression } from '../../expression.model';
+import { Expression } from '../../untyped-expression.model';
 import {
   TypedExpression,
   TypedNoneLiteralExpression,
 } from '../../typed-expression.model';
 import { assertNever } from '../../utils';
-import { NoneExpression } from '../../expression.model';
+import { UntypedNoneExpression } from '../../untyped-expression.model';
 import { TypedScope } from './typed-scope.model';
 import { parseArrayLiteral } from './typers/array-literal';
 import { parseFunctionCallExpression } from './typers/function-call';
@@ -34,7 +34,7 @@ export function typeSyntaxTree(scope: TypedScope, expression: Expression): Typed
   }
 }
 
-export function makeNoneExpression(scope: TypedScope, expression: NoneExpression): TypedNoneLiteralExpression {
+export function makeNoneExpression(scope: TypedScope, expression: UntypedNoneExpression): TypedNoneLiteralExpression {
   return {
     kind: 'NoneLiteral',
     resultType: { kind: 'None' },

@@ -1,4 +1,4 @@
-import { Expression } from '../../expression.model';
+import { Expression } from '../../untyped-expression.model';
 import { assertNever } from '../../utils';
 
 export function printExpression(expression: Expression): string {

@@ -1,8 +1,8 @@
 import { keyBy } from 'lodash';
 import {
   Expression,
-  FunctionCallExpression,
-} from '../../../../expression.model';
+  UntypedFunctionCallExpression,
+} from '../../../../untyped-expression.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { buildExpression } from '../../interpret-expression';
 import {
@@ -65,7 +65,7 @@ export function buildInfixOperatorExpression(
   tokens: Token[],
   leftExpression: Expression | null,
   operatorPrecedence: number
-): FunctionCallExpression | undefined {
+): UntypedFunctionCallExpression | undefined {
   const opToken = tokens[0];
   const matchingOp = operatorMap[opToken.kind];
   if (hasHigherPrecedence(matchingOp, operatorPrecedence)) {

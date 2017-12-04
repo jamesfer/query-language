@@ -1,7 +1,7 @@
 import {
   Expression,
-  FunctionCallExpression,
-} from '../../../../expression.model';
+  UntypedFunctionCallExpression,
+} from '../../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
@@ -10,17 +10,17 @@ import {
   makeFunctionCallExpression,
 } from '../function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
-import { makeNoneExpression } from '../../../../expression.model';
+import { makeUntypedNoneExpression } from '../../../../untyped-expression.model';
 
 const RangePrecedence = 6;
 
-export function buildRangeOperatorExpression(tokens: Token[], leftExpression: Expression | null, operatorPrecedence: number): FunctionCallExpression | undefined {
+export function buildRangeOperatorExpression(tokens: Token[], leftExpression: Expression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.RangeOperator) && operatorPrecedence < RangePrecedence) {
     let rangeToken: Token = tokens[0];
     tokens = tokens.slice(1);
 
-    let start = leftExpression || makeNoneExpression();
-    let end = buildExpression(tokens, null, RangePrecedence) || makeNoneExpression();
+    let start = leftExpression || makeUntypedNoneExpression();
+    let end = buildExpression(tokens, null, RangePrecedence) || makeUntypedNoneExpression();
 
     let messages: Message[] = [];
     if (start.kind === 'NoneLiteral' && end.kind === 'NoneLiteral') {

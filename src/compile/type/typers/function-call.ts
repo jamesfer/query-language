@@ -1,4 +1,4 @@
-import { FunctionCallExpression } from 'expression.model';
+import { UntypedFunctionCallExpression } from 'untyped-expression.model';
 import { filter, map } from 'lodash';
 import { makeMessage, Message } from '../../../message.model';
 import {
@@ -83,7 +83,7 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
   return null;
 }
 
-export function parseFunctionCallExpression(scope: TypedScope, expression: FunctionCallExpression): TypedFunctionCallExpression {
+export function parseFunctionCallExpression(scope: TypedScope, expression: UntypedFunctionCallExpression): TypedFunctionCallExpression {
   let funcExp = typeSyntaxTree(scope, expression.functionExpression);
   let funcType = funcExp.resultType;
   let messages: Message[] = [];

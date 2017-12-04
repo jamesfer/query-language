@@ -1,4 +1,4 @@
-import { Expression } from '../../../../expression.model';
+import { Expression } from '../../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';

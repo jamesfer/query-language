@@ -1,4 +1,4 @@
-import { Expression } from '../../../../expression.model';
+import { Expression } from '../../../../untyped-expression.model';
 import { Token } from '../../../../token.model';
 import { firstResult } from '../../../../utils';
 import { buildArrayAccessOperatorExpression } from './array-access-operator';

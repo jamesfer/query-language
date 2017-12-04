@@ -1,6 +1,6 @@
 import { Token } from '../src/token.model';
 import { Message } from '../src/message.model';
-import { Expression } from '../src/expression.model';
+import { Expression } from '../src/untyped-expression.model';
 import { TypedFunctionCallExpression } from '../src/typed-expression.model';
 import { TypedIdentifierExpression } from '../src/typed-expression.model';
 import {
@@ -23,8 +23,8 @@ import { Observable } from 'rxjs/Observable';
 import { Type } from '../src/type.model';
 import { assertNever } from '../src/utils';
 import { inspect } from 'util';
-import { StringLiteralExpression } from '../src/expression.model';
-import { IdentifierExpression } from '../src/expression.model';
+import { UntypedStringLiteralExpression } from '../src/untyped-expression.model';
+import { UntypedIdentifierExpression } from '../src/untyped-expression.model';
 
 
 export interface ValueExpressionExpectation {

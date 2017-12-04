@@ -1,7 +1,7 @@
 import {
   Expression,
-  FunctionCallExpression,
-} from '../../../../expression.model';
+  UntypedFunctionCallExpression,
+} from '../../../../untyped-expression.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
 import { buildExpression } from '../../interpret-expression';
@@ -13,7 +13,7 @@ import { makeCustomNumericLiteralExpression } from '../literal/numeric-literal';
 
 const UnaryMinusPrecedence = 12;
 
-export function buildUnaryMinusOperatorExpression(tokens: Token[], leftExpression: Expression | null, operatorPrecedence: number): FunctionCallExpression | undefined {
+export function buildUnaryMinusOperatorExpression(tokens: Token[], leftExpression: Expression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.SubtractOperator)
     && leftExpression === null
     && UnaryMinusPrecedence > operatorPrecedence
