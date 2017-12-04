@@ -114,7 +114,7 @@ export function makeRecordType(fields: Record<string, TypeShorthand>): RecordTyp
   };
 }
 
-export function makeUnionType(types: Type[]): UnionType {
+export function makeUnionType(types: Type[]): Type {
   function flattenUnionTypes(types: Type[]): Type[] {
     return reduce(types, (list, type): Type[] => {
       if (type.kind === 'Union') {
@@ -134,10 +134,14 @@ export function makeUnionType(types: Type[]): UnionType {
     }
     return [...list, type];
   }
+  types = reduceRight(reduce(types, combineTypes, []), combineTypes, []);
 
+  if (types.length === 1) {
+    return types[0];
+  }
   return {
     kind: 'Union',
-    types: reduceRight(reduce(types, combineTypes, []), combineTypes, []),
+    types: types,
   };
 }
 
