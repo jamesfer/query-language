@@ -1,4 +1,4 @@
-import { Token, TokenKind } from '../src/token.model';
+import { Token, TokenKind, Position } from '../src/token.model';
 import { partial } from 'lodash';
 import {
   ArrayExpressionExpectation, ExpressionExpectation,
@@ -10,56 +10,60 @@ import {
   Type,
   FloatType,
 } from '../src/type.model';
+import { addPositions } from '../src/compile/parse/parse-tokens';
 
-function makeToken(kind: TokenKind, value: string, begin: number = 0): Token {
+function makeToken(kind: TokenKind, value: string, begin: Position | number = [ 0, 0 ]): Token {
+  if (typeof begin === 'number') {
+    begin = [ 0, begin ];
+  }
   return {
     kind,
     value,
     begin,
-    end: begin + value.length,
+    end: addPositions(begin, value.length),
   };
 }
 
-export const identifierToken: (value: string, begin?: number) => Token
+export const identifierToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.Identifier);
-export const numericToken: (value: string, begin?: number) => Token
+export const numericToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.NumericLiteral);
-export const stringToken: (value: string, begin?: number) => Token
+export const stringToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.StringLiteral);
 
-export const openBraceToken: (begin?: number) => Token
+export const openBraceToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.OpenBrace, '{');
-export const closeBraceToken: (begin?: number) => Token
+export const closeBraceToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.CloseBrace, '}');
-export const openParenToken: (begin?: number) => Token
+export const openParenToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.OpenParen, '(');
-export const closeParenToken: (begin?: number) => Token
+export const closeParenToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.CloseParen, ')');
-export const openBracketToken: (begin?: number) => Token
+export const openBracketToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.OpenBracket, '[');
-export const closeBracketToken: (begin?: number) => Token
+export const closeBracketToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.CloseBracket, ']');
-export const commaToken: (begin?: number) => Token
+export const commaToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.Comma, ',');
-export const colonToken: (begin?: number) => Token
+export const colonToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.Colon, ':');
-export const addToken: (begin?: number) => Token
+export const addToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.AddOperator, '+');
-export const subtractToken: (begin?: number) => Token
+export const subtractToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.SubtractOperator, '-');
-export const multiplyToken: (begin?: number) => Token
+export const multiplyToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.MultiplyOperator, '*');
-export const divideToken: (begin?: number) => Token
+export const divideToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.DivideOperator, '/');
-export const moduloToken: (begin?: number) => Token
+export const moduloToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.ModuloOperator, '%');
-export const powerToken: (begin?: number) => Token
+export const powerToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.PowerOperator, '**');
-export const composeToken: (begin?: number) => Token
+export const composeToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.ComposeOperator, '&');
-export const inToken: (begin?: number) => Token
+export const inToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.InOperator, 'in');
-export const rangeToken: (begin?: number) => Token
+export const rangeToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.RangeOperator, '..');
 
 

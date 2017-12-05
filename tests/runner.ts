@@ -22,6 +22,7 @@ import { Message } from '../src/message.model';
 import { Token } from '../src/token.model';
 import { Type } from '../src/type.model';
 import { assertNever } from '../src/utils';
+import { addPositions } from '../src/compile/parse/parse-tokens';
 
 
 export interface ValueExpressionExpectation {
@@ -195,9 +196,10 @@ function evaluateCode(code: string, minimalExpected: MinimalEvaluationExpectatio
   // Correct relative token offsets
   for (let i = 0; i < expected.tokens.length; i++) {
     if (i !== 0) {
+      const token = expected.tokens[i];
       const offset = expected.tokens[i - 1].end;
-      expected.tokens[i].begin += offset;
-      expected.tokens[i].end += offset
+      token.begin = addPositions(offset, token.begin);
+      token.end = addPositions(offset, token.end);
     }
   }
 

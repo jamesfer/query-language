@@ -43,9 +43,16 @@ export enum TokenKind {
   ComposeOperator,
 }
 
+// export interface Position {
+//   line: number,
+//   position: number,
+// }
+
+export type Position = [number, number];
+
 export class Token {
   kind: TokenKind;
   value: string;
-  begin: number;
-  end: number;
+  begin: Position;
+  end: Position;
 }
