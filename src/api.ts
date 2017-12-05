@@ -16,7 +16,7 @@ import { Token } from './token.model';
 import { Expression } from './expression.model';
 
 
-export type CompilationResult = {
+export interface CompilationResult {
   messages: Message[],
   tokens: Token[],
   expression?: Expression,
@@ -29,7 +29,7 @@ export interface EvaluationResult {
   evaluated: boolean,
 }
 
-export type ExecutionResult = CompilationResult & Partial<EvaluationResult>;
+export interface ExecutionResult extends CompilationResult, EvaluationResult {}
 
 
 type MessageContainer = { messages: Message[] };
@@ -58,13 +58,15 @@ export function compile(code: string, scope?: Scope): CompilationResult {
       && every(expressions, e => e.kind !== 'Unrecognized');
 
     // Type syntax tree
-    if (result.compiled) {
+    if (expressions.length > 0) {
       scope = scope || convertToScope(standardLibrary);
       let typedScope = extractTypedScope(scope);
       let typedExpression = typeSyntaxTree(typedScope, expressions[0]);
       if (typedExpression.kind !== 'Unrecognized') {
-        result.compiled = true;
         result.expression = typedExpression;
+      }
+      else {
+        result.compiled = false;
       }
     }
   }
