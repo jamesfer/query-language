@@ -94,5 +94,8 @@ export function execute(code: string, scope?: Scope): ExecutionResult {
       messages: compRes.messages.concat(evalRes.messages),
     } as ExecutionResult;
   }
-  return compRes as ExecutionResult;
+  return {
+    evaluated: false,
+    ...compRes
+  };
 }
