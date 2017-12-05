@@ -50,7 +50,7 @@ export type ExpressionExpectation = ValueExpressionExpectation
 
 
 export interface BaseEvaluationExpectation {
-  result: any,
+  result?: any,
   tokens: Token[],
   expression: ExpressionExpectation,
 }
