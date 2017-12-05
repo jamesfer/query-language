@@ -1,4 +1,4 @@
-import { every } from 'lodash';
+import { every, reduce } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { buildSyntaxTree } from './compile/interpret/interpret-expression';
 import { parseTokens } from './compile/parse/parse-tokens';
@@ -32,6 +32,14 @@ export interface EvaluationResult {
 export type ExecutionResult = CompilationResult & Partial<EvaluationResult>;
 
 
+type MessageContainer = { messages: Message[] };
+
+function extractMessages(expressions: MessageContainer[]): Message[] {
+  return reduce<MessageContainer, Message[]>(expressions, (list, exp) => {
+    return list.concat(exp.messages);
+  }, []);
+}
+
 export function compile(code: string, scope?: Scope): CompilationResult {
   // Parse Tokens
   let tokenResult = parseTokens(code);
@@ -44,7 +52,9 @@ export function compile(code: string, scope?: Scope): CompilationResult {
   // Build syntax tree
   if (result.compiled) {
     let expressions = buildSyntaxTree(tokenResult.tokens);
+    result.messages = result.messages.concat(extractMessages(expressions));
     result.compiled = expressions.length !== 0
+      && result.messages.length === 0
       && every(expressions, e => e.kind !== 'Unrecognized');
 
     // Type syntax tree
