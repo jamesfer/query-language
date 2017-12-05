@@ -8,6 +8,7 @@ import {
   stringToken,
 } from '../utils';
 import { IntegerType } from '../../src/type.model';
+import { makeMessage } from '../../src/message.model';
 
 describe('values', function() {
   evaluates('integers', '123', {
@@ -107,4 +108,44 @@ describe('values', function() {
       integerExpression(3),
     ]),
   });
+
+  evaluates('array literals with trailing commas', '[1, 2, 3,]', {
+    result: [1, 2, 3],
+    tokens: [
+      openBracketToken(),
+      numericToken('1'),
+      commaToken(),
+      numericToken('2', 1),
+      commaToken(),
+      numericToken('3', 1),
+      commaToken(),
+      closeBracketToken(),
+    ],
+    expression: arrayExpression(IntegerType, [
+      integerExpression(1),
+      integerExpression(2),
+      integerExpression(3),
+    ]),
+  });
+
+  evaluates('array literals with missing commas', '[1, 2 3]', {
+    compiled: false,
+    evaluated: false,
+    tokens: [
+      openBracketToken(),
+      numericToken('1'),
+      commaToken(),
+      numericToken('2', 1),
+      numericToken('3', 1),
+      closeBracketToken(),
+    ],
+    expression: arrayExpression(IntegerType, [
+      integerExpression(1),
+      integerExpression(2),
+      integerExpression(3),
+    ]),
+    messages: [
+      makeMessage('Error', 'Missing separator between items'),
+    ],
+  })
 });
