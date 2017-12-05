@@ -22,19 +22,19 @@ export type PartialPlaceholder = {};
 
 export function evaluateExpression(scope: EvaluationScope, expression: Expression): LazyValue | undefined {
   switch (expression.kind) {
-    case 'StringLiteral':
+    case 'String':
       return evaluateStringLiteral(scope, expression);
-    case 'IntegerLiteral':
+    case 'Integer':
       return evaluateIntegerLiteral(scope, expression);
-    case 'FloatLiteral':
+    case 'Float':
       return evaluateFloatLiteral(scope, expression);
-    case 'ArrayLiteral':
+    case 'Array':
       return evaluateArrayLiteral(scope, expression);
     case 'FunctionCall':
       return evaluateFunctionCall(scope, expression);
     case 'Identifier':
       return evaluateIdentifier(scope, expression);
-    case 'NoneLiteral':
+    case 'None':
       return LazyNoneValue;
     case 'Unrecognized':
       return undefined;

@@ -9,7 +9,7 @@ import {
   makeFunctionCallExpression,
 } from '../function-call';
 import { makeIdentifierExpression } from '../identifier';
-import { makeCustomNumericLiteralExpression } from '../literal/numeric-literal';
+import { makeCustomNumericExpression } from '../literal/numeric';
 
 const UnaryMinusPrecedence = 12;
 
@@ -22,7 +22,7 @@ export function buildUnaryMinusOperatorExpression(tokens: Token[], leftExpressio
     if (rightExpression) {
       const identifierExpression = makeIdentifierExpression(tokens[0]);
       return makeFunctionCallExpression(identifierExpression, [
-        makeCustomNumericLiteralExpression('0'),
+        makeCustomNumericExpression('0'),
         rightExpression,
       ]);
     }

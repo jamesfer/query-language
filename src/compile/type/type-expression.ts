@@ -2,32 +2,32 @@ import { UntypedExpression } from '../../untyped-expression.model';
 import {
   addType,
   Expression,
-  NoneLiteralExpression,
+  NoneExpression,
 } from '../../expression.model';
 import { assertNever } from '../../utils';
 import { UntypedNoneExpression } from '../../untyped-expression.model';
 import { TypedScope } from './typed-scope.model';
-import { parseArrayLiteral } from './typers/array-literal';
+import { parseArrayExpression } from './typers/array';
 import { parseFunctionCallExpression } from './typers/function-call';
 import { parseIdentifierExpression } from './typers/identifier';
-import { parseNumericLiteral } from './typers/numeric-literal';
-import { parseStringLiteral } from './typers/string-literal';
+import { parseNumericExpression } from './typers/numeric';
+import { parseStringExpression } from './typers/string';
 import { NoneType } from '../../type.model';
 
 
 export function typeSyntaxTree(scope: TypedScope, expression: UntypedExpression): Expression {
   switch (expression.kind) {
-    case 'StringLiteral':
-      return parseStringLiteral(scope, expression);
-    case 'NumericLiteral':
-      return parseNumericLiteral(scope, expression);
-    case 'ArrayLiteral':
-      return parseArrayLiteral(scope, expression);
+    case 'String':
+      return parseStringExpression(scope, expression);
+    case 'Numeric':
+      return parseNumericExpression(scope, expression);
+    case 'Array':
+      return parseArrayExpression(scope, expression);
     case 'Identifier':
       return parseIdentifierExpression(scope, expression);
     case 'FunctionCall':
       return parseFunctionCallExpression(scope, expression);
-    case 'NoneLiteral':
+    case 'None':
       return makeNoneExpression(scope, expression);
     case 'Unrecognized':
       return makeUnrecognizedExpression(scope, expression);
@@ -36,7 +36,7 @@ export function typeSyntaxTree(scope: TypedScope, expression: UntypedExpression)
   }
 }
 
-export function makeNoneExpression(scope: TypedScope, expression: UntypedNoneExpression): NoneLiteralExpression {
+export function makeNoneExpression(scope: TypedScope, expression: UntypedNoneExpression): NoneExpression {
   return addType(expression, NoneType);
 }
 

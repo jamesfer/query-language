@@ -23,7 +23,7 @@ export function buildRangeOperatorExpression(tokens: Token[], leftExpression: Un
     let end = buildExpression(tokens, null, RangePrecedence) || makeUntypedNoneExpression();
 
     let messages: Message[] = [];
-    if (start.kind === 'NoneLiteral' && end.kind === 'NoneLiteral') {
+    if (start.kind === 'None' && end.kind === 'None') {
       messages.push(makeMessage('Error', 'Range operator was not given a lower or an upper bound.'));
     }
 

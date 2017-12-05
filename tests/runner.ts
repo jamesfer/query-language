@@ -14,7 +14,7 @@ import { Observable } from 'rxjs/Observable';
 import { inspect } from 'util';
 import { execute, ExecutionResult } from '../src/api';
 import {
-  ArrayLiteralExpression,
+  ArrayExpression,
   Expression,
   FunctionCallExpression,
 } from '../src/expression.model';
@@ -26,7 +26,7 @@ import { addPositions } from '../src/compile/parse/parse-tokens';
 
 
 export interface ValueExpressionExpectation {
-  kind: 'StringLiteral' | 'IntegerLiteral' | 'FloatLiteral' | 'Identifier',
+  kind: 'String' | 'Integer' | 'Float' | 'Identifier',
   resultType: Type | null,
   value: any,
 }
@@ -39,7 +39,7 @@ export interface FunctionExpressionExpectation {
 }
 
 export interface ArrayExpressionExpectation {
-  kind: 'ArrayLiteral',
+  kind: 'Array',
   resultType: Type | null,
   elements: ExpressionExpectation[],
 }
@@ -78,8 +78,8 @@ function compareExpressions(actual: Expression | null | undefined, expected: Exp
   expect(actual.resultType).to.deep.equal(expected.resultType);
 
   switch (expected.kind) {
-    case 'ArrayLiteral':
-      let actualArray = actual as ArrayLiteralExpression;
+    case 'Array':
+      let actualArray = actual as ArrayExpression;
 
       // Compare elements
       expect(actualArray.elements.length).to.equal(expected.elements.length);
@@ -104,10 +104,10 @@ function compareExpressions(actual: Expression | null | undefined, expected: Exp
       });
       break;
 
-    case 'StringLiteral':
+    case 'String':
     case 'Identifier':
-    case 'IntegerLiteral':
-    case 'FloatLiteral':
+    case 'Integer':
+    case 'Float':
       const ignoreKeys = ['expression', 'messages', 'tokens'];
       expect(omit(actual, ignoreKeys)).to.deep.equal(expected);
       break;

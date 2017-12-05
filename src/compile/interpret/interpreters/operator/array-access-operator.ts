@@ -20,7 +20,7 @@ export function buildArrayAccessOperatorExpression(tokens: Token[], leftExpressi
     let list = buildArrayAccessList(tokens);
     if (list) {
       // Check if any indexes were given
-      if (every(list.expressions, arg => arg.kind === 'NoneLiteral')) {
+      if (every(list.expressions, arg => arg.kind === 'None')) {
         list.messages.push(makeMessage('Warning', 'No indexes were supplied to array access expression. Remove the brackets to simplify.'));
       }
 

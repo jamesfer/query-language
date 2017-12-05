@@ -1,17 +1,17 @@
-import { UntypedArrayLiteralExpression } from '../../../untyped-expression.model';
+import { UntypedArrayExpression } from '../../../untyped-expression.model';
 import { Message } from '../../../message.model';
 import {
   isTypeOf, makeArrayType, makeUnionType,
   Type,
 } from '../../../type.model';
 import {
-  ArrayLiteralExpression,
+  ArrayExpression,
   Expression,
 } from '../../../expression.model';
 import { typeSyntaxTree } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
 
-export function parseArrayLiteral(scope: TypedScope, expression: UntypedArrayLiteralExpression): ArrayLiteralExpression {
+export function parseArrayExpression(scope: TypedScope, expression: UntypedArrayExpression): ArrayExpression {
   let messages: Message[] = [];
   let elements: Expression[] = new Array(expression.elements.length);
   let elementType: Type | null = null;

@@ -1,7 +1,7 @@
 import {
-  FloatLiteralExpression,
+  FloatExpression,
   IdentifierExpression,
-  IntegerLiteralExpression, StringLiteralExpression,
+  IntegerExpression, StringExpression,
 } from '../../expression.model';
 import {
   FloatValue, IntegerValue, LazyValue, makeLazyFloatValue,
@@ -15,14 +15,14 @@ export function evaluateIdentifier(scope: EvaluationScope, expression: Identifie
   return scope[expression.value];
 }
 
-export function evaluateIntegerLiteral(scope: EvaluationScope, expression: IntegerLiteralExpression): LazyValue<IntegerValue> {
+export function evaluateIntegerLiteral(scope: EvaluationScope, expression: IntegerExpression): LazyValue<IntegerValue> {
   return makeLazyIntegerValue(toNumber(expression.value));
 }
 
-export function evaluateFloatLiteral(scope: EvaluationScope, expression: FloatLiteralExpression): LazyValue<FloatValue> {
+export function evaluateFloatLiteral(scope: EvaluationScope, expression: FloatExpression): LazyValue<FloatValue> {
   return makeLazyFloatValue(toNumber(expression.value));
 }
 
-export function evaluateStringLiteral(scope: EvaluationScope, expression: StringLiteralExpression): LazyValue<StringValue> {
+export function evaluateStringLiteral(scope: EvaluationScope, expression: StringExpression): LazyValue<StringValue> {
   return Observable.of(makeStringValue(expression.value));
 }

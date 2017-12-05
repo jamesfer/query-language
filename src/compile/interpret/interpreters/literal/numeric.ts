@@ -1,27 +1,27 @@
-import { UntypedNumericLiteralExpression, } from '../../../../untyped-expression.model';
+import { UntypedNumericExpression, } from '../../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
 
-export function makeNumericLiteralExpression(token: Token, messages: Message[] = []): UntypedNumericLiteralExpression {
+export function makeNumericExpression(token: Token, messages: Message[] = []): UntypedNumericExpression {
   return {
-    kind: 'NumericLiteral',
+    kind: 'Numeric',
     tokens: [token],
     value: token.value,
     messages,
   };
 }
 
-export function makeCustomNumericLiteralExpression(contents: string, messages: Message[] = []): UntypedNumericLiteralExpression {
+export function makeCustomNumericExpression(contents: string, messages: Message[] = []): UntypedNumericExpression {
   return {
-    kind: 'NumericLiteral',
+    kind: 'Numeric',
     tokens: [],
     value: contents,
     messages,
   };
 }
 
-export function buildNumericLiteralExpression(tokens: Token[]): UntypedNumericLiteralExpression | undefined {
+export function buildNumericExpression(tokens: Token[]): UntypedNumericExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.NumericLiteral)) {
     const token = tokens[0];
     const value = +token.value;
@@ -36,6 +36,6 @@ export function buildNumericLiteralExpression(tokens: Token[]): UntypedNumericLi
     else if (value <= Number.MIN_VALUE) {
       messages.push(makeMessage('Error', 'Value is smaller than the minimum value of ' + Number.MIN_VALUE));
     }
-    return makeNumericLiteralExpression(token, messages);
+    return makeNumericExpression(token, messages);
   }
 }

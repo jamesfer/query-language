@@ -12,7 +12,7 @@ export interface UntypedFunctionCallExpression extends UntypedExpressionInterfac
   args: (UntypedExpression | null)[];
 }
 
-export interface UntypedArrayLiteralExpression extends UntypedExpressionInterface<'ArrayLiteral'> {
+export interface UntypedArrayExpression extends UntypedExpressionInterface<'Array'> {
   elements: UntypedExpression[];
 }
 
@@ -20,29 +20,29 @@ export interface UntypedIdentifierExpression extends UntypedExpressionInterface<
   value: string;
 }
 
-export interface UntypedNumericLiteralExpression extends UntypedExpressionInterface<'NumericLiteral'> {
+export interface UntypedNumericExpression extends UntypedExpressionInterface<'Numeric'> {
   value: string;
 }
 
-export interface UntypedStringLiteralExpression extends UntypedExpressionInterface<'StringLiteral'> {
+export interface UntypedStringExpression extends UntypedExpressionInterface<'String'> {
   value: string;
 }
 
-export interface UntypedNoneExpression extends UntypedExpressionInterface<'NoneLiteral'> {}
+export interface UntypedNoneExpression extends UntypedExpressionInterface<'None'> {}
 
 export interface UntypedUnrecognizedExpression extends UntypedExpressionInterface<'Unrecognized'> {}
 
 export type UntypedExpression = UntypedFunctionCallExpression
-  | UntypedStringLiteralExpression
-  | UntypedNumericLiteralExpression
-  | UntypedArrayLiteralExpression
+  | UntypedStringExpression
+  | UntypedNumericExpression
+  | UntypedArrayExpression
   | UntypedIdentifierExpression
   | UntypedUnrecognizedExpression
   | UntypedNoneExpression;
 
 export function makeUntypedNoneExpression(): UntypedNoneExpression {
   return {
-    kind: 'NoneLiteral',
+    kind: 'None',
     tokens: [],
     messages: [],
   };

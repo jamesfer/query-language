@@ -84,14 +84,14 @@ export function arrayExpression(
   elementType: Type | null, elements: ExpressionExpectation[],
 ): ArrayExpressionExpectation {
   return {
-    kind: 'ArrayLiteral',
+    kind: 'Array',
     resultType: makeArrayType(elementType),
     elements,
   };
 }
 
 function valueExpression(
-  kind: 'StringLiteral' | 'IntegerLiteral' | 'FloatLiteral' | 'Identifier', resultType: Type | null, value: any,
+  kind: 'String' | 'Integer' | 'Float' | 'Identifier', resultType: Type | null, value: any,
 ): ValueExpressionExpectation {
   return {
     kind,
@@ -100,9 +100,9 @@ function valueExpression(
   };
 }
 
-export const stringExpression = partial(valueExpression, 'StringLiteral', StringType);
-export const integerExpression = partial(valueExpression, 'IntegerLiteral', IntegerType);
-export const floatExpression = partial(valueExpression, 'FloatLiteral', FloatType);
+export const stringExpression = partial(valueExpression, 'String', StringType);
+export const integerExpression = partial(valueExpression, 'Integer', IntegerType);
+export const floatExpression = partial(valueExpression, 'Float', FloatType);
 export const identifierExpression = partial(valueExpression, 'Identifier');
 
 // function noneExpression(): ExpressionExpectation {
