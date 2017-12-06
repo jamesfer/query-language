@@ -7,10 +7,12 @@ import { sum } from './standard-library/array/sum';
 import { ifBranch } from './standard-library/branching/if';
 import { math } from './standard-library/math/math';
 import { otherOperators } from './standard-library/other-operators';
+import { comparators } from './standard-library/comparators';
 
 export const standardLibrary: Library = {
   ...math,
   ...otherOperators,
+  ...comparators,
 
   'in': inArray,
   '..': buildRange,

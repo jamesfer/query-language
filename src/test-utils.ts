@@ -1,5 +1,5 @@
 import { execute } from './api';
-import 'rxjs/add/operator/do';
+import { expect } from 'chai';
 
 export function testExecute(code: string, cb?: (value: any) => void): Promise<any> {
   let program = execute(code);
@@ -20,4 +20,10 @@ export function testExecute(code: string, cb?: (value: any) => void): Promise<an
       return value;
     })
     .toPromise();
+}
+
+export function executeExpect(code: string, expected: any): Promise<any> {
+  return testExecute(code, actual => {
+    expect(actual).to.equal(expected);
+  });
 }

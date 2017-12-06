@@ -4,7 +4,7 @@ import 'rxjs/add/operator/switch';
 import { Observable } from 'rxjs/Observable';
 import {
   FloatValue,
-  LazyValue,
+  LazyValue, makeLazyBooleanValue,
   makeLazyFloatValue,
   PlainFunctionValue,
   Value,
@@ -19,5 +19,11 @@ export function evaluateArguments<R extends (Value | LazyValue) = Value>(func: L
 export function bindFloatFunction(func: (...args: number[]) => number) {
   return evaluateArguments((...args: FloatValue[]) => {
     return makeLazyFloatValue(func(...map(args, 'value')))
+  });
+}
+
+export function bindBooleanFunction(func: (...args: number[]) => boolean) {
+  return evaluateArguments((...args: FloatValue[]) => {
+    return makeLazyBooleanValue(func(...map(args, 'value')));
   });
 }

@@ -41,6 +41,12 @@ const operators: InfixOperator[] = [
   { type: TokenKind.ModuloOperator, associativity: 'Left', precedence: 10 },
   { type: TokenKind.AddOperator, associativity: 'Left', precedence: 9 },
   { type: TokenKind.SubtractOperator, associativity: 'Left', precedence: 9 },
+  { type: TokenKind.LessThan, associativity: 'Left', precedence: 7 },
+  { type: TokenKind.LessEqual, associativity: 'Left', precedence: 7 },
+  { type: TokenKind.GreaterThan, associativity: 'Left', precedence: 7 },
+  { type: TokenKind.GreaterEqual, associativity: 'Left', precedence: 7 },
+  { type: TokenKind.Equal, associativity: 'Left', precedence: 6 },
+  { type: TokenKind.NotEqual, associativity: 'Left', precedence: 6 },
   { type: TokenKind.InOperator, associativity: 'Right', precedence: 5 },
 ];
 

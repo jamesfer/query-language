@@ -68,6 +68,30 @@ export const patterns: TokenTest[] = [
     type: TokenKind.DivideOperator,
   },
   {
+    test: /^<=/,
+    type: TokenKind.LessEqual,
+  },
+  {
+    test: /^</,
+    type: TokenKind.LessThan,
+  },
+  {
+    test: /^>=/,
+    type: TokenKind.GreaterEqual,
+  },
+  {
+    test: /^>/,
+    type: TokenKind.GreaterThan,
+  },
+  {
+    test: /^!=/,
+    type: TokenKind.NotEqual,
+  },
+  {
+    test: /^=/,
+    type: TokenKind.Equal,
+  },
+  {
     test: /^\.\.\./,
     type: TokenKind.SpreadOperator,
   },
