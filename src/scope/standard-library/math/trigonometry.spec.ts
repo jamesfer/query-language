@@ -1,20 +1,16 @@
-import { testExecute } from '../../../test-utils';
+import { executeExpect, testExecute } from '../../../test-utils';
 import { expect } from 'chai';
 
 describe('trigonometry', function() {
   describe('sin', function() {
     it('should calculate the sin of a number', function() {
-      return testExecute('sin(0.5)', value => {
-        expect(value).to.equal(Math.sin(0.5));
-      });
+      return executeExpect('sin(0.5)', Math.sin(0.5));
     });
   });
 
   describe('cos', function() {
     it('should calculate the cos of a number', function() {
-      return testExecute('cos(0.5)', value => {
-        expect(value).to.equal(Math.cos(0.5));
-      });
+      return executeExpect('cos(0.5)', Math.cos(0.5));
     });
   });
 
