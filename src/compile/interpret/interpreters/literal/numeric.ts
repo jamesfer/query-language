@@ -1,28 +1,33 @@
-import { UntypedNumericExpression, } from '../../../../untyped-expression.model';
+import {
+  UntypedFloatExpression,
+  UntypedIntegerExpression,
+} from '../../../../untyped-expression.model';
 import { makeMessage, Message } from '../../../../message.model';
 import { Token, TokenKind } from '../../../../token.model';
 import { tokenArrayMatches } from '../../../../utils';
+import { isInteger } from 'lodash';
 
-export function makeNumericExpression(token: Token, messages: Message[] = []): UntypedNumericExpression {
+function makeFloatExpression(value: number, token: Token, messages: Message[] = []): UntypedFloatExpression {
   return {
-    kind: 'Numeric',
+    kind: 'Float',
     tokens: [token],
-    value: token.value,
+    value,
     messages,
   };
 }
 
-export function makeCustomNumericExpression(contents: string, messages: Message[] = []): UntypedNumericExpression {
+function makeIntegerExpression(value: number, token: Token, messages: Message[] = []): UntypedIntegerExpression {
   return {
-    kind: 'Numeric',
-    tokens: [],
-    value: contents,
+    kind: 'Integer',
+    tokens: [token],
+    value,
     messages,
   };
 }
 
-export function buildNumericExpression(tokens: Token[]): UntypedNumericExpression | undefined {
-  if (tokenArrayMatches(tokens, TokenKind.NumericLiteral)) {
+export function buildNumericExpression(tokens: Token[]): UntypedFloatExpression | UntypedIntegerExpression | undefined {
+  if (tokenArrayMatches(tokens, TokenKind.FloatLiteral)
+    || tokenArrayMatches(tokens, TokenKind.IntegerLiteral)) {
     const token = tokens[0];
     const value = +token.value;
 
@@ -36,6 +41,10 @@ export function buildNumericExpression(tokens: Token[]): UntypedNumericExpressio
     else if (value <= Number.MIN_VALUE) {
       messages.push(makeMessage('Error', 'Value is smaller than the minimum value of ' + Number.MIN_VALUE));
     }
-    return makeNumericExpression(token, messages);
+
+    if (token.kind === TokenKind.IntegerLiteral) {
+      return makeIntegerExpression(value, token, messages);
+    }
+    return makeFloatExpression(value, token, messages);
   }
 }

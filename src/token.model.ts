@@ -20,7 +20,8 @@
 
 export enum TokenKind {
   Identifier,
-  NumericLiteral,
+  IntegerLiteral,
+  FloatLiteral,
   StringLiteral,
   OpenBrace,
   CloseBrace,

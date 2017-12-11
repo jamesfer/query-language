@@ -26,8 +26,10 @@ function makeToken(kind: TokenKind, value: string, begin: Position | number = [ 
 
 export const identifierToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.Identifier);
-export const numericToken: (value: string, begin?: Position | number) => Token
-  = partial(makeToken, TokenKind.NumericLiteral);
+export const integerToken: (value: string, begin?: Position | number) => Token
+  = partial(makeToken, TokenKind.IntegerLiteral);
+export const floatToken: (value: string, begin?: Position | number) => Token
+  = partial(makeToken, TokenKind.FloatLiteral);
 export const stringToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.StringLiteral);
 

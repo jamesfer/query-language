@@ -4,7 +4,7 @@ import {
   arrayExpression,
   closeBracketToken, closeParenToken,
   commaToken, functionCallExpression, identifierExpression,
-  identifierToken, integerExpression, numericToken, openBracketToken,
+  identifierToken, integerExpression, integerToken, openBracketToken,
   openParenToken,
 } from '../utils';
 import {
@@ -36,11 +36,11 @@ describe('functions', function() {
       identifierToken('head'),
       openParenToken(),
       openBracketToken(),
-      numericToken('1'),
+      integerToken('1'),
       commaToken(),
-      numericToken('2', 1),
+      integerToken('2', 1),
       commaToken(),
-      numericToken('3', 1),
+      integerToken('3', 1),
       closeBracketToken(),
       closeParenToken(),
     ],
@@ -60,9 +60,9 @@ describe('functions', function() {
   evaluates('infix operators', '1 + 2', {
     result: 3,
     tokens: [
-      numericToken('1'),
+      integerToken('1'),
       addToken(1),
-      numericToken('2', 1),
+      integerToken('2', 1),
     ],
     expression: functionCallExpression(
       FloatType,
@@ -79,13 +79,13 @@ describe('functions', function() {
     tokens: [
       identifierToken('if'),
       openParenToken(),
-      numericToken('1'),
+      integerToken('1'),
       closeParenToken(),
       openParenToken(),
-      numericToken('2'),
+      integerToken('2'),
       closeParenToken(),
       openParenToken(),
-      numericToken('3'),
+      integerToken('3'),
       closeParenToken(),
     ],
     expression: functionCallExpression(
@@ -107,11 +107,11 @@ describe('functions', function() {
     result: 3,
     tokens: [
       openParenToken(),
-      numericToken('1'),
+      integerToken('1'),
       addToken(1),
       closeParenToken(),
       openParenToken(),
-      numericToken('2'),
+      integerToken('2'),
       closeParenToken(),
     ],
     expression: functionCallExpression(

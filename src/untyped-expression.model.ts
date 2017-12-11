@@ -20,8 +20,12 @@ export interface UntypedIdentifierExpression extends UntypedExpressionInterface<
   value: string;
 }
 
-export interface UntypedNumericExpression extends UntypedExpressionInterface<'Numeric'> {
-  value: string;
+export interface UntypedFloatExpression extends UntypedExpressionInterface<'Float'> {
+  value: number;
+}
+
+export interface UntypedIntegerExpression extends UntypedExpressionInterface<'Integer'> {
+  value: number;
 }
 
 export interface UntypedStringExpression extends UntypedExpressionInterface<'String'> {
@@ -34,7 +38,8 @@ export interface UntypedUnrecognizedExpression extends UntypedExpressionInterfac
 
 export type UntypedExpression = UntypedFunctionCallExpression
   | UntypedStringExpression
-  | UntypedNumericExpression
+  | UntypedFloatExpression
+  | UntypedIntegerExpression
   | UntypedArrayExpression
   | UntypedIdentifierExpression
   | UntypedUnrecognizedExpression
