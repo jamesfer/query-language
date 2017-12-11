@@ -3,10 +3,10 @@ import { assertNever } from '../../utils';
 
 export function printExpression(expression: UntypedExpression): string {
   switch (expression.kind) {
-    case 'NumericLiteral':
-    case 'StringLiteral':
+    case 'Numeric':
+    case 'String':
       return expression.tokens[0].value;
-    case 'ArrayLiteral':
+    case 'Array':
       return '[' + expression.elements.map(printExpression).join(', ') + ']';
     case 'FunctionCall':
       let funcExp = printExpression(expression.functionExpression);
@@ -16,8 +16,8 @@ export function printExpression(expression: UntypedExpression): string {
       let args = expression.args.map(printExpression);
       return '(' + args[0] + ' ' + funcExp + ' ' + args[1] + ')';
     case 'Identifier':
-      return expression.name;
-    case 'NoneLiteral':
+      return expression.value;
+    case 'None':
       return 'none';
     case 'Unrecognized':
       return 'unrecognized';
