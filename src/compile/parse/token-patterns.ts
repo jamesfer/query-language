@@ -112,8 +112,13 @@ export const patterns: TokenTest[] = [
     type: TokenKind.Identifier,
   },
   {
-    test: /^[0-9]+(\.[0-9]+)?([eE][0-9]+)?/,
-    type: TokenKind.NumericLiteral,
+    // test: /^[0-9]+(\.[0-9]*|(\.[0-9]*)?[eE]-?[0-9]+)/,
+    test: /^[0-9]+((\.[0-9]*)?[eE]-?[0-9]+|\.[0-9]*)/,
+    type: TokenKind.FloatLiteral,
+  },
+  {
+    test: /^[0-9]+/,
+    type: TokenKind.IntegerLiteral,
   },
   {
     test: /^('(\\\\|\\'|(?!').)*'?|"(\\\\|\\"|(?!").)*"?)/,

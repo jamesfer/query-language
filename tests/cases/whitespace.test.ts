@@ -1,7 +1,7 @@
 import { evaluates } from '../runner';
 import {
   arrayExpression,
-  closeBracketToken, commaToken, integerExpression, numericToken,
+  closeBracketToken, commaToken, integerExpression, integerToken,
   openBracketToken,
 } from '../utils';
 import { IntegerType } from '../../src/type.model';
@@ -11,9 +11,9 @@ describe('whitespace', function() {
     result: [ 1, 2 ],
     tokens: [
       openBracketToken(),
-      numericToken('1', 6),
+      integerToken('1', 6),
       commaToken(4),
-      numericToken('2'),
+      integerToken('2'),
       closeBracketToken(4),
     ],
     expression: arrayExpression(IntegerType, [
@@ -26,9 +26,9 @@ describe('whitespace', function() {
     result: [ 1, 2 ],
     tokens: [
       openBracketToken(),
-      numericToken('1', [ 1, 2 ]),
+      integerToken('1', [ 1, 2 ]),
       commaToken(),
-      numericToken('2', [ 1, 2 ]),
+      integerToken('2', [ 1, 2 ]),
       closeBracketToken([ 1, 0 ]),
     ],
     expression: arrayExpression(IntegerType, [

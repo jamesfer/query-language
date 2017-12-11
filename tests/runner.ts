@@ -157,7 +157,7 @@ function assertProgramContents(program: ExecutionResult, expected: EvaluationExp
 }
 
 
-function stringifyProgram(program: ExecutionResult): string {
+export function stringifyProgram(program: ExecutionResult): string {
   program = { ...program };
   if (program.result instanceof Observable) {
     (program.result as any)[inspect.custom] = () => 'Observable';
@@ -166,7 +166,7 @@ function stringifyProgram(program: ExecutionResult): string {
 }
 
 
-function indent(str: string, indent: number): string {
+export function indent(str: string, indent: number): string {
   return join(map(split(str, '\n'), line => ' '.repeat(indent) + line), '\n');
 }
 

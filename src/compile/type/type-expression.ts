@@ -19,7 +19,8 @@ export function typeSyntaxTree(scope: TypedScope, expression: UntypedExpression)
   switch (expression.kind) {
     case 'String':
       return parseStringExpression(scope, expression);
-    case 'Numeric':
+    case 'Integer':
+    case 'Float':
       return parseNumericExpression(scope, expression);
     case 'Array':
       return parseArrayExpression(scope, expression);

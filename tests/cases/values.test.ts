@@ -3,7 +3,8 @@ import {
   arrayExpression,
   closeBracketToken,
   commaToken,
-  floatExpression, integerExpression, numericToken, openBracketToken,
+  floatExpression, floatToken, integerExpression, integerToken,
+  openBracketToken,
   stringExpression,
   stringToken,
 } from '../utils';
@@ -14,23 +15,23 @@ describe('values', function() {
   evaluates('integers', '123', {
     result: 123,
     tokens: [
-      numericToken('123'),
+      integerToken('123'),
     ],
     expression: integerExpression(123),
   });
 
-  evaluates('integers in scientific form', '123.123e10', {
-    result: 123.123e10,
+  evaluates('integers in scientific form', '123e10', {
+    result: 123e10,
     tokens: [
-      numericToken('123.123e10'),
+      floatToken('123e10'),
     ],
-    expression: integerExpression(123.123e10),
+    expression: floatExpression(123e10),
   });
 
   evaluates('floats', '123.123', {
     result: 123.123,
     tokens: [
-      numericToken('123.123'),
+      floatToken('123.123'),
     ],
     expression: floatExpression(123.123),
   });
@@ -38,7 +39,7 @@ describe('values', function() {
   evaluates('floats in scientific form', '123.123e2', {
     result: 123.123e2,
     tokens: [
-      numericToken('123.123e2'),
+      floatToken('123.123e2'),
     ],
     expression: floatExpression(123.123e2),
   });
@@ -95,11 +96,11 @@ describe('values', function() {
     result: [1, 2, 3],
     tokens: [
       openBracketToken(),
-      numericToken('1'),
+      integerToken('1'),
       commaToken(),
-      numericToken('2', 1),
+      integerToken('2', 1),
       commaToken(),
-      numericToken('3', 1),
+      integerToken('3', 1),
       closeBracketToken(),
     ],
     expression: arrayExpression(IntegerType, [
@@ -113,11 +114,11 @@ describe('values', function() {
     result: [1, 2, 3],
     tokens: [
       openBracketToken(),
-      numericToken('1'),
+      integerToken('1'),
       commaToken(),
-      numericToken('2', 1),
+      integerToken('2', 1),
       commaToken(),
-      numericToken('3', 1),
+      integerToken('3', 1),
       commaToken(),
       closeBracketToken(),
     ],
@@ -133,10 +134,10 @@ describe('values', function() {
     evaluated: false,
     tokens: [
       openBracketToken(),
-      numericToken('1'),
+      integerToken('1'),
       commaToken(),
-      numericToken('2', 1),
-      numericToken('3', 1),
+      integerToken('2', 1),
+      integerToken('3', 1),
       closeBracketToken(),
     ],
     expression: arrayExpression(IntegerType, [
