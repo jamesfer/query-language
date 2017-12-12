@@ -1,7 +1,7 @@
 import { Message } from './message.model';
 import { Token } from './token.model';
 
-interface UntypedExpressionInterface<K> {
+export interface UntypedExpressionInterface<K> {
   kind: K;
   tokens: Token[];
   messages: Message[];

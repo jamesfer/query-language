@@ -16,7 +16,7 @@ import {
   UntypedStringExpression,
 } from './untyped-expression.model';
 
-interface ExpressionInterface<K extends string, T extends (Type | null) = Type | null> {
+export interface ExpressionInterface<K extends string, T extends (Type | null) = Type | null> {
   kind: K;
   resultType: T;
   messages: Message[];

@@ -1,5 +1,5 @@
 import { Token, TokenKind, Position } from '../src/token.model';
-import { partial } from 'lodash';
+import { Function2, partial } from 'lodash';
 import {
   ArrayExpressionExpectation, ExpressionExpectation,
   FunctionExpressionExpectation,
@@ -105,7 +105,9 @@ function valueExpression(
 export const stringExpression = partial(valueExpression, 'String', StringType);
 export const integerExpression = partial(valueExpression, 'Integer', IntegerType);
 export const floatExpression = partial(valueExpression, 'Float', FloatType);
-export const identifierExpression = partial(valueExpression, 'Identifier');
+// Needs explicit type annotation to prevent "Exported variable X has
+// or is using name Y from external module, but cannot be named" errors.
+export const identifierExpression: Function2<Type | null, any, ValueExpressionExpectation> = partial(valueExpression, 'Identifier');
 
 // function noneExpression(): ExpressionExpectation {
 //
