@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = env => {
   let production = !!(env && env.production);
@@ -34,7 +35,12 @@ module.exports = env => {
       ],
       extensions: ['.ts', '.js', '.json', '*'],
     },
-    plugins: []
+    plugins: [
+      new CleanWebpackPlugin(path.resolve(__dirname, 'dist'), {
+        verbose: false,
+        watch: false
+      }),
+    ]
       .concat(production ? [
         new UglifyJSPlugin({
           sourceMap: true,

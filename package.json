@@ -20,6 +20,7 @@
     "@types/mocha": "^2.2.41",
     "@types/node": "^8.0.24",
     "chai": "^4.1.1",
+    "clean-webpack-plugin": "^0.1.17",
     "lodash": "^4.17.4",
     "mocha": "^3.5.0",
     "rxjs": "^5.5.0",
