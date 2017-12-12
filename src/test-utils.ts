@@ -24,6 +24,6 @@ export function testExecute(code: string, cb?: (value: any) => void): Promise<an
 
 export function executeExpect(code: string, expected: any): Promise<any> {
   return testExecute(code, actual => {
-    expect(actual).to.equal(expected);
+    expect(actual).to.deep.equal(expected);
   });
 }
