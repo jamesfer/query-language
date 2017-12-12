@@ -10,7 +10,7 @@
     "build:prod": "webpack --progress --env.production",
     "test": "npm run test:scope && npm run test:conformance",
     "test:conformance": "mocha --require ts-node/register tests/**/*.test.ts",
-    "test:scope": "mocha --require ts-node/register src/scope/**/*.spec.ts"
+    "test:scope": "mocha --require ts-node/register src/**/*.spec.ts"
   },
   "author": "James Ferguson",
   "license": "MIT",
