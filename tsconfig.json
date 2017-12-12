@@ -20,5 +20,12 @@
     "lib": [
       "es2016"
     ]
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tests",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
 }
