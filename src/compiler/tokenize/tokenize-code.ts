@@ -98,7 +98,7 @@ function nextToken(code: string, position: Position): { token: Token | null, ski
   // };
 }
 
-export function parseTokens(code: string): TokenList {
+export function tokenizeCode(code: string): TokenList {
   let unrecognisedCharacters = '';
   let messages: Message[] = [];
   let tokens: Token[] = [];

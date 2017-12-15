@@ -10,7 +10,7 @@ import {
 import { standardLibrary } from './scope/standard-library';
 import { Token } from './token.model';
 import { Expression } from './expression.model';
-import { parseTokens } from './compiler/parse/parse-tokens';
+import { tokenizeCode } from './compiler/tokenize/tokenize-code';
 import { interpretSyntaxTree } from './compiler/interpret-expression';
 import { typeExpression } from './compiler/type-expression';
 import { evaluateSyntaxTree } from './compiler/evaluate-expression';
@@ -42,7 +42,7 @@ function extractMessages(expressions: MessageContainer[]): Message[] {
 
 export function compile(code: string, scope?: Scope): CompilationResult {
   // Parse Tokens
-  let tokenResult = parseTokens(code);
+  let tokenResult = tokenizeCode(code);
   let result: CompilationResult = {
     messages: tokenResult.messages,
     tokens: tokenResult.tokens,
