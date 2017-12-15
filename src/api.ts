@@ -1,9 +1,5 @@
 import { every, reduce } from 'lodash';
 import { Observable } from 'rxjs/Observable';
-import { buildSyntaxTree } from './compile/interpret/interpret-expression';
-import { parseTokens } from './compile/parse/parse-tokens';
-import { typeSyntaxTree } from './compile/type/type-expression';
-import { evaluateSyntaxTree } from './evaluate/evaluate-expression';
 import { Message } from './message.model';
 import { convertToScope } from './scope/library';
 import {
@@ -14,6 +10,10 @@ import {
 import { standardLibrary } from './scope/standard-library';
 import { Token } from './token.model';
 import { Expression } from './expression.model';
+import { tokenizeCode } from './compiler/tokenize/tokenize-code';
+import { interpretSyntaxTree } from './compiler/interpret-expression';
+import { typeExpression } from './compiler/type-expression';
+import { evaluateSyntaxTree } from './compiler/evaluate-expression';
 
 
 export interface CompilationResult {
@@ -42,7 +42,7 @@ function extractMessages(expressions: MessageContainer[]): Message[] {
 
 export function compile(code: string, scope?: Scope): CompilationResult {
   // Parse Tokens
-  let tokenResult = parseTokens(code);
+  let tokenResult = tokenizeCode(code);
   let result: CompilationResult = {
     messages: tokenResult.messages,
     tokens: tokenResult.tokens,
@@ -51,7 +51,7 @@ export function compile(code: string, scope?: Scope): CompilationResult {
 
   // Build syntax tree
   if (result.compiled) {
-    let expressions = buildSyntaxTree(tokenResult.tokens);
+    let expressions = interpretSyntaxTree(tokenResult.tokens);
     result.messages = result.messages.concat(extractMessages(expressions));
     result.compiled = expressions.length !== 0
       && result.messages.length === 0
@@ -61,7 +61,7 @@ export function compile(code: string, scope?: Scope): CompilationResult {
     if (expressions.length > 0) {
       scope = scope || convertToScope(standardLibrary);
       let typedScope = extractTypedScope(scope);
-      let typedExpression = typeSyntaxTree(typedScope, expressions[0]);
+      let typedExpression = typeExpression(typedScope, expressions[0]);
       if (typedExpression.kind !== 'Unrecognized') {
         result.expression = typedExpression;
       }
