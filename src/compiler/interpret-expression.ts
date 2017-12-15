@@ -1,5 +1,6 @@
 import { UntypedExpression } from '../untyped-expression.model';
-import { Token } from '../token.model';
+import { Token, TokenKind } from '../token.model';
+import { dropWhile, includes } from 'lodash';
 import { firstResult } from '../utils';
 import { interpretFunctionCall } from './expression-compilers/function/interpret-function-call';
 import { interpretIdentifier } from './expression-compilers/identifier';
@@ -10,6 +11,15 @@ import { intepretString } from './expression-compilers/string';
 import { interpretNumber } from './expression-compilers/number';
 import { interpretArray } from './expression-compilers/array';
 import { interpretBoolean } from './expression-compilers/boolean';
+
+
+const ignoredTokens = [ TokenKind.Comment ];
+
+function skipIgnoredTokens(tokens: Token[]) {
+  return dropWhile(tokens, token => {
+    return includes(ignoredTokens, token.kind);
+  });
+}
 
 function buildLiteralExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
   if (prevExpression === null) {
@@ -47,12 +57,14 @@ export function interpretExpression(tokens: Token[], prevExpression: UntypedExpr
 
 export function interpretSyntaxTree(tokens: Token[]): UntypedExpression[] {
   let expressions: UntypedExpression[] = [];
-  let remainingTokens = tokens;
+  let remainingTokens = skipIgnoredTokens(tokens);
   while (remainingTokens.length) {
     let result = interpretExpression(remainingTokens)
       || makeUntypedUnrecognizedExpression(remainingTokens);
-    remainingTokens = remainingTokens.slice(result.tokens.length);
     expressions.push(result);
+
+    remainingTokens = remainingTokens.slice(result.tokens.length);
+    remainingTokens = skipIgnoredTokens(remainingTokens);
   }
   return expressions;
 }

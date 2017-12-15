@@ -35,6 +35,8 @@ export const booleanToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.BooleanLiteral);
 export const stringToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.StringLiteral);
+export const commentToken: (value: string, begin?: Position | number) => Token
+  = partial(makeToken, TokenKind.Comment);
 
 export const openBraceToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.OpenBrace, '{');

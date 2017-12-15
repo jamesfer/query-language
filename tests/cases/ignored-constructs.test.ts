@@ -1,12 +1,12 @@
 import { evaluates } from '../runner';
 import {
   arrayExpression,
-  closeBracketToken, commaToken, integerExpression, integerToken,
+  closeBracketToken, commaToken, commentToken, integerExpression, integerToken,
   openBracketToken,
 } from '../utils';
 import { IntegerType } from '../../src/type.model';
 
-describe('whitespace', function() {
+describe('ignored constructs', function() {
   evaluates('ignores spaces and tabs', '[      1 \t \t,2    ]', {
     result: [ 1, 2 ],
     tokens: [
@@ -35,5 +35,14 @@ describe('whitespace', function() {
       integerExpression(1),
       integerExpression(2),
     ]),
+  });
+
+  evaluates('supports comments', '-- This is a comment\n1', {
+    result: 1,
+    tokens: [
+      commentToken('-- This is a comment'),
+      integerToken('1', [ 1, 0 ]),
+    ],
+    expression: integerExpression(1),
   });
 });
