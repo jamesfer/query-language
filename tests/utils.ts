@@ -11,7 +11,7 @@ import {
   FloatType,
   BooleanType,
 } from '../src/type.model';
-import { addPositions } from '../src/compile/parse/parse-tokens';
+import { addPositions } from '../src/compiler/parse/parse-tokens';
 
 function makeToken(kind: TokenKind, value: string, begin: Position | number = [ 0, 0 ]): Token {
   if (typeof begin === 'number') {

@@ -1,9 +1,5 @@
 import { every, reduce } from 'lodash';
 import { Observable } from 'rxjs/Observable';
-import { buildSyntaxTree } from './compile/interpret/interpret-expression';
-import { parseTokens } from './compile/parse/parse-tokens';
-import { typeSyntaxTree } from './compile/type/type-expression';
-import { evaluateSyntaxTree } from './evaluate/evaluate-expression';
 import { Message } from './message.model';
 import { convertToScope } from './scope/library';
 import {
@@ -14,6 +10,10 @@ import {
 import { standardLibrary } from './scope/standard-library';
 import { Token } from './token.model';
 import { Expression } from './expression.model';
+import { parseTokens } from './compiler/parse/parse-tokens';
+import { buildSyntaxTree } from './compiler/interpret-expression';
+import { typeSyntaxTree } from './compiler/type-expression';
+import { evaluateSyntaxTree } from './compiler/evaluate-expression';
 
 
 export interface CompilationResult {

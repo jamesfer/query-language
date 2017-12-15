@@ -22,7 +22,7 @@ import { Message } from '../src/message.model';
 import { Token } from '../src/token.model';
 import { Type } from '../src/type.model';
 import { assertNever } from '../src/utils';
-import { addPositions } from '../src/compile/parse/parse-tokens';
+import { addPositions } from '../src/compiler/parse/parse-tokens';
 
 
 export interface ValueExpressionExpectation {
