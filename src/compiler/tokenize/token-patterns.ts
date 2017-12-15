@@ -8,6 +8,10 @@ export interface TokenTest {
 export const whitespacePattern = /^[\s]+/;
 export const patterns: TokenTest[] = [
   {
+    test: /^--.*$/m,
+    type: TokenKind.Comment
+  },
+  {
     test: /^{/,
     type: TokenKind.OpenBrace,
   },
