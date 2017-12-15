@@ -32,6 +32,10 @@ export interface UntypedStringExpression extends UntypedExpressionInterface<'Str
   value: string;
 }
 
+export interface UntypedBooleanExpression extends UntypedExpressionInterface<'Boolean'> {
+  value: boolean;
+}
+
 export interface UntypedNoneExpression extends UntypedExpressionInterface<'None'> {}
 
 export interface UntypedUnrecognizedExpression extends UntypedExpressionInterface<'Unrecognized'> {}
@@ -40,6 +44,7 @@ export type UntypedExpression = UntypedFunctionCallExpression
   | UntypedStringExpression
   | UntypedFloatExpression
   | UntypedIntegerExpression
+  | UntypedBooleanExpression
   | UntypedArrayExpression
   | UntypedIdentifierExpression
   | UntypedUnrecognizedExpression

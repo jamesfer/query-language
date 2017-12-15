@@ -4,6 +4,7 @@ import { firstResult } from '../../../../utils';
 import { buildArrayExpression } from './array';
 import { buildNumericExpression } from './numeric';
 import { buildStringExpression } from './string';
+import { buildBooleanExpression } from './boolean';
 
 export function buildLiteralExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
   if (prevExpression === null) {
@@ -11,6 +12,7 @@ export function buildLiteralExpression(tokens: Token[], prevExpression: UntypedE
       buildStringExpression,
       buildNumericExpression,
       buildArrayExpression,
+      buildBooleanExpression,
     ], tokens)
   }
 }

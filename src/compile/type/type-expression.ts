@@ -13,6 +13,7 @@ import { parseIdentifierExpression } from './typers/identifier';
 import { parseNumericExpression } from './typers/numeric';
 import { parseStringExpression } from './typers/string';
 import { NoneType } from '../../type.model';
+import { parseBooleanExpression } from './typers/boolean';
 
 
 export function typeSyntaxTree(scope: TypedScope, expression: UntypedExpression): Expression {
@@ -22,6 +23,8 @@ export function typeSyntaxTree(scope: TypedScope, expression: UntypedExpression)
     case 'Integer':
     case 'Float':
       return parseNumericExpression(scope, expression);
+    case 'Boolean':
+      return parseBooleanExpression(scope, expression);
     case 'Array':
       return parseArrayExpression(scope, expression);
     case 'Identifier':

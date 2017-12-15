@@ -48,6 +48,7 @@ export enum TokenKind {
   RangeOperator,
   FatArrow,
   ComposeOperator,
+  BooleanLiteral,
 }
 
 // export interface Position {

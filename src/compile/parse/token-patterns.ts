@@ -108,6 +108,10 @@ export const patterns: TokenTest[] = [
     type: TokenKind.InOperator,
   },
   {
+    test: /^(true|false)/,
+    type: TokenKind.BooleanLiteral,
+  },
+  {
     test: /^[_a-zA-Z][_a-zA-Z0-9]*/,
     type: TokenKind.Identifier,
   },

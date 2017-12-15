@@ -26,7 +26,7 @@ import { addPositions } from '../src/compile/parse/parse-tokens';
 
 
 export interface ValueExpressionExpectation {
-  kind: 'String' | 'Integer' | 'Float' | 'Identifier',
+  kind: 'String' | 'Integer' | 'Float' | 'Identifier' | 'Boolean',
   resultType: Type | null,
   value: any,
 }
@@ -107,6 +107,7 @@ function compareExpressions(actual: Expression | null | undefined, expected: Exp
     case 'String':
     case 'Identifier':
     case 'Integer':
+    case 'Boolean':
     case 'Float':
       const ignoreKeys = ['expression', 'messages', 'tokens'];
       expect(omit(actual, ignoreKeys)).to.deep.equal(expected);

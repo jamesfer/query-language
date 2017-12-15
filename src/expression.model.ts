@@ -8,8 +8,10 @@ import {
   NoneType,
   StringType,
   Type,
+  BooleanType,
 } from './type.model';
 import {
+  UntypedBooleanExpression,
   UntypedExpression,
   UntypedIdentifierExpression,
   UntypedNoneExpression,
@@ -35,6 +37,10 @@ export interface StringExpression extends ExpressionInterface<'String', StringTy
   value: string;
 }
 
+export interface BooleanExpression extends ExpressionInterface<'Boolean', BooleanType> {
+  value: boolean;
+}
+
 export interface IdentifierExpression extends ExpressionInterface<'Identifier'> {
   value: string;
 }
@@ -56,6 +62,7 @@ export type Expression = FunctionCallExpression
   | IdentifierExpression
   | StringExpression
   | FloatExpression
+  | BooleanExpression
   | NoneExpression
   | IntegerExpression
   | ArrayExpression
@@ -63,6 +70,7 @@ export type Expression = FunctionCallExpression
 
 
 export function addType(expression: UntypedStringExpression, resultType: StringType, messages?: Message[]): StringExpression;
+export function addType(expression: UntypedBooleanExpression, resultType: BooleanType, messages?: Message[]): BooleanExpression;
 export function addType(expression: UntypedIdentifierExpression, resultType: Type | null, messages?: Message[]): IdentifierExpression;
 export function addType(expression: UntypedNoneExpression, resultType: NoneType, messages?: Message[]): NoneExpression;
 export function addType(expression: UntypedExpression, resultType: null, messages?: Message[]): UnrecognizedExpression;
