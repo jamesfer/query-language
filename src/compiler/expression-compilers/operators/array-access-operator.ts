@@ -9,11 +9,11 @@ import {
   makeFunctionCallExpression,
 } from '../function/interpret-function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
-import { buildList } from '../../compiler-utils/list';
+import { buildListInterpreter } from '../../compiler-utils/interpret-list';
 
 const ArrayAccessPrecedence = 12;
 
-let buildArrayAccessList = buildList(TokenKind.OpenBrace, TokenKind.CloseBrace, TokenKind.Comma, 3);
+let buildArrayAccessList = buildListInterpreter(TokenKind.OpenBrace, TokenKind.CloseBrace, TokenKind.Comma, 3);
 
 export function buildArrayAccessOperatorExpression(tokens: Token[], leftExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (leftExpression && operatorPrecedence < ArrayAccessPrecedence) {

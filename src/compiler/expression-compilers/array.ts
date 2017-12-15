@@ -8,7 +8,7 @@ import {
 } from '../../untyped-expression.model';
 import { typeSyntaxTree } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
-import { buildList } from '../compiler-utils/list';
+import { buildListInterpreter } from '../compiler-utils/interpret-list';
 import { EvaluationScope } from '../evaluation-scope';
 import {
   ArrayValue, LazyValue, makeLazyArrayValue,
@@ -65,7 +65,7 @@ function makeArrayExpression(elements: UntypedExpression[], tokens: Token[] = []
   };
 }
 
-let buildArrayList = buildList(TokenKind.OpenBracket, TokenKind.CloseBracket, TokenKind.Comma);
+let buildArrayList = buildListInterpreter(TokenKind.OpenBracket, TokenKind.CloseBracket, TokenKind.Comma);
 
 export function buildArrayExpression(tokens: Token[]): UntypedArrayExpression | undefined {
   let list = buildArrayList(tokens);

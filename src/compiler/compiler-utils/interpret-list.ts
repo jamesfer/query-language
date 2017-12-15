@@ -58,7 +58,7 @@ function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]
   }
 }
 
-export function buildList(openToken: TokenKind, closeToken: TokenKind, sepToken: TokenKind, maxItems: number = -1)
+export function buildListInterpreter(openToken: TokenKind, closeToken: TokenKind, sepToken: TokenKind, maxItems: number = -1)
 : (tokens: Token[]) => { expressions: UntypedExpression[], tokens: Token[], messages: Message[] } | undefined {
   return tokens => {
     if (tokenArrayMatches(tokens, openToken)) {

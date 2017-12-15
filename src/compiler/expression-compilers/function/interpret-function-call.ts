@@ -5,7 +5,7 @@ import {
 } from '../../../untyped-expression.model';
 import { Message } from '../../../message.model';
 import { Token, TokenKind } from '../../../token.model';
-import { buildList } from '../../compiler-utils/list';
+import { buildListInterpreter } from '../../compiler-utils/interpret-list';
 
 export const FunctionCallPrecedence = 100;
 
@@ -30,7 +30,7 @@ export function makeFunctionCallExpression(functionExpression: UntypedExpression
   };
 }
 
-let buildArguments = buildList(TokenKind.OpenParen, TokenKind.CloseParen, TokenKind.Comma);
+let buildArguments = buildListInterpreter(TokenKind.OpenParen, TokenKind.CloseParen, TokenKind.Comma);
 
 export function buildFunctionCallExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (operatorPrecedence < FunctionCallPrecedence && prevExpression !== null) {
