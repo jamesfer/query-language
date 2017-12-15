@@ -1,7 +1,7 @@
 export * from './api';
-export { TokenKind } from './token.model';
+export * from './expression.model';
+export * from './message.model';
+export * from './token.model';
+export * from './type.model';
+export * from './value.model';
 export { standardLibrary } from './scope/standard-library';
-// export { parseTokens } from './parse-tokens/parse-tokens';
-// export { buildSyntaxTree } from './build-expression/build-expression';
-// export { typeSyntaxTree } from './type-expression/type-expression';
-// export { evaluateExpression } from './evaluate-expression/evaluate-expression';
