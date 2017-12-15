@@ -9,15 +9,20 @@ import {
   makeFunctionCallExpression,
 } from '../function/interpret-function-call';
 import { makeIdentifierExpression } from '../identifier';
+import { hasHigherPrecedence, precedences } from './precedences';
 
-const UnaryMinusPrecedence = 12;
 
 export function interpretUnaryMinusOperator(tokens: Token[], leftExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.SubtractOperator)
     && leftExpression === null
-    && UnaryMinusPrecedence > operatorPrecedence
+    && hasHigherPrecedence(precedences.unaryMinus, operatorPrecedence)
   ) {
-    const rightExpression = interpretExpression(tokens.slice(1), null, UnaryMinusPrecedence);
+    const rightExpression = interpretExpression(
+      tokens.slice(1),
+      null,
+      precedences.unaryMinus.precedence,
+    );
+
     if (rightExpression) {
       const identifierExpression = makeIdentifierExpression(tokens[0]);
       const integerExpression = {
