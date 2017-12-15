@@ -11,16 +11,20 @@ import {
 } from '../function/interpret-function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
 import { makeUntypedNoneExpression } from '../../../untyped-expression.model';
+import { hasHigherPrecedence, precedences } from './precedences';
 
-const RangePrecedence = 6;
 
-export function interpretRangeOperator(tokens: Token[], leftExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
-  if (tokenArrayMatches(tokens, TokenKind.RangeOperator) && operatorPrecedence < RangePrecedence) {
+export function interpretRangeOperator(tokens: Token[], leftExpression: UntypedExpression | null, prevPrecedence: number): UntypedFunctionCallExpression | undefined {
+  const hasPrecedence = hasHigherPrecedence(precedences.range, prevPrecedence);
+  if (tokenArrayMatches(tokens, TokenKind.RangeOperator) && hasPrecedence) {
     let rangeToken: Token = tokens[0];
     tokens = tokens.slice(1);
 
     let start = leftExpression || makeUntypedNoneExpression();
-    let end = interpretExpression(tokens, null, RangePrecedence) || makeUntypedNoneExpression();
+    let end = interpretExpression(tokens, null, precedences.range.precedence);
+    if (!end) {
+      end = makeUntypedNoneExpression();
+    }
 
     let messages: Message[] = [];
     if (start.kind === 'None' && end.kind === 'None') {
@@ -31,6 +35,3 @@ export function interpretRangeOperator(tokens: Token[], leftExpression: UntypedE
     return makeFunctionCallExpression(identifier, [start, end], messages);
   }
 }
-
-
-

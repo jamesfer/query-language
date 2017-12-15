@@ -10,13 +10,13 @@ import {
 } from '../function/interpret-function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
 import { buildListInterpreter } from '../../compiler-utils/interpret-list';
-
-const ArraySlicePrecedence = 12;
+import { hasHigherPrecedence, precedences } from './precedences';
 
 let buildArrayAccessList = buildListInterpreter(TokenKind.OpenBrace, TokenKind.CloseBrace, TokenKind.Comma, 3);
 
-export function interpretArraySliceOperator(tokens: Token[], leftExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
-  if (leftExpression && operatorPrecedence < ArraySlicePrecedence) {
+export function interpretArraySliceOperator(tokens: Token[], leftExpression: UntypedExpression | null, prevPrecedence: number): UntypedFunctionCallExpression | undefined {
+  const hasPrecedence = hasHigherPrecedence(precedences.slice, prevPrecedence);
+  if (leftExpression && hasPrecedence) {
     let list = buildArrayAccessList(tokens);
     if (list) {
       // Check if any indexes were given
@@ -29,6 +29,3 @@ export function interpretArraySliceOperator(tokens: Token[], leftExpression: Unt
     }
   }
 }
-
-
-
