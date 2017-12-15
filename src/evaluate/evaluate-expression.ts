@@ -11,6 +11,7 @@ import { EvaluationScope } from './evaluation-scope';
 import { evaluateArrayLiteral } from './evaluators/array-literal';
 import { evaluateFunctionCall } from './evaluators/function-call';
 import {
+  evaluateBooleanLiteral,
   evaluateIdentifier,
   evaluateIntegerLiteral, evaluateStringLiteral,
 } from './evaluators/simple-expressions';
@@ -28,6 +29,8 @@ export function evaluateExpression(scope: EvaluationScope, expression: Expressio
       return evaluateIntegerLiteral(scope, expression);
     case 'Float':
       return evaluateFloatLiteral(scope, expression);
+    case 'Boolean':
+      return evaluateBooleanLiteral(scope, expression);
     case 'Array':
       return evaluateArrayLiteral(scope, expression);
     case 'FunctionCall':

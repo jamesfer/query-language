@@ -9,6 +9,7 @@ import {
   IntegerType, makeArrayType, StringType,
   Type,
   FloatType,
+  BooleanType,
 } from '../src/type.model';
 import { addPositions } from '../src/compile/parse/parse-tokens';
 
@@ -30,6 +31,8 @@ export const integerToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.IntegerLiteral);
 export const floatToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.FloatLiteral);
+export const booleanToken: (value: string, begin?: Position | number) => Token
+  = partial(makeToken, TokenKind.BooleanLiteral);
 export const stringToken: (value: string, begin?: Position | number) => Token
   = partial(makeToken, TokenKind.StringLiteral);
 
@@ -93,7 +96,9 @@ export function arrayExpression(
 }
 
 function valueExpression(
-  kind: 'String' | 'Integer' | 'Float' | 'Identifier', resultType: Type | null, value: any,
+  kind: 'String' | 'Integer' | 'Float' | 'Identifier' | 'Boolean',
+  resultType: Type | null,
+  value: any,
 ): ValueExpressionExpectation {
   return {
     kind,
@@ -105,6 +110,7 @@ function valueExpression(
 export const stringExpression = partial(valueExpression, 'String', StringType);
 export const integerExpression = partial(valueExpression, 'Integer', IntegerType);
 export const floatExpression = partial(valueExpression, 'Float', FloatType);
+export const booleanExpression = partial(valueExpression, 'Boolean', BooleanType);
 // Needs explicit type annotation to prevent "Exported variable X has
 // or is using name Y from external module, but cannot be named" errors.
 export const identifierExpression: Function2<Type | null, any, ValueExpressionExpectation> = partial(valueExpression, 'Identifier');

@@ -1,6 +1,6 @@
 import { evaluates } from '../runner';
 import {
-  arrayExpression,
+  arrayExpression, booleanExpression, booleanToken,
   closeBracketToken,
   commaToken,
   floatExpression, floatToken, integerExpression, integerToken,
@@ -148,5 +148,21 @@ describe('values', function() {
     messages: [
       makeMessage('Error', 'Missing separator between items'),
     ],
-  })
+  });
+
+  evaluates('boolean true literals', 'true', {
+    result: true,
+    tokens: [
+      booleanToken('true'),
+    ],
+    expression: booleanExpression(true),
+  });
+
+  evaluates('boolean false literals', 'false', {
+    result: false,
+    tokens: [
+      booleanToken('false'),
+    ],
+    expression: booleanExpression(false),
+  });
 });

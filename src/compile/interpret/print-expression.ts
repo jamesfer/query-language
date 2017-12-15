@@ -7,6 +7,7 @@ export function printExpression(expression: UntypedExpression): string {
     case 'Integer':
     case 'Float':
     case 'String':
+    case 'Boolean':
     case 'Identifier':
       return toString(expression.value);
     case 'Array':
