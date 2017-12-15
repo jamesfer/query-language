@@ -15,7 +15,7 @@ const ArrayAccessPrecedence = 12;
 
 let buildArrayAccessList = buildListInterpreter(TokenKind.OpenBrace, TokenKind.CloseBrace, TokenKind.Comma, 3);
 
-export function buildArrayAccessOperatorExpression(tokens: Token[], leftExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
+export function interpretArrayAccessOperator(tokens: Token[], leftExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (leftExpression && operatorPrecedence < ArrayAccessPrecedence) {
     let list = buildArrayAccessList(tokens);
     if (list) {

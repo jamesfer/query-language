@@ -8,32 +8,32 @@ import { Expression } from '../expression.model';
 import { assertNever } from '../utils';
 import { LazyNoneValue, LazyValue, Value } from '../value.model';
 import { EvaluationScope } from './evaluation-scope';
-import { evaluateArrayLiteral } from './expression-compilers/array';
+import { evaluateArray } from './expression-compilers/array';
 import { evaluateFunctionCall } from './expression-compilers/function/evaluate-function-call';
 import {
-  evaluateBooleanLiteral,
+  evaluateBoolean,
   } from './expression-compilers/boolean';
 import {
-  evaluateFloatLiteral,
-  } from './expression-compilers/numeric';
+  evaluateFloat,
+  } from './expression-compilers/number';
 import { evaluateIdentifier } from './expression-compilers/identifier';
-import { evaluateIntegerLiteral } from './expression-compilers/numeric';
-import { evaluateStringLiteral } from './expression-compilers/string';
+import { evaluateInteger } from './expression-compilers/number';
+import { evaluateString } from './expression-compilers/string';
 
 export type PartialPlaceholder = {};
 
 export function evaluateExpression(scope: EvaluationScope, expression: Expression): LazyValue | undefined {
   switch (expression.kind) {
     case 'String':
-      return evaluateStringLiteral(scope, expression);
+      return evaluateString(scope, expression);
     case 'Integer':
-      return evaluateIntegerLiteral(scope, expression);
+      return evaluateInteger(scope, expression);
     case 'Float':
-      return evaluateFloatLiteral(scope, expression);
+      return evaluateFloat(scope, expression);
     case 'Boolean':
-      return evaluateBooleanLiteral(scope, expression);
+      return evaluateBoolean(scope, expression);
     case 'Array':
-      return evaluateArrayLiteral(scope, expression);
+      return evaluateArray(scope, expression);
     case 'FunctionCall':
       return evaluateFunctionCall(scope, expression);
     case 'Identifier':
@@ -45,17 +45,6 @@ export function evaluateExpression(scope: EvaluationScope, expression: Expressio
     default:
       return assertNever(expression);
   }
-}
-
-export function evaluateSyntaxTree(scope: EvaluationScope, expression: Expression): Observable<any> | undefined {
-  let lazyValue = evaluateExpression(scope, expression);
-  if (lazyValue) {
-    return stripLazyValue(lazyValue);
-  }
-}
-
-export function stripLazyValue(lazyValue: LazyValue): Observable<any> | undefined {
-  return lazyValue.map(stripValue).mergeAll();
 }
 
 export function stripValue(value: Value): Observable<any> {
@@ -76,5 +65,16 @@ export function stripValue(value: Value): Observable<any> {
       return Observable.combineLatest(properties).map(fromPairs);
     default:
       return assertNever(value);
+  }
+}
+
+export function stripLazyValue(lazyValue: LazyValue): Observable<any> | undefined {
+  return lazyValue.map(stripValue).mergeAll();
+}
+
+export function evaluateSyntaxTree(scope: EvaluationScope, expression: Expression): Observable<any> | undefined {
+  let lazyValue = evaluateExpression(scope, expression);
+  if (lazyValue) {
+    return stripLazyValue(lazyValue);
   }
 }

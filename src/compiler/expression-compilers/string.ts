@@ -13,9 +13,6 @@ import { EvaluationScope } from '../evaluation-scope';
 import { LazyValue, makeStringValue, StringValue } from '../../value.model';
 import { Observable } from 'rxjs/Observable';
 
-export function parseStringExpression(scope: TypedScope, expression: UntypedStringExpression): StringExpression {
-  return addType(expression, StringType);
-}
 
 function makeStringExpression(token: Token, messages: Message[] = []): UntypedStringExpression {
   const value = token.value;
@@ -30,7 +27,7 @@ function makeStringExpression(token: Token, messages: Message[] = []): UntypedSt
   };
 }
 
-export function buildStringExpression(tokens: Token[]): UntypedExpression | undefined {
+export function intepretString(tokens: Token[]): UntypedExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.StringLiteral)) {
     let messages: Message[] = [];
     let strToken = tokens[0];
@@ -41,6 +38,10 @@ export function buildStringExpression(tokens: Token[]): UntypedExpression | unde
   }
 }
 
-export function evaluateStringLiteral(scope: EvaluationScope, expression: StringExpression): LazyValue<StringValue> {
+export function typeString(scope: TypedScope, expression: UntypedStringExpression): StringExpression {
+  return addType(expression, StringType);
+}
+
+export function evaluateString(scope: EvaluationScope, expression: StringExpression): LazyValue<StringValue> {
   return Observable.of(makeStringValue(expression.value));
 }

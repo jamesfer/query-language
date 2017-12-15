@@ -11,8 +11,8 @@ import { standardLibrary } from './scope/standard-library';
 import { Token } from './token.model';
 import { Expression } from './expression.model';
 import { parseTokens } from './compiler/parse/parse-tokens';
-import { buildSyntaxTree } from './compiler/interpret-expression';
-import { typeSyntaxTree } from './compiler/type-expression';
+import { interpretSyntaxTree } from './compiler/interpret-expression';
+import { typeExpression } from './compiler/type-expression';
 import { evaluateSyntaxTree } from './compiler/evaluate-expression';
 
 
@@ -51,7 +51,7 @@ export function compile(code: string, scope?: Scope): CompilationResult {
 
   // Build syntax tree
   if (result.compiled) {
-    let expressions = buildSyntaxTree(tokenResult.tokens);
+    let expressions = interpretSyntaxTree(tokenResult.tokens);
     result.messages = result.messages.concat(extractMessages(expressions));
     result.compiled = expressions.length !== 0
       && result.messages.length === 0
@@ -61,7 +61,7 @@ export function compile(code: string, scope?: Scope): CompilationResult {
     if (expressions.length > 0) {
       scope = scope || convertToScope(standardLibrary);
       let typedScope = extractTypedScope(scope);
-      let typedExpression = typeSyntaxTree(typedScope, expressions[0]);
+      let typedExpression = typeExpression(typedScope, expressions[0]);
       if (typedExpression.kind !== 'Unrecognized') {
         result.expression = typedExpression;
       }

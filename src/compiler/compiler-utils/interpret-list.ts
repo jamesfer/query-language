@@ -2,10 +2,10 @@ import { UntypedExpression } from '../../untyped-expression.model';
 import { makeMessage, Message } from '../../message.model';
 import { Token, TokenKind } from '../../token.model';
 import { tokenArrayMatches } from '../../utils';
-import { buildExpression } from '../interpret-expression';
+import { interpretExpression } from '../interpret-expression';
 
 function consumeElementAndSep(sepToken: TokenKind, tokens: Token[]): { expression: UntypedExpression | null, sep: Token | null } {
-  let expression = buildExpression(tokens);
+  let expression = interpretExpression(tokens);
   if (expression) {
     tokens = tokens.slice(expression.tokens.length);
   }

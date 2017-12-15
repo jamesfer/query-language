@@ -7,30 +7,30 @@ import {
 import { assertNever } from '../utils';
 import { UntypedNoneExpression } from '../untyped-expression.model';
 import { TypedScope } from './typed-scope.model';
-import { parseArrayExpression } from './expression-compilers/array';
-import { parseFunctionCallExpression } from './expression-compilers/function/type-function-call';
-import { parseIdentifierExpression } from './expression-compilers/identifier';
-import { parseNumericExpression } from './expression-compilers/numeric';
-import { parseStringExpression } from './expression-compilers/string';
+import { typeArray } from './expression-compilers/array';
+import { typeFunctionCall } from './expression-compilers/function/type-function-call';
+import { typeIdentifier } from './expression-compilers/identifier';
+import { typeNumber } from './expression-compilers/number';
+import { typeString } from './expression-compilers/string';
 import { NoneType } from '../type.model';
-import { parseBooleanExpression } from './expression-compilers/boolean';
+import { typeBoolean } from './expression-compilers/boolean';
 
 
-export function typeSyntaxTree(scope: TypedScope, expression: UntypedExpression): Expression {
+export function typeExpression(scope: TypedScope, expression: UntypedExpression): Expression {
   switch (expression.kind) {
     case 'String':
-      return parseStringExpression(scope, expression);
+      return typeString(scope, expression);
     case 'Integer':
     case 'Float':
-      return parseNumericExpression(scope, expression);
+      return typeNumber(scope, expression);
     case 'Boolean':
-      return parseBooleanExpression(scope, expression);
+      return typeBoolean(scope, expression);
     case 'Array':
-      return parseArrayExpression(scope, expression);
+      return typeArray(scope, expression);
     case 'Identifier':
-      return parseIdentifierExpression(scope, expression);
+      return typeIdentifier(scope, expression);
     case 'FunctionCall':
-      return parseFunctionCallExpression(scope, expression);
+      return typeFunctionCall(scope, expression);
     case 'None':
       return makeNoneExpression(scope, expression);
     case 'Unrecognized':

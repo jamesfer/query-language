@@ -15,18 +15,6 @@ import { EvaluationScope } from '../evaluation-scope';
 import { TypedScope } from '../typed-scope.model';
 import { toNumber } from 'lodash';
 
-export function parseNumericExpression(scope: TypedScope, expression: UntypedFloatExpression | UntypedIntegerExpression): IntegerExpression | FloatExpression {
-  if (expression.kind === 'Integer') {
-    return {
-      ...expression,
-      resultType: IntegerType,
-    };
-  }
-  return {
-    ...expression,
-    resultType: FloatType,
-  }
-}
 
 function makeFloatExpression(value: number, token: Token, messages: Message[] = []): UntypedFloatExpression {
   return {
@@ -46,7 +34,7 @@ function makeIntegerExpression(value: number, token: Token, messages: Message[] 
   };
 }
 
-export function buildNumericExpression(tokens: Token[]): UntypedFloatExpression | UntypedIntegerExpression | undefined {
+export function interpretNumber(tokens: Token[]): UntypedFloatExpression | UntypedIntegerExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.FloatLiteral)
     || tokenArrayMatches(tokens, TokenKind.IntegerLiteral)) {
     const token = tokens[0];
@@ -70,10 +58,23 @@ export function buildNumericExpression(tokens: Token[]): UntypedFloatExpression 
   }
 }
 
-export function evaluateIntegerLiteral(scope: EvaluationScope, expression: IntegerExpression): LazyValue<IntegerValue> {
+export function typeNumber(scope: TypedScope, expression: UntypedFloatExpression | UntypedIntegerExpression): IntegerExpression | FloatExpression {
+  if (expression.kind === 'Integer') {
+    return {
+      ...expression,
+      resultType: IntegerType,
+    };
+  }
+  return {
+    ...expression,
+    resultType: FloatType,
+  }
+}
+
+export function evaluateInteger(scope: EvaluationScope, expression: IntegerExpression): LazyValue<IntegerValue> {
   return makeLazyIntegerValue(toNumber(expression.value));
 }
 
-export function evaluateFloatLiteral(scope: EvaluationScope, expression: FloatExpression): LazyValue<FloatValue> {
+export function evaluateFloat(scope: EvaluationScope, expression: FloatExpression): LazyValue<FloatValue> {
   return makeLazyFloatValue(toNumber(expression.value));
 }

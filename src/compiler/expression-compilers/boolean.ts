@@ -8,11 +8,8 @@ import { BooleanValue, LazyValue, makeBooleanValue } from '../../value.model';
 import { Observable } from 'rxjs/Observable';
 import { tokenArrayMatches } from '../../utils';
 
-export function parseBooleanExpression(scope: TypedScope, expression: UntypedBooleanExpression): BooleanExpression {
-  return addType(expression, BooleanType);
-}
 
-export function buildBooleanExpression(tokens: Token[]): UntypedBooleanExpression | undefined {
+export function interpretBoolean(tokens: Token[]): UntypedBooleanExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.BooleanLiteral)) {
     let booleanToken = tokens[0];
     return {
@@ -24,6 +21,10 @@ export function buildBooleanExpression(tokens: Token[]): UntypedBooleanExpressio
   }
 }
 
-export function evaluateBooleanLiteral(scope: EvaluationScope, expression: BooleanExpression): LazyValue<BooleanValue> {
+export function typeBoolean(scope: TypedScope, expression: UntypedBooleanExpression): BooleanExpression {
+  return addType(expression, BooleanType);
+}
+
+export function evaluateBoolean(scope: EvaluationScope, expression: BooleanExpression): LazyValue<BooleanValue> {
   return Observable.of(makeBooleanValue(expression.value));
 }

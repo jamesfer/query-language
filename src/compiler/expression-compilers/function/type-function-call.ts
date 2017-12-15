@@ -14,7 +14,7 @@ import {
   Expression,
   FunctionCallExpression,
 } from '../../../expression.model';
-import { typeSyntaxTree } from '../../type-expression';
+import { typeExpression } from '../../type-expression';
 import { TypedScope } from '../../typed-scope.model';
 
 interface PartialApplication {
@@ -85,8 +85,8 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
   return null;
 }
 
-export function parseFunctionCallExpression(scope: TypedScope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
-  let funcExp = typeSyntaxTree(scope, expression.functionExpression);
+export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
+  let funcExp = typeExpression(scope, expression.functionExpression);
   let funcType = funcExp.resultType;
   let messages: Message[] = [];
   if (funcType && funcType.kind !== 'Function') {
@@ -103,7 +103,7 @@ export function parseFunctionCallExpression(scope: TypedScope, expression: Untyp
       // let expectedType = getNextArgType(partial);
 
       // Apply the next arg to the function signature
-      let typedArg = typeSyntaxTree(scope, arg);
+      let typedArg = typeExpression(scope, arg);
       partial = applyArg(partial, typedArg.resultType);
 
       // Check if the expected type matches the actual type

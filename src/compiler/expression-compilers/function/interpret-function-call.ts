@@ -32,7 +32,7 @@ export function makeFunctionCallExpression(functionExpression: UntypedExpression
 
 let buildArguments = buildListInterpreter(TokenKind.OpenParen, TokenKind.CloseParen, TokenKind.Comma);
 
-export function buildFunctionCallExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
+export function interpretFunctionCall(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
   if (operatorPrecedence < FunctionCallPrecedence && prevExpression !== null) {
     let args = buildArguments(tokens);
     if (args) {

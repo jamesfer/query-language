@@ -2,13 +2,13 @@ import { UntypedExpression } from '../../untyped-expression.model';
 import { makeMessage } from '../../message.model';
 import { Token, TokenKind } from '../../token.model';
 import { tokenArrayMatches } from '../../utils';
-import { buildExpression } from '../interpret-expression';
+import { interpretExpression } from '../interpret-expression';
 
-export function buildParenthesisExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
+export function interpretParenthesis(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.OpenParen) && prevExpression === null) {
     let openParen = tokens[0];
     tokens = tokens.slice(1);
-    let expression = buildExpression(tokens);
+    let expression = interpretExpression(tokens);
     if (expression) {
       tokens = tokens.slice(expression.tokens.length);
       expression.tokens = [openParen, ...expression.tokens];

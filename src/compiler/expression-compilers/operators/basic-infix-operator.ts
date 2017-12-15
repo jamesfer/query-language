@@ -4,7 +4,7 @@ import {
   UntypedFunctionCallExpression,
 } from '../../../untyped-expression.model';
 import { Token, TokenKind } from '../../../token.model';
-import { buildExpression } from '../../interpret-expression';
+import { interpretExpression } from '../../interpret-expression';
 import {
   makeFunctionCallExpression,
 } from '../function/interpret-function-call';
@@ -67,7 +67,7 @@ function hasHigherPrecedence(
   return false;
 }
 
-export function buildInfixOperatorExpression(
+export function interpretInfixOperator(
   tokens: Token[],
   leftExpression: UntypedExpression | null,
   operatorPrecedence: number
@@ -76,7 +76,7 @@ export function buildInfixOperatorExpression(
   const matchingOp = operatorMap[opToken.kind];
   if (hasHigherPrecedence(matchingOp, operatorPrecedence)) {
     const newPrecedence = matchingOp.precedence;
-    const rightExpression = buildExpression(tokens.slice(1), null, newPrecedence);
+    const rightExpression = interpretExpression(tokens.slice(1), null, newPrecedence);
     const identifierExpression = makeIdentifierExpression(opToken);
     return makeFunctionCallExpression(identifierExpression, [
       leftExpression,

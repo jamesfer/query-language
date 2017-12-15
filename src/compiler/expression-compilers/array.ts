@@ -6,7 +6,7 @@ import {
   UntypedArrayExpression,
   UntypedExpression,
 } from '../../untyped-expression.model';
-import { typeSyntaxTree } from '../type-expression';
+import { typeExpression } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
 import { buildListInterpreter } from '../compiler-utils/interpret-list';
 import { EvaluationScope } from '../evaluation-scope';
@@ -19,7 +19,22 @@ import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/filter';
 import { evaluateExpression } from '../evaluate-expression';
 
-export function parseArrayExpression(scope: TypedScope, expression: UntypedArrayExpression): ArrayExpression {
+
+let buildArrayList = buildListInterpreter(TokenKind.OpenBracket, TokenKind.CloseBracket, TokenKind.Comma);
+
+export function interpretArray(tokens: Token[]): UntypedArrayExpression | undefined {
+  let list = buildArrayList(tokens);
+  if (list) {
+    return {
+      kind: 'Array',
+      elements: list.expressions,
+      tokens: list.tokens,
+      messages: list.messages,
+    };
+  }
+}
+
+export function typeArray(scope: TypedScope, expression: UntypedArrayExpression): ArrayExpression {
   let messages: Message[] = [];
   let elements: Expression[] = new Array(expression.elements.length);
   let elementType: Type | null = null;
@@ -27,7 +42,7 @@ export function parseArrayExpression(scope: TypedScope, expression: UntypedArray
   // Process each element expression
   let index = -1;
   while (++index < expression.elements.length) {
-    let typedExpression = typeSyntaxTree(scope, expression.elements[index]);
+    let typedExpression = typeExpression(scope, expression.elements[index]);
     elements[index] = typedExpression;
 
     // Check the type with the existing element type
@@ -56,25 +71,7 @@ export function parseArrayExpression(scope: TypedScope, expression: UntypedArray
   };
 }
 
-function makeArrayExpression(elements: UntypedExpression[], tokens: Token[] = [], messages: Message[] = []): UntypedArrayExpression {
-  return {
-    kind: 'Array',
-    elements,
-    tokens,
-    messages,
-  };
-}
-
-let buildArrayList = buildListInterpreter(TokenKind.OpenBracket, TokenKind.CloseBracket, TokenKind.Comma);
-
-export function buildArrayExpression(tokens: Token[]): UntypedArrayExpression | undefined {
-  let list = buildArrayList(tokens);
-  if (list) {
-    return makeArrayExpression(list.expressions, list.tokens, list.messages);
-  }
-}
-
-export function evaluateArrayLiteral(scope: EvaluationScope, expression: ArrayExpression): LazyValue<ArrayValue> {
+export function evaluateArray(scope: EvaluationScope, expression: ArrayExpression): LazyValue<ArrayValue> {
   let elements = Observable.from(expression.elements)
     .map(element => evaluateExpression(scope, element))
     .filter(element => !!element) as Observable<Observable<Value>>;

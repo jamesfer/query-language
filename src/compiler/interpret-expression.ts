@@ -1,23 +1,23 @@
 import { UntypedExpression } from '../untyped-expression.model';
 import { Token } from '../token.model';
 import { firstResult } from '../utils';
-import { buildFunctionCallExpression } from './expression-compilers/function/interpret-function-call';
-import { buildIdentifierExpression } from './expression-compilers/identifier';
+import { interpretFunctionCall } from './expression-compilers/function/interpret-function-call';
+import { interpretIdentifier } from './expression-compilers/identifier';
 import { buildOperatorExpression } from './expression-compilers/operators/operator';
-import { buildParenthesisExpression } from './expression-compilers/parenthesis';
+import { interpretParenthesis } from './expression-compilers/parenthesis';
 import { makeUntypedUnrecognizedExpression } from '../untyped-expression.model';
-import { buildStringExpression } from './expression-compilers/string';
-import { buildNumericExpression } from './expression-compilers/numeric';
-import { buildArrayExpression } from './expression-compilers/array';
-import { buildBooleanExpression } from './expression-compilers/boolean';
+import { intepretString } from './expression-compilers/string';
+import { interpretNumber } from './expression-compilers/number';
+import { interpretArray } from './expression-compilers/array';
+import { interpretBoolean } from './expression-compilers/boolean';
 
 function buildLiteralExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
   if (prevExpression === null) {
     return firstResult([
-      buildStringExpression,
-      buildNumericExpression,
-      buildArrayExpression,
-      buildBooleanExpression,
+      intepretString,
+      interpretNumber,
+      interpretArray,
+      interpretBoolean,
     ], tokens)
   }
 }
@@ -25,16 +25,16 @@ function buildLiteralExpression(tokens: Token[], prevExpression: UntypedExpressi
 function runExpressionBuilders(tokens: Token[], prevExpression: UntypedExpression | null = null, operatorPrecedence: number = 0): UntypedExpression | undefined {
   if (tokens.length) {
     return firstResult([
-      buildParenthesisExpression,
+      interpretParenthesis,
       buildLiteralExpression,
-      buildIdentifierExpression,
-      buildFunctionCallExpression,
+      interpretIdentifier,
+      interpretFunctionCall,
       buildOperatorExpression,
     ], tokens, prevExpression, operatorPrecedence);
   }
 }
 
-export function buildExpression(tokens: Token[], prevExpression: UntypedExpression | null = null, operatorPrecedence: number = 0): UntypedExpression | null {
+export function interpretExpression(tokens: Token[], prevExpression: UntypedExpression | null = null, operatorPrecedence: number = 0): UntypedExpression | null {
   let result: UntypedExpression | undefined;
   let expressionPart = runExpressionBuilders(tokens, prevExpression, operatorPrecedence);
   while (expressionPart) {
@@ -45,11 +45,11 @@ export function buildExpression(tokens: Token[], prevExpression: UntypedExpressi
   return result || null;
 }
 
-export function buildSyntaxTree(tokens: Token[]): UntypedExpression[] {
+export function interpretSyntaxTree(tokens: Token[]): UntypedExpression[] {
   let expressions: UntypedExpression[] = [];
   let remainingTokens = tokens;
   while (remainingTokens.length) {
-    let result = buildExpression(remainingTokens)
+    let result = interpretExpression(remainingTokens)
       || makeUntypedUnrecognizedExpression(remainingTokens);
     remainingTokens = remainingTokens.slice(result.tokens.length);
     expressions.push(result);
