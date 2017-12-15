@@ -1,6 +1,9 @@
 import { makeMessage, Message } from '../../message.model';
-import { Token, Position } from '../../token.model';
+import { Token, Position, TokenKind } from '../../token.model';
 import { patterns, whitespacePattern } from './token-patterns';
+import { includes } from 'lodash';
+
+const ignoredTokens = [ TokenKind.Comment ];
 
 export interface TokenList {
   tokens: Token[],
@@ -124,8 +127,10 @@ export function tokenizeCode(code: string): TokenList {
         unrecognisedCharacters = '';
       }
 
-      // Save the token found
-      tokens.push(result.token);
+      // Save the token found if it is not ignored
+      if (!includes(ignoredTokens, result.token.kind)) {
+        tokens.push(result.token);
+      }
       remaining = remaining.substr(result.skip);
       position = result.token.end;
     }

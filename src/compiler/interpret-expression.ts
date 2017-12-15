@@ -13,14 +13,6 @@ import { interpretArray } from './expression-compilers/array';
 import { interpretBoolean } from './expression-compilers/boolean';
 
 
-const ignoredTokens = [ TokenKind.Comment ];
-
-function skipIgnoredTokens(tokens: Token[]) {
-  return dropWhile(tokens, token => {
-    return includes(ignoredTokens, token.kind);
-  });
-}
-
 function buildLiteralExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
   if (prevExpression === null) {
     return firstResult([
@@ -57,14 +49,14 @@ export function interpretExpression(tokens: Token[], prevExpression: UntypedExpr
 
 export function interpretSyntaxTree(tokens: Token[]): UntypedExpression[] {
   let expressions: UntypedExpression[] = [];
-  let remainingTokens = skipIgnoredTokens(tokens);
+  let remainingTokens = tokens;
   while (remainingTokens.length) {
     let result = interpretExpression(remainingTokens)
       || makeUntypedUnrecognizedExpression(remainingTokens);
     expressions.push(result);
 
     remainingTokens = remainingTokens.slice(result.tokens.length);
-    remainingTokens = skipIgnoredTokens(remainingTokens);
+    remainingTokens = remainingTokens;
   }
   return expressions;
 }
