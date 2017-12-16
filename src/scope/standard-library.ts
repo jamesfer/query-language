@@ -8,6 +8,7 @@ import { ifBranch } from './standard-library/branching/if';
 import { math } from './standard-library/math/math';
 import { otherOperators } from './standard-library/other-operators';
 import { comparators } from './standard-library/comparators';
+import { take } from './standard-library/array/take';
 
 export const standardLibrary: Library = {
   ...math,
@@ -21,4 +22,5 @@ export const standardLibrary: Library = {
   sum,
   map,
   head,
+  take,
 };
