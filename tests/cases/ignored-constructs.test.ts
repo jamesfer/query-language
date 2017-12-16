@@ -40,9 +40,27 @@ describe('ignored constructs', function() {
   evaluates('supports comments', '-- This is a comment\n1', {
     result: 1,
     tokens: [
-      commentToken('-- This is a comment'),
       integerToken('1', [ 1, 0 ]),
     ],
     expression: integerExpression(1),
+  });
+
+  evaluates('supports comments in the middle of expressions',
+    '[1 \n--This is a comment\n ,2, -- This is a comment\n 3]', {
+    result: [ 1, 2, 3 ],
+    tokens: [
+      openBracketToken(),
+      integerToken('1'),
+      commaToken([ 2, 1 ]),
+      integerToken('2'),
+      commaToken(),
+      integerToken('3', [ 1, 1 ]),
+      closeBracketToken(),
+    ],
+    expression: arrayExpression(IntegerType, [
+      integerExpression(1),
+      integerExpression(2),
+      integerExpression(3),
+    ]),
   });
 });

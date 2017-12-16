@@ -8,7 +8,7 @@ export interface TokenTest {
 export const whitespacePattern = /^[\s]+/;
 export const patterns: TokenTest[] = [
   {
-    test: /^--.*$/m,
+    test: /^--[^\n\r]*/,
     type: TokenKind.Comment
   },
   {
