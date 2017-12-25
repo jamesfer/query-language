@@ -11,7 +11,7 @@ import {
   makeFloatValue,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
-import { evaluateArguments } from '../../library-utils';
+import { evalArgs } from '../../library-utils';
 
 function sumFunc(list: ArrayValue): LazyValue<FloatValue> {
   return list.value.reduce((sum, { value }) => sum + (value as number), 0)
@@ -20,5 +20,5 @@ function sumFunc(list: ArrayValue): LazyValue<FloatValue> {
 
 export const sum: LibraryEntry = {
   type: makeFunctionType([makeArrayType(FloatType)], FloatType),
-  impl: evaluateArguments(sumFunc),
+  impl: evalArgs(sumFunc),
 };

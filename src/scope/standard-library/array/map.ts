@@ -10,7 +10,7 @@ import {
   makeLazyArrayValue,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
-import { evaluateArguments } from '../../library-utils';
+import { evalArgs } from '../../library-utils';
 
 function mapFunc(func: FunctionValue, list: ArrayValue): LazyValue<ArrayValue> {
   let mapped = list.value.map(el => of(el)).switchMap(value => func.value(value));
@@ -22,5 +22,5 @@ export const map: LibraryEntry = {
     makeFunctionType(['T'], 'R'),
     makeArrayType('T'),
   ], makeArrayType('T')),
-  impl: evaluateArguments(mapFunc),
+  impl: evalArgs(mapFunc),
 };

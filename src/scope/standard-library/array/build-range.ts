@@ -16,7 +16,7 @@ import {
   NoneValue,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
-import { evaluateArguments } from '../../library-utils';
+import { evalArgs } from '../../library-utils';
 
 
 export function buildRangeFunc(a: IntegerValue | NoneValue, b: IntegerValue | NoneValue): LazyValue<ArrayValue> {
@@ -37,5 +37,5 @@ export const buildRange: LibraryEntry = {
     makeUnionType([IntegerType, NoneType]),
     makeUnionType([IntegerType, NoneType]),
   ], makeArrayType(IntegerType)),
-  impl: evaluateArguments(buildRangeFunc),
+  impl: evalArgs(buildRangeFunc),
 };

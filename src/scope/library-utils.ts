@@ -12,18 +12,22 @@ import {
 
 export type LibraryFunc = (...args: Value[]) => LazyValue;
 
-export function evaluateArguments<R extends (Value | LazyValue) = Value>(func: LibraryFunc): PlainFunctionValue {
+/**
+ * Returns a function that will automatically evaluate all its lazy arguments
+ * and call the given function with them.
+ */
+export function evalArgs<R extends (Value | LazyValue) = Value>(func: LibraryFunc): PlainFunctionValue {
   return (...args) => Observable.combineLatest(...args, func).switch();
 }
 
 export function bindFloatFunction(func: (...args: number[]) => number) {
-  return evaluateArguments((...args: FloatValue[]) => {
+  return evalArgs((...args: FloatValue[]) => {
     return makeLazyFloatValue(func(...map(args, 'value')))
   });
 }
 
 export function bindBooleanFunction(func: (...args: number[]) => boolean) {
-  return evaluateArguments((...args: FloatValue[]) => {
+  return evalArgs((...args: FloatValue[]) => {
     return makeLazyBooleanValue(func(...map(args, 'value')));
   });
 }

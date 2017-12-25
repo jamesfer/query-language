@@ -4,7 +4,7 @@ import {
 } from '../../../value.model';
 import 'rxjs/add/operator/take';
 import { Observable } from 'rxjs/Observable';
-import { evaluateArguments } from '../../library-utils';
+import { evalArgs } from '../../library-utils';
 import {
   IntegerType, makeArrayType,
   makeFunctionType,
@@ -17,5 +17,5 @@ function takeFunc(count: IntegerValue, list: ArrayValue): LazyValue<ArrayValue> 
 
 export const take: LibraryEntry = {
   type: makeFunctionType([IntegerType, makeArrayType('T')], 'T'),
-  impl: evaluateArguments(takeFunc),
+  impl: evalArgs(takeFunc),
 };

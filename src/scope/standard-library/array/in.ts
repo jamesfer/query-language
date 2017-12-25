@@ -13,7 +13,7 @@ import {
   Value,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
-import { evaluateArguments } from '../../library-utils';
+import { evalArgs } from '../../library-utils';
 
 
 function inFunc(item: Value, list: ArrayValue): LazyValue<BooleanValue> {
@@ -23,5 +23,5 @@ function inFunc(item: Value, list: ArrayValue): LazyValue<BooleanValue> {
 
 export const inArray: LibraryEntry = {
   type: makeFunctionType([ 'T', makeArrayType('T') ], BooleanType),
-  impl: evaluateArguments(inFunc),
+  impl: evalArgs(inFunc),
 };
