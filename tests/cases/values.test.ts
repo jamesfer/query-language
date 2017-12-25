@@ -146,7 +146,12 @@ describe('values', function() {
       integerExpression(3),
     ]),
     messages: [
-      makeMessage('Error', 'Missing separator between items'),
+      makeMessage(
+        'Error',
+        'Missing separator between items',
+        [ 0, 5 ],
+        [ 0, 6 ],
+      ),
     ],
   });
 

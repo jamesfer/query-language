@@ -58,10 +58,10 @@ export function makeUntypedNoneExpression(): UntypedNoneExpression {
   };
 }
 
-export function makeUntypedUnrecognizedExpression(tokens: Token[]): UntypedUnrecognizedExpression {
+export function makeUntypedUnrecognizedExpression(tokens: Token[], messages: Message[] = []): UntypedUnrecognizedExpression {
   return {
     kind: 'Unrecognized',
     tokens,
-    messages: [],
+    messages,
   };
 }

@@ -32,7 +32,7 @@ export function intepretString(tokens: Token[]): UntypedExpression | undefined {
     let messages: Message[] = [];
     let strToken = tokens[0];
     if (head(strToken.value) !== last(strToken.value)) {
-      messages.push(makeMessage('Error', 'String literal is missing closing quote.'));
+      messages.push(makeMessage('Error', 'String literal is missing closing quote.', strToken.end));
     }
     return makeStringExpression(strToken, messages);
   }

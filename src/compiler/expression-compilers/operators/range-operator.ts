@@ -12,6 +12,7 @@ import {
 import { makeCustomIdentifierExpression } from '../identifier';
 import { makeUntypedNoneExpression } from '../../../untyped-expression.model';
 import { hasHigherPrecedence, precedences } from './precedences';
+import { first, last } from 'lodash';
 
 
 export function interpretRangeOperator(tokens: Token[], leftExpression: UntypedExpression | null, prevPrecedence: number): UntypedFunctionCallExpression | undefined {
@@ -28,7 +29,14 @@ export function interpretRangeOperator(tokens: Token[], leftExpression: UntypedE
 
     let messages: Message[] = [];
     if (start.kind === 'None' && end.kind === 'None') {
-      messages.push(makeMessage('Error', 'Range operator was not given a lower or an upper bound.'));
+      const beginToken = first(start.tokens) || rangeToken;
+      const endToken = last(start.tokens) || rangeToken;
+      messages.push(makeMessage(
+        'Error',
+        'Range operator was not given a lower or an upper bound.',
+        beginToken,
+        endToken
+      ));
     }
 
     const identifier = makeCustomIdentifierExpression('..', [rangeToken]);

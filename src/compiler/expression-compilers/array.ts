@@ -4,7 +4,6 @@ import { Token, TokenKind, } from '../../token.model';
 import { isTypeOf, makeArrayType, makeUnionType, Type } from '../../type.model';
 import {
   UntypedArrayExpression,
-  UntypedExpression,
 } from '../../untyped-expression.model';
 import { typeExpression } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
