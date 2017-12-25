@@ -4,17 +4,14 @@ import {
   makeFunctionType,
 } from '../../../type.model';
 import {
-  ArrayValue,
-  FunctionValue,
-  LazyValue,
-  makeLazyArrayValue,
+  makeLazyArrayValue, PlainFunctionValue, Value,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
-import { evaluateArguments } from '../../library-utils';
+import { evalArgs } from '../../library-utils';
+import { Observable } from 'rxjs/Observable';
 
-function mapFunc(func: FunctionValue, list: ArrayValue): LazyValue<ArrayValue> {
-  let mapped = list.value.map(el => of(el)).switchMap(value => func.value(value));
-  return makeLazyArrayValue(mapped);
+function mapFunc(func: PlainFunctionValue, list: Observable<Value>) {
+  return makeLazyArrayValue(list.switchMap(value => func(of(value))));
 }
 
 export const map: LibraryEntry = {
@@ -22,5 +19,5 @@ export const map: LibraryEntry = {
     makeFunctionType(['T'], 'R'),
     makeArrayType('T'),
   ], makeArrayType('T')),
-  impl: evaluateArguments(mapFunc),
+  impl: evalArgs(mapFunc),
 };

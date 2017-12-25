@@ -9,19 +9,17 @@ import {
 } from '../../../type.model';
 import {
   ArrayValue,
-  IntegerValue,
   LazyValue,
   makeArrayValue,
   makeIntegerValue,
-  NoneValue,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
-import { evaluateArguments } from '../../library-utils';
+import { evalArgs } from '../../library-utils';
 
 
-export function buildRangeFunc(a: IntegerValue | NoneValue, b: IntegerValue | NoneValue): LazyValue<ArrayValue> {
-  let start: number = a.value !== null ? a.value : 0;
-  let end: number = b.value !== null ? b.value : Infinity;
+export function buildRangeFunc(a: number | null, b: number | null): LazyValue<ArrayValue> {
+  let start: number = a !== null ? a : 0;
+  let end: number = b !== null ? b : Infinity;
   let sign = start < end ? 1 : -1;
   let count = end === Infinity ? Infinity : Math.abs(start - end);
   let arr = Observable.range(0, count)
@@ -37,5 +35,5 @@ export const buildRange: LibraryEntry = {
     makeUnionType([IntegerType, NoneType]),
     makeUnionType([IntegerType, NoneType]),
   ], makeArrayType(IntegerType)),
-  impl: evaluateArguments(buildRangeFunc),
+  impl: evalArgs(buildRangeFunc),
 };

@@ -1,5 +1,3 @@
-
-
 import { Library, LibraryEntry } from '../library';
 import { BooleanType, FloatType, makeFunctionType } from '../../type.model';
 import { bindBooleanFunction } from '../library-utils';

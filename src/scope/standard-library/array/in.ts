@@ -6,22 +6,22 @@ import {
   makeFunctionType,
 } from '../../../type.model';
 import {
-  ArrayValue,
   BooleanValue,
   LazyValue,
   makeBooleanValue,
   Value,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
-import { evaluateArguments } from '../../library-utils';
+import { evalArgs } from '../../library-utils';
+import { Observable } from 'rxjs/Observable';
 
 
-function inFunc(item: Value, list: ArrayValue): LazyValue<BooleanValue> {
-  return list.value.first(el => el.value === item.value, () => true, false)
+function inFunc(item: any, list: Observable<Value>): LazyValue<BooleanValue> {
+  return list.first(el => el.value === item, () => true, false)
     .map(makeBooleanValue);
 }
 
 export const inArray: LibraryEntry = {
   type: makeFunctionType([ 'T', makeArrayType('T') ], BooleanType),
-  impl: evaluateArguments(inFunc),
+  impl: evalArgs(inFunc),
 };

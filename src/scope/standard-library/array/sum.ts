@@ -5,20 +5,20 @@ import {
   makeFunctionType,
 } from '../../../type.model';
 import {
-  ArrayValue,
   FloatValue,
   LazyValue,
-  makeFloatValue,
+  makeFloatValue, Value,
 } from '../../../value.model';
 import { LibraryEntry } from '../../library';
-import { evaluateArguments } from '../../library-utils';
+import { evalArgs } from '../../library-utils';
+import { Observable } from 'rxjs/Observable';
 
-function sumFunc(list: ArrayValue): LazyValue<FloatValue> {
-  return list.value.reduce((sum, { value }) => sum + (value as number), 0)
+function sumFunc(list: Observable<Value>): LazyValue<FloatValue> {
+  return list.reduce((sum, { value }) => sum + (value as number), 0)
     .map(makeFloatValue);
 }
 
 export const sum: LibraryEntry = {
   type: makeFunctionType([makeArrayType(FloatType)], FloatType),
-  impl: evaluateArguments(sumFunc),
+  impl: evalArgs(sumFunc),
 };
