@@ -6,28 +6,27 @@ import {
   FloatValue,
   LazyValue, makeLazyBooleanValue,
   makeLazyFloatValue,
-  PlainFunctionValue,
-  Value,
+  PlainFunctionValue, PlainValue,
 } from '../value.model';
-
-export type LibraryFunc = (...args: Value[]) => LazyValue;
 
 /**
  * Returns a function that will automatically evaluate all its lazy arguments
- * and call the given function with them.
+ * and call the given function with values of them.
  */
-export function evalArgs<R extends (Value | LazyValue) = Value>(func: LibraryFunc): PlainFunctionValue {
-  return (...args) => Observable.combineLatest(...args, func).switch();
+export function evalArgs(func: (...args: PlainValue[]) => LazyValue): PlainFunctionValue {
+  return (...args) => Observable.combineLatest(...args, (...values) => {
+    return func(...map(values, 'value'));
+  }).switch();
 }
 
 export function bindFloatFunction(func: (...args: number[]) => number) {
-  return evalArgs((...args: FloatValue[]) => {
-    return makeLazyFloatValue(func(...map(args, 'value')))
+  return evalArgs((...args: number[]) => {
+    return makeLazyFloatValue(func(...args));
   });
 }
 
 export function bindBooleanFunction(func: (...args: number[]) => boolean) {
-  return evalArgs((...args: FloatValue[]) => {
-    return makeLazyBooleanValue(func(...map(args, 'value')));
+  return evalArgs((...args: number[]) => {
+    return makeLazyBooleanValue(func(...args));
   });
 }

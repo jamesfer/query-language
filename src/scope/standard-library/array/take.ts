@@ -1,6 +1,5 @@
 import {
-  ArrayValue, FloatValue, IntegerValue,
-  LazyValue, makeArrayValue,
+  makeLazyArrayValue, Value,
 } from '../../../value.model';
 import 'rxjs/add/operator/take';
 import { Observable } from 'rxjs/Observable';
@@ -11,8 +10,8 @@ import {
 } from '../../../type.model';
 import { LibraryEntry } from '../../library';
 
-function takeFunc(count: IntegerValue, list: ArrayValue): LazyValue<ArrayValue> {
-  return Observable.of(makeArrayValue(list.value.take(count.value)));
+function takeFunc(count: number, list: Observable<Value>) {
+  return makeLazyArrayValue(list.take(count));
 }
 
 export const take: LibraryEntry = {
