@@ -42,13 +42,13 @@ export function interpretNumber(tokens: Token[]): UntypedFloatExpression | Untyp
 
     let messages: Message[] = [];
     if (isNaN(value)) {
-      messages.push(makeMessage('Error', 'Not a valid number.'));
+      messages.push(makeMessage('Error', 'Not a valid number.', token));
     }
     else if (value >= Number.MAX_VALUE) {
-      messages.push(makeMessage('Error', 'Value is larger than the maximum value of ' + Number.MAX_VALUE));
+      messages.push(makeMessage('Error', 'Value is larger than the maximum value of ' + Number.MAX_VALUE, token));
     }
     else if (value <= Number.MIN_VALUE) {
-      messages.push(makeMessage('Error', 'Value is smaller than the minimum value of ' + Number.MIN_VALUE));
+      messages.push(makeMessage('Error', 'Value is smaller than the minimum value of ' + Number.MIN_VALUE, token));
     }
 
     if (token.kind === TokenKind.IntegerLiteral) {

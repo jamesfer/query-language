@@ -1,4 +1,4 @@
-import { every } from 'lodash';
+import { every, first, last } from 'lodash';
 import {
   UntypedExpression,
   UntypedFunctionCallExpression,
@@ -19,13 +19,22 @@ export function interpretArraySliceOperator(tokens: Token[], leftExpression: Unt
   if (leftExpression && hasPrecedence) {
     let list = buildArrayAccessList(tokens);
     if (list) {
+      const identifier = makeCustomIdentifierExpression('[]', []);
+      const expression = makeFunctionCallExpression(identifier, list.expressions, list.messages, list.tokens);
+
       // Check if any indexes were given
       if (every(list.expressions, arg => arg.kind === 'None')) {
-        list.messages.push(makeMessage('Warning', 'No indexes were supplied to array slice expression. Remove the brackets to simplify.'));
+        const firstToken = first(expression.tokens) || tokens[0];
+        const lastToken = last(expression.tokens);
+        expression.messages.push(makeMessage(
+          'Warning',
+          'No indexes were supplied to array slice expression. Remove the brackets to simplify.',
+          firstToken,
+          lastToken,
+        ));
       }
 
-      const identifier = makeCustomIdentifierExpression('[]', []);
-      return makeFunctionCallExpression(identifier, list.expressions, list.messages, list.tokens);
+      return expression;
     }
   }
 }

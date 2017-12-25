@@ -3,6 +3,7 @@ import { makeMessage, Message } from '../../message.model';
 import { Token, TokenKind } from '../../token.model';
 import { tokenArrayMatches } from '../../utils';
 import { interpretExpression } from '../interpret-expression';
+import { last, first } from 'lodash';
 
 function consumeElementAndSep(sepToken: TokenKind, tokens: Token[]): { expression: UntypedExpression | null, sep: Token | null } {
   let expression = interpretExpression(tokens);
@@ -31,8 +32,15 @@ function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]
       tokens = tokens.slice(expression.tokens.length);
       usedTokens = usedTokens.concat(expression.tokens);
 
-      if (!sep && !tokenArrayMatches(tokens, closeToken)) {
-        messages.push(makeMessage('Error', 'Missing separator between items'));
+      if (!sep && !tokenArrayMatches(tokens, closeToken) && tokens.length) {
+        const lastToken = last(usedTokens);
+        const nextToken = tokens[0];
+        messages.push(makeMessage(
+          'Error',
+          'Missing separator between items',
+          lastToken ? lastToken.end : nextToken.begin,
+          nextToken.begin,
+        ));
       }
     }
     if (sep) {
@@ -40,7 +48,11 @@ function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]
       tokens = tokens.slice(1);
 
       if (!expression) {
-        messages.push(makeMessage('Error', 'Unneeded separator between items'));
+        messages.push(makeMessage(
+          'Error',
+          'Unneeded separator between items',
+          sep,
+        ));
       }
     }
 
@@ -73,11 +85,23 @@ export function buildListInterpreter(openToken: TokenKind, closeToken: TokenKind
         list.tokens.push(tokens[0]);
       }
       else {
-        list.messages.push(makeMessage('Error', 'Missing closing token'));
+        const lastToken = last(list.tokens) || openingToken;
+        list.messages.push(makeMessage(
+          'Error',
+          'Missing closing token',
+          lastToken
+        ));
       }
 
       if (maxItems !== -1 && list.expressions.length > maxItems) {
-        list.messages.push(makeMessage('Error', 'Too many elements'));
+        const firstExcessiveToken = first(list.expressions[maxItems].tokens);
+        const lastToken = last(list.tokens) || openingToken;
+        list.messages.push(makeMessage(
+          'Error',
+          'Too many elements',
+          firstExcessiveToken || openingToken,
+          lastToken || openingToken,
+        ));
       }
 
       return list;

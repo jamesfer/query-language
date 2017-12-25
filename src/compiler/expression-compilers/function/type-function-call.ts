@@ -1,5 +1,5 @@
 import { UntypedFunctionCallExpression } from 'untyped-expression.model';
-import { filter, map, assign } from 'lodash';
+import { filter, map, last } from 'lodash';
 import { makeMessage, Message } from '../../../message.model';
 import {
   applyGenericMap,
@@ -7,10 +7,8 @@ import {
   isTypeOf,
   makeFunctionType,
   Type,
-  FunctionType,
 } from '../../../type.model';
 import {
-  addType,
   Expression,
   FunctionCallExpression,
 } from '../../../expression.model';
@@ -90,7 +88,11 @@ export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionC
   let funcType = funcExp.resultType;
   let messages: Message[] = [];
   if (funcType && funcType.kind !== 'Function') {
-    messages.push(makeMessage('Error', 'Cannot call an expression that is not a function.'));
+    messages.push(makeMessage(
+      'Error',
+      'Cannot call an expression that is not a function.',
+      funcExp.tokens[0],
+    ));
   }
 
   let partial = makeInitialPartial(funcType);
@@ -110,7 +112,12 @@ export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionC
       let expectedType = getNextArgType(partial);
       if (expectedType && typedArg.resultType
         && !isTypeOf(expectedType, typedArg.resultType)) {
-        typedArg.messages.push(makeMessage('Error', `Argument has an incorrect type.`));
+        typedArg.messages.push(makeMessage(
+          'Error',
+          'Argument has an incorrect type.',
+          typedArg.tokens[0],
+          last(typedArg.tokens),
+        ));
       }
 
       typedArgs.push(typedArg);
@@ -122,7 +129,12 @@ export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionC
 
   // Check if the number of arguments are correct.
   if (funcType && funcType.kind === 'Function' && typedArgs.length > funcType.argTypes.length) {
-    messages.push(makeMessage('Error', 'Too many arguments supplied to function call.'));
+    messages.push(makeMessage(
+      'Error',
+      'Too many arguments supplied to function call.',
+      expression.tokens[0],
+      last(expression.tokens)
+    ));
   }
 
   return {

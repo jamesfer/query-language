@@ -30,7 +30,7 @@ export function interpretIdentifier(tokens: Token[]): UntypedIdentifierExpressio
 export function typeIdentifier(scope: TypedScope, expression: UntypedIdentifierExpression): IdentifierExpression {
   let resultType = scope[expression.value] || null;
   let messages: Message[] = resultType ? [] : [
-    makeMessage('Error', `Unrecognized identifier ${expression.value}`),
+    makeMessage('Error', `Unrecognized identifier ${expression.value}`, expression.tokens[0]),
   ];
 
   return addType(expression, resultType, messages);

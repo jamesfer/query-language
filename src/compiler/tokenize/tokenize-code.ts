@@ -123,7 +123,11 @@ export function tokenizeCode(code: string): TokenList {
     if (result.token) {
       // Check if there was an unrecognised token
       if (unrecognisedCharacters.length) {
-        messages.push(makeMessage('Error', 'Unrecognised token ' + unrecognisedCharacters));
+        const unknownPosition: Position = [
+          position[0] - unrecognisedCharacters.length,
+          position[1],
+        ];
+        messages.push(makeMessage('Error', 'Unrecognised token ' + unrecognisedCharacters, unknownPosition));
         unrecognisedCharacters = '';
       }
 
