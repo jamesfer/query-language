@@ -3,7 +3,6 @@ import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/switch';
 import { Observable } from 'rxjs/Observable';
 import {
-  FloatValue,
   LazyValue, makeLazyBooleanValue,
   makeLazyFloatValue,
   PlainFunctionValue, PlainValue,
@@ -19,13 +18,13 @@ export function evalArgs(func: (...args: PlainValue[]) => LazyValue): PlainFunct
   }).switch();
 }
 
-export function bindFloatFunction(func: (...args: number[]) => number) {
+export function bindFloatFunction(func: (...args: number[]) => number): PlainFunctionValue {
   return evalArgs((...args: number[]) => {
     return makeLazyFloatValue(func(...args));
   });
 }
 
-export function bindBooleanFunction(func: (...args: number[]) => boolean) {
+export function bindBooleanFunction(func: (...args: number[]) => boolean): PlainFunctionValue {
   return evalArgs((...args: number[]) => {
     return makeLazyBooleanValue(func(...args));
   });
