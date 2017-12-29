@@ -1,8 +1,8 @@
-import { makeFunctionType } from '../type.model';
+import { makeFunctionType } from '../type';
 import {
   makeLazyFunctionValue,
   PlainFunctionValue,
-} from '../value.model';
+} from '../value';
 import { Library, LibraryEntry } from './library';
 import { evalArgs } from './library-utils';
 

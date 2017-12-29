@@ -1,8 +1,8 @@
-import { Token } from '../../../token.model';
+import { Token } from '../../../token';
 import {
   UntypedExpression,
   UntypedFunctionCallExpression,
-} from '../../../untyped-expression.model';
+} from '../../../untyped-expression';
 import { interpretExpression } from '../../interpret-expression';
 import { makeFunctionCallExpression, } from '../function/interpret-function-call';
 import { makeIdentifierExpression } from '../identifier';

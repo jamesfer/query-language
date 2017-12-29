@@ -1,9 +1,9 @@
-import { addType, IdentifierExpression, } from '../../expression.model';
-import { makeMessage, Message } from '../../message.model';
-import { Token, TokenKind } from '../../token.model';
-import { UntypedIdentifierExpression, } from '../../untyped-expression.model';
+import { addType, IdentifierExpression, } from '../../expression';
+import { makeMessage, Message } from '../../message';
+import { Token, TokenKind } from '../../token';
+import { UntypedIdentifierExpression, } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
-import { LazyValue } from '../../value.model';
+import { LazyValue } from '../../value';
 import { EvaluationScope } from '../evaluation-scope';
 import { TypedScope } from '../typed-scope.model';
 

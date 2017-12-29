@@ -1,16 +1,16 @@
-import { FloatExpression, IntegerExpression, } from '../../expression.model';
-import { makeMessage, Message } from '../../message.model';
-import { Token, TokenKind, } from '../../token.model';
-import { FloatType, IntegerType } from '../../type.model';
+import { FloatExpression, IntegerExpression, } from '../../expression';
+import { makeMessage, Message } from '../../message';
+import { Token, TokenKind, } from '../../token';
+import { FloatType, IntegerType } from '../../type';
 import {
   UntypedFloatExpression,
   UntypedIntegerExpression,
-} from '../../untyped-expression.model';
+} from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import {
   FloatValue, IntegerValue, LazyValue, makeLazyFloatValue,
   makeLazyIntegerValue,
-} from '../../value.model';
+} from '../../value';
 import { EvaluationScope } from '../evaluation-scope';
 import { TypedScope } from '../typed-scope.model';
 import { toNumber } from 'lodash';

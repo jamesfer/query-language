@@ -1,9 +1,9 @@
 import {
   makeUntypedUnrecognizedExpression,
   UntypedExpression,
-} from '../../untyped-expression.model';
-import { makeMessage } from '../../message.model';
-import { Token, TokenKind } from '../../token.model';
+} from '../../untyped-expression';
+import { makeMessage } from '../../message';
+import { Token, TokenKind } from '../../token';
 import { tokenArrayMatches } from '../../utils';
 import { interpretExpression } from '../interpret-expression';
 import { last } from 'lodash';

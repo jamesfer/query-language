@@ -1,6 +1,6 @@
-import { UntypedExpression } from '../../untyped-expression.model';
-import { makeMessage, Message } from '../../message.model';
-import { Token, TokenKind } from '../../token.model';
+import { UntypedExpression } from '../../untyped-expression';
+import { makeMessage, Message } from '../../message';
+import { Token, TokenKind } from '../../token';
 import { tokenArrayMatches } from '../../utils';
 import { interpretExpression } from '../interpret-expression';
 import { last, first } from 'lodash';

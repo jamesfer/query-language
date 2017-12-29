@@ -1,6 +1,6 @@
 import { every, reduce } from 'lodash';
 import { Observable } from 'rxjs/Observable';
-import { Message } from './message.model';
+import { Message } from './message';
 import { convertToScope } from './standard-library/library';
 import {
   extractEvaluationScope,
@@ -8,8 +8,8 @@ import {
   Scope,
 } from './scope';
 import { standardLibrary } from './standard-library/standard-library';
-import { Token } from './token.model';
-import { Expression } from './expression.model';
+import { Token } from './token';
+import { Expression } from './expression';
 import { tokenizeCode } from './compiler/tokenize/tokenize-code';
 import { interpretSyntaxTree } from './compiler/interpret-expression';
 import { typeExpression } from './compiler/type-expression';

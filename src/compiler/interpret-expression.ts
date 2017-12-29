@@ -1,12 +1,12 @@
-import { UntypedExpression } from '../untyped-expression.model';
-import { Token, TokenKind } from '../token.model';
+import { UntypedExpression } from '../untyped-expression';
+import { Token, TokenKind } from '../token';
 import { dropWhile, includes } from 'lodash';
 import { firstResult } from '../utils';
 import { interpretFunctionCall } from './expression-compilers/function/interpret-function-call';
 import { interpretIdentifier } from './expression-compilers/identifier';
 import { buildOperatorExpression } from './expression-compilers/operators/operator';
 import { interpretParenthesis } from './expression-compilers/parenthesis';
-import { makeUntypedUnrecognizedExpression } from '../untyped-expression.model';
+import { makeUntypedUnrecognizedExpression } from '../untyped-expression';
 import { intepretString } from './expression-compilers/string';
 import { interpretNumber } from './expression-compilers/number';
 import { interpretArray } from './expression-compilers/array';

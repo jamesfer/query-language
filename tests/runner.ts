@@ -17,10 +17,10 @@ import {
   ArrayExpression,
   Expression,
   FunctionCallExpression,
-} from '../src/expression.model';
-import { Message } from '../src/message.model';
-import { Token } from '../src/token.model';
-import { Type } from '../src/type.model';
+} from '../src/expression';
+import { Message } from '../src/message';
+import { Token } from '../src/token';
+import { Type } from '../src/type';
 import { assertNever } from '../src/utils';
 import { addPositions } from '../src/compiler/tokenize/tokenize-code';
 

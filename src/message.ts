@@ -1,4 +1,4 @@
-import { Position, Token } from './token.model';
+import { Position, Token } from './token';
 import { isArray } from 'lodash';
 
 export type MessageLevel = 'Info' | 'Warning' | 'Error';

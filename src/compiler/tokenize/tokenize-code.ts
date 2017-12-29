@@ -1,5 +1,5 @@
-import { makeMessage, Message } from '../../message.model';
-import { Token, Position, TokenKind } from '../../token.model';
+import { makeMessage, Message } from '../../message';
+import { Token, Position, TokenKind } from '../../token';
 import { patterns, whitespacePattern } from './token-patterns';
 import { includes } from 'lodash';
 

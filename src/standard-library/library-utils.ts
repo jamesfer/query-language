@@ -6,7 +6,7 @@ import {
   LazyValue, makeLazyBooleanValue,
   makeLazyFloatValue,
   PlainFunctionValue, PlainValue,
-} from '../value.model';
+} from '../value';
 
 /**
  * Returns a function that will automatically evaluate all its lazy arguments

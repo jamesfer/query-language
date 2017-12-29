@@ -3,12 +3,12 @@ import {
   FloatType,
   makeArrayType,
   makeFunctionType,
-} from '../../type.model';
+} from '../../type';
 import {
   FloatValue,
   LazyValue,
   makeFloatValue, Value,
-} from '../../value.model';
+} from '../../value';
 import { LibraryEntry } from '../library';
 import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';

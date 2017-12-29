@@ -1,17 +1,17 @@
-import { UntypedFunctionCallExpression } from 'untyped-expression.model';
+import { UntypedFunctionCallExpression } from 'untyped-expression';
 import { filter, map, last } from 'lodash';
-import { makeMessage, Message } from '../../../message.model';
+import { makeMessage, Message } from '../../../message';
 import {
   applyGenericMap,
   createGenericMap,
   isTypeOf,
   makeFunctionType,
   Type,
-} from '../../../type.model';
+} from '../../../type';
 import {
   Expression,
   FunctionCallExpression,
-} from '../../../expression.model';
+} from '../../../expression';
 import { typeExpression } from '../../type-expression';
 import { TypedScope } from '../../typed-scope.model';
 

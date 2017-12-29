@@ -1,10 +1,10 @@
-import { addType, BooleanExpression, } from '../../expression.model';
-import { Token, TokenKind } from '../../token.model';
-import { BooleanType } from '../../type.model';
-import { UntypedBooleanExpression, } from '../../untyped-expression.model';
+import { addType, BooleanExpression, } from '../../expression';
+import { Token, TokenKind } from '../../token';
+import { BooleanType } from '../../type';
+import { UntypedBooleanExpression, } from '../../untyped-expression';
 import { TypedScope } from '../typed-scope.model';
 import { EvaluationScope } from '../evaluation-scope';
-import { BooleanValue, LazyValue, makeBooleanValue } from '../../value.model';
+import { BooleanValue, LazyValue, makeBooleanValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
 import { tokenArrayMatches } from '../../utils';
 
