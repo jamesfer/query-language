@@ -4,8 +4,9 @@ import { head } from './head';
 import { take } from './take';
 import { _in } from './in';
 import { range } from './range';
+import { Library } from 'standard-library/library';
 
-export const array = {
+export const array: Library = {
   sum,
   map,
   head,
