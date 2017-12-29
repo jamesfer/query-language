@@ -7,7 +7,7 @@ import { sum } from './array/sum';
 import { ifBranch } from './branching/if';
 import { math } from './math/math';
 import { otherOperators } from './other-operators';
-import { comparators } from './comparators';
+import { comparators } from './math/comparators';
 import { take } from './array/take';
 
 export const standardLibrary: Library = {
