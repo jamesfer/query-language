@@ -1,4 +1,4 @@
-import { executeExpect } from '../../test-utils';
+import { executeExpect } from '../test-utils';
 
 describe('operators', function() {
   describe('greaterThan', function () {

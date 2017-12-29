@@ -4,15 +4,15 @@ import {
   BooleanType,
   makeArrayType,
   makeFunctionType,
-} from '../../../type.model';
+} from '../../type.model';
 import {
   BooleanValue,
   LazyValue,
   makeBooleanValue,
   Value,
-} from '../../../value.model';
-import { LibraryEntry } from '../../library';
-import { evalArgs } from '../../library-utils';
+} from '../../value.model';
+import { LibraryEntry } from '../library';
+import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';
 
 

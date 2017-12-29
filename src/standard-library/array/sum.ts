@@ -3,14 +3,14 @@ import {
   FloatType,
   makeArrayType,
   makeFunctionType,
-} from '../../../type.model';
+} from '../../type.model';
 import {
   FloatValue,
   LazyValue,
   makeFloatValue, Value,
-} from '../../../value.model';
-import { LibraryEntry } from '../../library';
-import { evalArgs } from '../../library-utils';
+} from '../../value.model';
+import { LibraryEntry } from '../library';
+import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';
 
 function sumFunc(list: Observable<Value>): LazyValue<FloatValue> {

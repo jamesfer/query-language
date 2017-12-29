@@ -1,7 +1,7 @@
 import { mapValues } from 'lodash';
 import { Type } from '../type.model';
 import { makeLazyFunctionValue, PlainFunctionValue, } from '../value.model';
-import { Scope } from './scope';
+import { Scope } from '../scope';
 
 export interface LibraryEntry {
   type: Type,
