@@ -2,12 +2,12 @@ import { of } from 'rxjs/observable/of';
 import {
   makeArrayType,
   makeFunctionType,
-} from '../../../type.model';
+} from '../../type.model';
 import {
   makeLazyArrayValue, PlainFunctionValue, Value,
-} from '../../../value.model';
-import { LibraryEntry } from '../../library';
-import { evalArgs } from '../../library-utils';
+} from '../../value.model';
+import { LibraryEntry } from '../library';
+import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';
 
 function mapFunc(func: PlainFunctionValue, list: Observable<Value>) {

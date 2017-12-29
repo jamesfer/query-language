@@ -1,13 +1,13 @@
 import { every, reduce } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { Message } from './message.model';
-import { convertToScope } from './scope/library';
+import { convertToScope } from './standard-library/library';
 import {
   extractEvaluationScope,
   extractTypedScope,
   Scope,
-} from './scope/scope';
-import { standardLibrary } from './scope/standard-library';
+} from './scope';
+import { standardLibrary } from './standard-library/standard-library';
 import { Token } from './token.model';
 import { Expression } from './expression.model';
 import { tokenizeCode } from './compiler/tokenize/tokenize-code';

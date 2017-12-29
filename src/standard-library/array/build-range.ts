@@ -6,15 +6,15 @@ import {
   makeFunctionType,
   makeUnionType,
   NoneType,
-} from '../../../type.model';
+} from '../../type.model';
 import {
   ArrayValue,
   LazyValue,
   makeArrayValue,
   makeIntegerValue,
-} from '../../../value.model';
-import { LibraryEntry } from '../../library';
-import { evalArgs } from '../../library-utils';
+} from '../../value.model';
+import { LibraryEntry } from '../library';
+import { evalArgs } from '../library-utils';
 
 
 export function buildRangeFunc(a: number | null, b: number | null): LazyValue<ArrayValue> {

@@ -1,4 +1,5 @@
-import { executeExpect } from '../../../test-utils';
+
+import { executeExpect } from '../../test-utils';
 
 describe('sum', function() {
   it('should sum the values in a list', function() {

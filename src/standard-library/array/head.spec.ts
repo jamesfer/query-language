@@ -1,4 +1,5 @@
-import { executeExpect } from '../../../test-utils';
+
+import { executeExpect } from '../../test-utils';
 
 describe('head', function() {
   it('should return the first element of an array', function() {

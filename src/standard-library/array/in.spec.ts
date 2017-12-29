@@ -1,5 +1,5 @@
-import { testExecute } from '../../../test-utils';
 import { expect } from 'chai';
+import { testExecute } from '../../test-utils';
 
 describe('in (array)', function() {
   it('should return true if the value appears in the array', function() {

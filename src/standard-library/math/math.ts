@@ -1,4 +1,4 @@
-import { Library } from '../../library';
+import { Library } from '../library';
 import { operators } from './operators';
 import { trigonometry } from './trigonometry';
 
