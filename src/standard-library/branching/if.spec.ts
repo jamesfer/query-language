@@ -1,4 +1,4 @@
-import { executeExpect } from '../../../test-utils';
+import { executeExpect } from '../../test-utils';
 
 describe('if', function() {
   it('should return the true branch', function() {

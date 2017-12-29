@@ -1,4 +1,5 @@
-import { executeExpect } from '../../../test-utils';
+
+import { executeExpect } from '../../test-utils';
 
 describe('take', function() {
   it('should take a certain number of values from a list', function() {

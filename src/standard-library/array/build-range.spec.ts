@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { testExecute } from '../../../test-utils';
 import { range } from 'lodash';
+import { testExecute } from '../../test-utils';
 
 describe('buildRange', function() {
   it('should build a bounded range', function() {

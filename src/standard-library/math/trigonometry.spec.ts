@@ -1,5 +1,5 @@
-import { executeExpect, testExecute } from '../../../test-utils';
 import { expect } from 'chai';
+import { executeExpect, testExecute } from '../../test-utils';
 
 describe('trigonometry', function() {
   describe('sin', function() {

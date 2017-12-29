@@ -1,5 +1,5 @@
-import { executeExpect, testExecute } from '../../../test-utils';
-import { expect } from 'chai';
+
+import { executeExpect } from '../../test-utils';
 
 describe('operators', function() {
   describe('add', function () {
