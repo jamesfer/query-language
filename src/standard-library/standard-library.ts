@@ -1,5 +1,5 @@
 import { Library } from './library';
-import { ifBranch } from './branching/if';
+import { _if } from './branching/if';
 import { math } from './math/math';
 import { otherOperators } from './other-operators';
 import { comparators } from './math/comparators';
@@ -11,5 +11,5 @@ export const standardLibrary: Library = {
   ...comparators,
   ...array,
 
-  'if': ifBranch,
+  'if': _if,
 };

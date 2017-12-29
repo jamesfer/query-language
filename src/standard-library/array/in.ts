@@ -21,7 +21,7 @@ function inFunc(item: any, list: Observable<Value>): LazyValue<BooleanValue> {
     .map(makeBooleanValue);
 }
 
-export const inArray: LibraryEntry = {
+export const _in: LibraryEntry = {
   type: makeFunctionType([ 'T', makeArrayType('T') ], BooleanType),
   impl: evalArgs(inFunc),
 };

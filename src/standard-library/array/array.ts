@@ -2,7 +2,7 @@ import { sum } from './sum';
 import { map } from './map';
 import { head } from './head';
 import { take } from './take';
-import { inArray } from './in';
+import { _in } from './in';
 import { range } from './range';
 
 export const array = {
@@ -10,6 +10,6 @@ export const array = {
   map,
   head,
   take,
-  'in': inArray,
+  'in': _in,
   '..': range,
 };

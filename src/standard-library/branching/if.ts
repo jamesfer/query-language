@@ -10,7 +10,7 @@ function ifFunc(condition: LazyValue<BooleanValue>, truth: LazyValue, fallacy: L
   return condition.switchMap(c => c ? truth : fallacy);
 }
 
-export const ifBranch: LibraryEntry = {
+export const _if: LibraryEntry = {
   type: makeFunctionType([ BooleanType, 'T', 'F', ],
     makeUnionType([ 'T', 'F' ])),
   impl: ifFunc,
