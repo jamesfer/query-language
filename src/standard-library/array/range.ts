@@ -17,7 +17,7 @@ import { LibraryEntry } from '../library';
 import { evalArgs } from '../library-utils';
 
 
-export function buildRangeFunc(a: number | null, b: number | null): LazyValue<ArrayValue> {
+export function rangeFunc(a: number | null, b: number | null): LazyValue<ArrayValue> {
   let start: number = a !== null ? a : 0;
   let end: number = b !== null ? b : Infinity;
   let sign = start < end ? 1 : -1;
@@ -30,10 +30,10 @@ export function buildRangeFunc(a: number | null, b: number | null): LazyValue<Ar
 
 
 
-export const buildRange: LibraryEntry = {
+export const range: LibraryEntry = {
   type: makeFunctionType([
     makeUnionType([IntegerType, NoneType]),
     makeUnionType([IntegerType, NoneType]),
   ], makeArrayType(IntegerType)),
-  impl: evalArgs(buildRangeFunc),
+  impl: evalArgs(rangeFunc),
 };

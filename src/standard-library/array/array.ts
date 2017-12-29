@@ -3,7 +3,7 @@ import { map } from './map';
 import { head } from './head';
 import { take } from './take';
 import { inArray } from './in';
-import { buildRange } from './build-range';
+import { range } from './range';
 
 export const array = {
   sum,
@@ -11,5 +11,5 @@ export const array = {
   head,
   take,
   'in': inArray,
-  '..': buildRange,
+  '..': range,
 };
