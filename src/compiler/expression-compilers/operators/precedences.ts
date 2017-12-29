@@ -1,4 +1,4 @@
-import { TokenKind } from '../../../token.model';
+import { TokenKind } from '../../../token';
 
 export interface Operator {
   associativity: 'Left' | 'Right',

@@ -6,13 +6,13 @@ import {
   makeFunctionType,
   makeUnionType,
   NoneType,
-} from '../../type.model';
+} from '../../type';
 import {
   ArrayValue,
   LazyValue,
   makeArrayValue,
   makeIntegerValue,
-} from '../../value.model';
+} from '../../value';
 import { LibraryEntry } from '../library';
 import { evalArgs } from '../library-utils';
 

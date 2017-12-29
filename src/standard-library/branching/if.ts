@@ -2,8 +2,8 @@ import {
   BooleanType,
   makeFunctionType,
   makeUnionType,
-} from '../../type.model';
-import { BooleanValue, LazyValue } from '../../value.model';
+} from '../../type';
+import { BooleanValue, LazyValue } from '../../value';
 import { LibraryEntry } from '../library';
 
 function ifFunc(condition: LazyValue<BooleanValue>, truth: LazyValue, fallacy: LazyValue): LazyValue {

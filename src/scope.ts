@@ -1,6 +1,6 @@
 import { mapValues } from 'lodash';
-import { Type } from './type.model';
-import { LazyValue, } from './value.model';
+import { Type } from './type';
+import { LazyValue, } from './value';
 import { TypedScope } from './compiler/typed-scope.model';
 import { EvaluationScope } from './compiler/evaluation-scope';
 

@@ -2,9 +2,9 @@ import { every, first, last } from 'lodash';
 import {
   UntypedExpression,
   UntypedFunctionCallExpression,
-} from '../../../untyped-expression.model';
-import { makeMessage } from '../../../message.model';
-import { Token, TokenKind } from '../../../token.model';
+} from '../../../untyped-expression';
+import { makeMessage } from '../../../message';
+import { Token, TokenKind } from '../../../token';
 import {
   makeFunctionCallExpression,
 } from '../function/interpret-function-call';

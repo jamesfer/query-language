@@ -1,4 +1,4 @@
-import { FloatType, makeFunctionType } from '../../type.model';
+import { FloatType, makeFunctionType } from '../../type';
 import { Library, LibraryEntry } from '../library';
 import { bindFloatFunction } from '../library-utils';
 

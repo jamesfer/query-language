@@ -1,4 +1,4 @@
-import { UntypedExpression } from '../untyped-expression.model';
+import { UntypedExpression } from '../untyped-expression';
 import { assertNever } from '../utils';
 import { toString } from 'lodash';
 

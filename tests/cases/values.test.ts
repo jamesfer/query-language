@@ -8,8 +8,8 @@ import {
   stringExpression,
   stringToken,
 } from '../utils';
-import { IntegerType } from '../../src/type.model';
-import { makeMessage } from '../../src/message.model';
+import { IntegerType } from '../../src/type';
+import { makeMessage } from '../../src/message';
 
 describe('values', function() {
   evaluates('integers', '123', {

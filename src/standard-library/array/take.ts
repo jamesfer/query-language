@@ -1,13 +1,13 @@
 import {
   makeLazyArrayValue, Value,
-} from '../../value.model';
+} from '../../value';
 import 'rxjs/add/operator/take';
 import { Observable } from 'rxjs/Observable';
 import { evalArgs } from '../library-utils';
 import {
   IntegerType, makeArrayType,
   makeFunctionType,
-} from '../../type.model';
+} from '../../type';
 import { LibraryEntry } from '../library';
 
 function takeFunc(count: number, list: Observable<Value>) {

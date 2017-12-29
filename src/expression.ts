@@ -1,6 +1,6 @@
 import { assign } from 'lodash';
-import { Message } from './message.model';
-import { Token } from './token.model';
+import { Message } from './message';
+import { Token } from './token';
 import {
   ArrayType,
   FloatType,
@@ -9,14 +9,14 @@ import {
   StringType,
   Type,
   BooleanType,
-} from './type.model';
+} from './type';
 import {
   UntypedBooleanExpression,
   UntypedExpression,
   UntypedIdentifierExpression,
   UntypedNoneExpression,
   UntypedStringExpression,
-} from './untyped-expression.model';
+} from './untyped-expression';
 
 export interface ExpressionInterface<K extends string, T extends (Type | null) = Type | null> {
   kind: K;

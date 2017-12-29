@@ -1,14 +1,14 @@
 import { filter, map, partial } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
-import { FunctionCallExpression } from '../../../expression.model';
-import { FunctionType } from '../../../type.model';
-import { Expression } from '../../../expression.model';
+import { FunctionCallExpression } from '../../../expression';
+import { FunctionType } from '../../../type';
+import { Expression } from '../../../expression';
 import {
   LazyValue,
   makeFunctionValue,
   PlainFunctionValue,
-} from '../../../value.model';
+} from '../../../value';
 import { evaluateExpression, PartialPlaceholder } from '../../evaluate-expression';
 import { EvaluationScope } from '../../evaluation-scope';
 

@@ -1,10 +1,10 @@
-import { ArrayExpression, Expression } from '../../expression.model';
-import { Message } from '../../message.model';
-import { Token, TokenKind, } from '../../token.model';
-import { isTypeOf, makeArrayType, makeUnionType, Type } from '../../type.model';
+import { ArrayExpression, Expression } from '../../expression';
+import { Message } from '../../message';
+import { Token, TokenKind, } from '../../token';
+import { isTypeOf, makeArrayType, makeUnionType, Type } from '../../type';
 import {
   UntypedArrayExpression,
-} from '../../untyped-expression.model';
+} from '../../untyped-expression';
 import { typeExpression } from '../type-expression';
 import { TypedScope } from '../typed-scope.model';
 import { buildListInterpreter } from '../compiler-utils/interpret-list';
@@ -12,7 +12,7 @@ import { EvaluationScope } from '../evaluation-scope';
 import {
   ArrayValue, LazyValue, makeLazyArrayValue,
   Value,
-} from '../../value.model';
+} from '../../value';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/filter';

@@ -1,4 +1,4 @@
-import { LazyValue } from '../value.model';
+import { LazyValue } from '../value';
 
 export type EvaluationScope = {
   [k: string]: LazyValue,

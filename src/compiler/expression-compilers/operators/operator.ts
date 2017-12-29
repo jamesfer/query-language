@@ -1,5 +1,5 @@
-import { UntypedExpression } from '../../../untyped-expression.model';
-import { Token } from '../../../token.model';
+import { UntypedExpression } from '../../../untyped-expression';
+import { Token } from '../../../token';
 import { firstResult } from '../../../utils';
 import { interpretArraySliceOperator } from './array-slice-operator';
 import { interpretInfixOperator } from './basic-infix-operator';

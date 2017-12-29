@@ -2,10 +2,10 @@ import { of } from 'rxjs/observable/of';
 import {
   makeArrayType,
   makeFunctionType,
-} from '../../type.model';
+} from '../../type';
 import {
   makeLazyArrayValue, PlainFunctionValue, Value,
-} from '../../value.model';
+} from '../../value';
 import { LibraryEntry } from '../library';
 import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';

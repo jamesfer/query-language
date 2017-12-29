@@ -2,9 +2,9 @@ import { reduce, sortBy } from 'lodash';
 import {
   UntypedExpression,
   UntypedFunctionCallExpression,
-} from '../../../untyped-expression.model';
-import { Message } from '../../../message.model';
-import { Token, TokenKind } from '../../../token.model';
+} from '../../../untyped-expression';
+import { Message } from '../../../message';
+import { Token, TokenKind } from '../../../token';
 import { buildListInterpreter } from '../../compiler-utils/interpret-list';
 
 export const FunctionCallPrecedence = 100;

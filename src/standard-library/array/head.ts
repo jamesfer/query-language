@@ -2,8 +2,8 @@ import 'rxjs/add/operator/first';
 import {
   makeArrayType,
   makeFunctionType,
-} from '../../type.model';
-import { ArrayValue, LazyValue, } from '../../value.model';
+} from '../../type';
+import { ArrayValue, LazyValue, } from '../../value';
 import { LibraryEntry } from '../library';
 import 'rxjs/add/operator/switchMap';
 

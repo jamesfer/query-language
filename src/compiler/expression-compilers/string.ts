@@ -1,16 +1,16 @@
 import { head, last } from 'lodash';
-import { addType, StringExpression, } from '../../expression.model';
-import { makeMessage, Message } from '../../message.model';
-import { Token, TokenKind } from '../../token.model';
-import { StringType } from '../../type.model';
+import { addType, StringExpression, } from '../../expression';
+import { makeMessage, Message } from '../../message';
+import { Token, TokenKind } from '../../token';
+import { StringType } from '../../type';
 import {
   UntypedExpression,
   UntypedStringExpression,
-} from '../../untyped-expression.model';
+} from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { TypedScope } from '../typed-scope.model';
 import { EvaluationScope } from '../evaluation-scope';
-import { LazyValue, makeStringValue, StringValue } from '../../value.model';
+import { LazyValue, makeStringValue, StringValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
 
 

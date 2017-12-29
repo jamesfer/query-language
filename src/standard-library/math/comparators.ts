@@ -1,5 +1,5 @@
 import { Library, LibraryEntry } from '../library';
-import { BooleanType, FloatType, makeFunctionType } from '../../type.model';
+import { BooleanType, FloatType, makeFunctionType } from '../../type';
 import { bindBooleanFunction } from '../library-utils';
 
 const greaterThan: LibraryEntry = {

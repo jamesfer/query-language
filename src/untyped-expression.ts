@@ -1,5 +1,5 @@
-import { Message } from './message.model';
-import { Token } from './token.model';
+import { Message } from './message';
+import { Token } from './token';
 
 export interface UntypedExpressionInterface<K> {
   kind: K;

@@ -1,4 +1,4 @@
-import { Token, TokenKind } from './token.model';
+import { Token, TokenKind } from './token';
 
 export function assertNever(x: never): never { return x; }
 

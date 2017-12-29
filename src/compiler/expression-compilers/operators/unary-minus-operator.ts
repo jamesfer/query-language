@@ -1,8 +1,8 @@
 import {
   UntypedExpression,
   UntypedFunctionCallExpression,
-} from '../../../untyped-expression.model';
-import { Token, TokenKind } from '../../../token.model';
+} from '../../../untyped-expression';
+import { Token, TokenKind } from '../../../token';
 import { tokenArrayMatches } from '../../../utils';
 import { interpretExpression } from '../../interpret-expression';
 import {

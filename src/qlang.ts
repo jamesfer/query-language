@@ -1,7 +1,7 @@
 export * from './api';
-export * from './expression.model';
-export * from './message.model';
-export * from './token.model';
-export * from './type.model';
-export * from './value.model';
+export * from './expression';
+export * from './message';
+export * from './token';
+export * from './type';
+export * from './value';
 export { standardLibrary } from './standard-library/standard-library';

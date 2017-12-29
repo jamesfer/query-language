@@ -1,4 +1,4 @@
-import { Token, TokenKind, Position } from '../src/token.model';
+import { Token, TokenKind, Position } from '../src/token';
 import { Function2, partial } from 'lodash';
 import {
   ArrayExpressionExpectation, ExpressionExpectation,
@@ -10,7 +10,7 @@ import {
   Type,
   FloatType,
   BooleanType,
-} from '../src/type.model';
+} from '../src/type';
 import { addPositions } from '../src/compiler/tokenize/tokenize-code';
 
 function makeToken(kind: TokenKind, value: string, begin: Position | number = [ 0, 0 ]): Token {

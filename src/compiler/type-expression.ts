@@ -1,18 +1,18 @@
-import { UntypedExpression } from '../untyped-expression.model';
+import { UntypedExpression } from '../untyped-expression';
 import {
   addType,
   Expression,
   NoneExpression,
-} from '../expression.model';
+} from '../expression';
 import { assertNever } from '../utils';
-import { UntypedNoneExpression } from '../untyped-expression.model';
+import { UntypedNoneExpression } from '../untyped-expression';
 import { TypedScope } from './typed-scope.model';
 import { typeArray } from './expression-compilers/array';
 import { typeFunctionCall } from './expression-compilers/function/type-function-call';
 import { typeIdentifier } from './expression-compilers/identifier';
 import { typeNumber } from './expression-compilers/number';
 import { typeString } from './expression-compilers/string';
-import { NoneType } from '../type.model';
+import { NoneType } from '../type';
 import { typeBoolean } from './expression-compilers/boolean';
 
 
