@@ -8,8 +8,8 @@
     "build": "webpack --progress",
     "watch": "webpack --progress --watch",
     "prod": "webpack --progress --env.production",
-    "test": "nyc --reporter=html --reporter=text mocha src/**/*.spec.ts tests/**/*.test.ts",
-    "test:ci": "nyc --reporter=lcov --reporter=text mocha src/**/*.spec.ts tests/**/*.test.ts",
+    "test": "nyc --reporter=html --reporter=text-summary mocha src/**/*.spec.ts tests/**/*.test.ts",
+    "test:ci": "nyc --reporter=lcovonly --reporter=text-summary mocha src/**/*.spec.ts tests/**/*.test.ts",
     "test:watch": "nodemon -e js,ts -w tests -w src --exec 'npm run test'",
     "test:conformance": "mocha --require ts-node/register tests/**/*.test.ts",
     "test:library": "mocha --require ts-node/register src/**/*.spec.ts"
