@@ -6,7 +6,7 @@ import {
 } from '../expression';
 import { assertNever } from '../utils';
 import { UntypedNoneExpression } from '../untyped-expression';
-import { TypedScope } from './typed-scope.model';
+import { TypedScope } from '../scope';
 import { typeArray } from './expression-compilers/array';
 import { typeFunctionCall } from './expression-compilers/function/type-function-call';
 import { typeIdentifier } from './expression-compilers/identifier';

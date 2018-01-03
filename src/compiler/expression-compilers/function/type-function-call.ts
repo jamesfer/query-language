@@ -13,7 +13,7 @@ import {
   FunctionCallExpression,
 } from '../../../expression';
 import { typeExpression } from '../../type-expression';
-import { TypedScope } from '../../typed-scope.model';
+import { TypedScope } from '../../../scope';
 
 interface PartialApplication {
   expectedArgs: Type[],

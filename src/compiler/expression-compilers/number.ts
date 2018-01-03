@@ -11,8 +11,8 @@ import {
   FloatValue, IntegerValue, LazyValue, makeLazyFloatValue,
   makeLazyIntegerValue,
 } from '../../value';
-import { EvaluationScope } from '../evaluation-scope';
-import { TypedScope } from '../typed-scope.model';
+import { EvaluationScope } from '../../scope';
+import { TypedScope } from '../../scope';
 import { toNumber } from 'lodash';
 
 

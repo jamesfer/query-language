@@ -10,7 +10,7 @@ import {
   PlainFunctionValue,
 } from '../../../value';
 import { evaluateExpression, PartialPlaceholder } from '../../evaluate-expression';
-import { EvaluationScope } from '../../evaluation-scope';
+import { EvaluationScope } from '../../../scope';
 
 interface Placeholder {
   (...a: any[]): any;

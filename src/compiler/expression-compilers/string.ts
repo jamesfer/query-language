@@ -8,8 +8,8 @@ import {
   UntypedStringExpression,
 } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
-import { TypedScope } from '../typed-scope.model';
-import { EvaluationScope } from '../evaluation-scope';
+import { TypedScope } from '../../scope';
+import { EvaluationScope } from '../../scope';
 import { LazyValue, makeStringValue, StringValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
 

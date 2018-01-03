@@ -6,9 +6,9 @@ import {
   UntypedArrayExpression,
 } from '../../untyped-expression';
 import { typeExpression } from '../type-expression';
-import { TypedScope } from '../typed-scope.model';
+import { TypedScope } from '../../scope';
 import { buildListInterpreter } from '../compiler-utils/interpret-list';
-import { EvaluationScope } from '../evaluation-scope';
+import { EvaluationScope } from '../../scope';
 import {
   ArrayValue, LazyValue, makeLazyArrayValue,
   Value,
