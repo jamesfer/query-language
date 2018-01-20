@@ -1,7 +1,7 @@
 import { FloatExpression, IntegerExpression, } from '../../expression';
 import { makeMessage, Message } from '../../message';
 import { Token, TokenKind, } from '../../token';
-import { FloatType, IntegerType } from '../../type/type';
+import { floatType, integerType } from '../../type/constructors';
 import {
   UntypedFloatExpression,
   UntypedIntegerExpression,
@@ -62,12 +62,12 @@ export function typeNumber(scope: TypedScope, expression: UntypedFloatExpression
   if (expression.kind === 'Integer') {
     return {
       ...expression,
-      resultType: IntegerType,
+      resultType: integerType,
     };
   }
   return {
     ...expression,
-    resultType: FloatType,
+    resultType: floatType,
   }
 }
 

@@ -1,7 +1,7 @@
 import { ArrayExpression, Expression } from '../../expression';
 import { Message } from '../../message';
 import { Token, TokenKind, } from '../../token';
-import { makeArrayType, makeUnionType, Type } from '../../type/type';
+import { Type } from '../../type/type';
 import {
   UntypedArrayExpression,
 } from '../../untyped-expression';
@@ -18,6 +18,7 @@ import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/filter';
 import { evaluateExpression } from '../evaluate-expression';
 import { isTypeOf } from '../../type/is-type-of';
+import { makeArrayType, makeUnionType } from '../../type/constructors';
 
 
 let buildArrayList = buildListInterpreter(TokenKind.OpenBracket, TokenKind.CloseBracket, TokenKind.Comma);

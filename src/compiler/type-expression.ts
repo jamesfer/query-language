@@ -12,7 +12,7 @@ import { typeFunctionCall } from './expression-compilers/function/type-function-
 import { typeIdentifier } from './expression-compilers/identifier';
 import { typeNumber } from './expression-compilers/number';
 import { typeString } from './expression-compilers/string';
-import { NoneType } from '../type/type';
+import { noneType } from '../type/constructors';
 import { typeBoolean } from './expression-compilers/boolean';
 
 
@@ -41,7 +41,7 @@ export function typeExpression(scope: TypedScope, expression: UntypedExpression)
 }
 
 export function makeNoneExpression(scope: TypedScope, expression: UntypedNoneExpression): NoneExpression {
-  return addType(expression, NoneType);
+  return addType(expression, noneType);
 }
 
 export function makeUnrecognizedExpression(scope: TypedScope, expression: UntypedExpression): Expression {

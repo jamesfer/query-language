@@ -8,11 +8,12 @@ import {
   openParenToken,
 } from '../utils';
 import {
-  BooleanType,
-  FloatType,
-  IntegerType, makeArrayType,
-  makeFunctionType, makeUnionType,
-} from '../../src/type/type';
+  makeUnionType,
+} from '../../src/type/constructors';
+import {
+  booleanType, floatType,
+  integerType, makeArrayType, makeFunctionType,
+} from '../../src/type/constructors';
 
 describe('functions', function() {
   let headIdentifier = identifierExpression(
@@ -21,12 +22,12 @@ describe('functions', function() {
   );
 
   let addIdentifier = identifierExpression(
-    makeFunctionType([ FloatType, FloatType ], FloatType),
+    makeFunctionType([ floatType, floatType ], floatType),
     '+',
   );
 
   let ifIdentifier = identifierExpression(
-    makeFunctionType([ BooleanType, 'T', 'F' ], makeUnionType(['T', 'F'])),
+    makeFunctionType([ booleanType, 'T', 'F' ], makeUnionType(['T', 'F'])),
     'if',
   );
 
@@ -45,10 +46,10 @@ describe('functions', function() {
       closeParenToken(),
     ],
     expression: functionCallExpression(
-      IntegerType,
+      integerType,
       headIdentifier,
       [
-        arrayExpression(IntegerType, [
+        arrayExpression(integerType, [
           integerExpression(1),
           integerExpression(2),
           integerExpression(3),
@@ -65,7 +66,7 @@ describe('functions', function() {
       integerToken('2', 1),
     ],
     expression: functionCallExpression(
-      FloatType,
+      floatType,
       addIdentifier,
       [
         integerExpression(1),
@@ -89,9 +90,9 @@ describe('functions', function() {
       closeParenToken(),
     ],
     expression: functionCallExpression(
-      IntegerType,
+      integerType,
       functionCallExpression(
-        makeFunctionType([ 'F' ], makeUnionType([ IntegerType, 'F' ])),
+        makeFunctionType([ 'F' ], makeUnionType([ integerType, 'F' ])),
         functionCallExpression(
           makeFunctionType([ 'T', 'F' ], makeUnionType(['F', 'T'])),
           ifIdentifier,
@@ -115,9 +116,9 @@ describe('functions', function() {
       closeParenToken(),
     ],
     expression: functionCallExpression(
-      FloatType,
+      floatType,
       functionCallExpression(
-        makeFunctionType([ FloatType ], FloatType),
+        makeFunctionType([ floatType ], floatType),
         addIdentifier,
         [ integerExpression(1) ]
       ),

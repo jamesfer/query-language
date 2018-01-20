@@ -1,6 +1,6 @@
 import { addType, BooleanExpression, } from '../../expression';
 import { Token, TokenKind } from '../../token';
-import { BooleanType } from '../../type/type';
+import { booleanType } from '../../type/constructors';
 import { UntypedBooleanExpression, } from '../../untyped-expression';
 import { TypedScope } from '../../scope';
 import { EvaluationScope } from '../../scope';
@@ -22,7 +22,7 @@ export function interpretBoolean(tokens: Token[]): UntypedBooleanExpression | un
 }
 
 export function typeBoolean(scope: TypedScope, expression: UntypedBooleanExpression): BooleanExpression {
-  return addType(expression, BooleanType);
+  return addType(expression, booleanType);
 }
 
 export function evaluateBoolean(scope: EvaluationScope, expression: BooleanExpression): LazyValue<BooleanValue> {

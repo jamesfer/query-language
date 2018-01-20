@@ -4,7 +4,6 @@ import { makeMessage, Message } from '../../../message';
 import {
   applyGenericMap,
   createGenericMap,
-  makeFunctionType,
   Type,
 } from '../../../type/type';
 import {
@@ -14,6 +13,7 @@ import {
 import { typeExpression } from '../../type-expression';
 import { TypedScope } from '../../../scope';
 import { isTypeOf } from '../../../type/is-type-of';
+import { makeFunctionType } from '../../../type/constructors';
 
 interface PartialApplication {
   expectedArgs: Type[],

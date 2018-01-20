@@ -6,12 +6,13 @@ import {
   ValueExpressionExpectation,
 } from './runner';
 import {
-  IntegerType, makeArrayType, StringType,
   Type,
-  FloatType,
-  BooleanType,
-} from '../src/type/type';
+  } from '../src/type/type';
 import { addPositions } from '../src/compiler/tokenize/tokenize-code';
+import {
+  booleanType, floatType, integerType, makeArrayType,
+  stringType,
+} from '../src/type/constructors';
 
 function makeToken(kind: TokenKind, value: string, begin: Position | number = [ 0, 0 ]): Token {
   if (typeof begin === 'number') {
@@ -109,10 +110,10 @@ function valueExpression(
   };
 }
 
-export const stringExpression = partial(valueExpression, 'String', StringType);
-export const integerExpression = partial(valueExpression, 'Integer', IntegerType);
-export const floatExpression = partial(valueExpression, 'Float', FloatType);
-export const booleanExpression = partial(valueExpression, 'Boolean', BooleanType);
+export const stringExpression = partial(valueExpression, 'String', stringType);
+export const integerExpression = partial(valueExpression, 'Integer', integerType);
+export const floatExpression = partial(valueExpression, 'Float', floatType);
+export const booleanExpression = partial(valueExpression, 'Boolean', booleanType);
 // Needs explicit type annotation to prevent "Exported variable X has
 // or is using name Y from external module, but cannot be named" errors.
 export const identifierExpression: Function2<Type | null, any, ValueExpressionExpectation> = partial(valueExpression, 'Identifier');
