@@ -7,7 +7,7 @@ import { evalArgs } from '../library-utils';
 import {
   IntegerType, makeArrayType,
   makeFunctionType,
-} from '../../type';
+} from '../../type/type';
 import { LibraryEntry } from '../library';
 
 function takeFunc(count: number, list: Observable<Value>) {

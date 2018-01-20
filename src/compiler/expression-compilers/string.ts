@@ -2,7 +2,7 @@ import { head, last } from 'lodash';
 import { addType, StringExpression, } from '../../expression';
 import { makeMessage, Message } from '../../message';
 import { Token, TokenKind } from '../../token';
-import { StringType } from '../../type';
+import { StringType } from '../../type/type';
 import {
   UntypedExpression,
   UntypedStringExpression,

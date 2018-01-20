@@ -12,7 +12,7 @@ import { typeFunctionCall } from './expression-compilers/function/type-function-
 import { typeIdentifier } from './expression-compilers/identifier';
 import { typeNumber } from './expression-compilers/number';
 import { typeString } from './expression-compilers/string';
-import { NoneType } from '../type';
+import { NoneType } from '../type/type';
 import { typeBoolean } from './expression-compilers/boolean';
 
 

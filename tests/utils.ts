@@ -10,7 +10,7 @@ import {
   Type,
   FloatType,
   BooleanType,
-} from '../src/type';
+} from '../src/type/type';
 import { addPositions } from '../src/compiler/tokenize/tokenize-code';
 
 function makeToken(kind: TokenKind, value: string, begin: Position | number = [ 0, 0 ]): Token {

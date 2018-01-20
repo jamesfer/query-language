@@ -6,7 +6,7 @@ import {
   makeFunctionType,
   makeUnionType,
   NoneType,
-} from '../../type';
+} from '../../type/type';
 import {
   ArrayValue,
   LazyValue,

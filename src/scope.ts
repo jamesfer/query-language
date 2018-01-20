@@ -1,5 +1,5 @@
 import { mapValues } from 'lodash';
-import { Type } from './type';
+import { Type } from './type/type';
 import { LazyValue, } from './value';
 
 export interface ScopeEntry {

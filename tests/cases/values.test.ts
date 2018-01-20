@@ -8,7 +8,7 @@ import {
   stringExpression,
   stringToken,
 } from '../utils';
-import { IntegerType } from '../../src/type';
+import { IntegerType } from '../../src/type/type';
 import { makeMessage } from '../../src/message';
 
 describe('values', function() {

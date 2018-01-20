@@ -1,7 +1,7 @@
 import { FloatExpression, IntegerExpression, } from '../../expression';
 import { makeMessage, Message } from '../../message';
 import { Token, TokenKind, } from '../../token';
-import { FloatType, IntegerType } from '../../type';
+import { FloatType, IntegerType } from '../../type/type';
 import {
   UntypedFloatExpression,
   UntypedIntegerExpression,

@@ -2,7 +2,7 @@ import { of } from 'rxjs/observable/of';
 import {
   makeArrayType,
   makeFunctionType,
-} from '../../type';
+} from '../../type/type';
 import {
   makeLazyArrayValue, PlainFunctionValue, Value,
 } from '../../value';

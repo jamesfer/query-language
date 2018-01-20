@@ -1,7 +1,7 @@
 import { ArrayExpression, Expression } from '../../expression';
 import { Message } from '../../message';
 import { Token, TokenKind, } from '../../token';
-import { isTypeOf, makeArrayType, makeUnionType, Type } from '../../type';
+import { isTypeOf, makeArrayType, makeUnionType, Type } from '../../type/type';
 import {
   UntypedArrayExpression,
 } from '../../untyped-expression';

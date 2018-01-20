@@ -5,7 +5,7 @@ import {
   BooleanType,
   makeArrayType,
   makeFunctionType,
-} from '../../type';
+} from '../../type/type';
 import {
   BooleanValue,
   LazyValue,

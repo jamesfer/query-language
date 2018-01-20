@@ -1,4 +1,4 @@
-import { makeFunctionType } from '../type';
+import { makeFunctionType } from '../type/type';
 import {
   makeLazyFunctionValue,
   PlainFunctionValue,

@@ -9,7 +9,7 @@ import {
   StringType,
   Type,
   BooleanType,
-} from './type';
+} from './type/type';
 import {
   UntypedBooleanExpression,
   UntypedExpression,

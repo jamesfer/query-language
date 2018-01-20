@@ -12,7 +12,7 @@ import {
   FloatType,
   IntegerType, makeArrayType,
   makeFunctionType, makeUnionType,
-} from '../../src/type';
+} from '../../src/type/type';
 
 describe('functions', function() {
   let headIdentifier = identifierExpression(

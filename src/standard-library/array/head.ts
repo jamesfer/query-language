@@ -2,7 +2,7 @@ import 'rxjs/add/operator/first';
 import {
   makeArrayType,
   makeFunctionType,
-} from '../../type';
+} from '../../type/type';
 import { ArrayValue, LazyValue, } from '../../value';
 import { LibraryEntry } from '../library';
 import 'rxjs/add/operator/switchMap';

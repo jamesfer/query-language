@@ -7,7 +7,7 @@ import {
   isTypeOf,
   makeFunctionType,
   Type,
-} from '../../../type';
+} from '../../../type/type';
 import {
   Expression,
   FunctionCallExpression,

@@ -3,7 +3,7 @@ import {
   FloatType,
   makeArrayType,
   makeFunctionType,
-} from '../../type';
+} from '../../type/type';
 import {
   FloatValue,
   LazyValue,

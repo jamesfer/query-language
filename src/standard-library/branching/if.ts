@@ -2,7 +2,7 @@ import {
   BooleanType,
   makeFunctionType,
   makeUnionType,
-} from '../../type';
+} from '../../type/type';
 import { BooleanValue, LazyValue } from '../../value';
 import { LibraryEntry } from '../library';
 import 'rxjs/add/operator/switchMap';

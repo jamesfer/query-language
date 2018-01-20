@@ -1,6 +1,6 @@
 import { addType, BooleanExpression, } from '../../expression';
 import { Token, TokenKind } from '../../token';
-import { BooleanType } from '../../type';
+import { BooleanType } from '../../type/type';
 import { UntypedBooleanExpression, } from '../../untyped-expression';
 import { TypedScope } from '../../scope';
 import { EvaluationScope } from '../../scope';

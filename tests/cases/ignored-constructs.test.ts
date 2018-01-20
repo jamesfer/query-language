@@ -4,7 +4,7 @@ import {
   closeBracketToken, commaToken, commentToken, integerExpression, integerToken,
   openBracketToken,
 } from '../utils';
-import { IntegerType } from '../../src/type';
+import { IntegerType } from '../../src/type/type';
 
 describe('ignored constructs', function() {
   evaluates('ignores spaces and tabs', '[      1 \t \t,2    ]', {
