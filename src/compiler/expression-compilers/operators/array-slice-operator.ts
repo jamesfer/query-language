@@ -17,10 +17,11 @@ let buildArrayAccessList = buildListInterpreter(TokenKind.OpenBrace, TokenKind.C
 export function interpretArraySliceOperator(tokens: Token[], leftExpression: UntypedExpression | null, prevPrecedence: number): UntypedFunctionCallExpression | undefined {
   const hasPrecedence = hasHigherPrecedence(precedences.slice, prevPrecedence);
   if (leftExpression && hasPrecedence) {
-    let list = buildArrayAccessList(tokens);
-    if (list) {
+    const result = buildArrayAccessList(tokens);
+    if (result) {
+      const [ list, messages ] = result;
       const identifier = makeCustomIdentifierExpression('[]', []);
-      const expression = makeFunctionCallExpression(identifier, list.expressions, list.messages, list.tokens);
+      const expression = makeFunctionCallExpression(identifier, list.expressions, messages, list.tokens);
 
       // Check if any indexes were given
       if (every(list.expressions, arg => arg.kind === 'None')) {

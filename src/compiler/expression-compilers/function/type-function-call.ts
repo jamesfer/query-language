@@ -14,6 +14,8 @@ import { typeExpression } from '../../type-expression';
 import { TypedScope } from '../../../scope';
 import { isTypeOf } from '../../../type/is-type-of';
 import { makeFunctionType } from '../../../type/constructors';
+import { MessageStore} from 'compiler/compiler-utils/message-store';
+import { MessageResult } from '../../compiler-utils/message-store';
 
 interface PartialApplication {
   expectedArgs: Type[],
@@ -83,10 +85,11 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
   return null;
 }
 
-function typeFunctionCallee(scope: TypedScope, expression: UntypedFunctionCallExpression): { funcExp: Expression, messages: Message[] } {
+function typeFunctionCallee(scope: TypedScope, expression: UntypedFunctionCallExpression): MessageResult<Expression> {
   let funcExp = typeExpression(scope, expression.functionExpression);
   let funcType = funcExp.resultType;
   let messages: Message[] = [];
+
   if (funcType && funcType.kind !== 'Function') {
     messages.push(makeMessage(
       'Error',
@@ -95,7 +98,7 @@ function typeFunctionCallee(scope: TypedScope, expression: UntypedFunctionCallEx
     ));
   }
 
-  return { funcExp, messages };
+  return [ funcExp, messages ];
 }
 
 function typeFunctionCallArgs(
@@ -143,7 +146,7 @@ function typeFunctionCallArgs(
 function checkArgumentCount(
   funcType: Type | null,
   typedArgs: (Expression | any)[],
-  expression: UntypedFunctionCallExpression
+  expression: UntypedFunctionCallExpression,
 ): Message | undefined {
   if (funcType && funcType.kind === 'Function'
     && typedArgs.length > funcType.argTypes.length) {
@@ -151,25 +154,23 @@ function checkArgumentCount(
       'Error',
       'Too many arguments supplied to function call.',
       expression.tokens[ 0 ],
-      last(expression.tokens)
+      last(expression.tokens),
     );
   }
 }
 
 export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
-  // Type the funcion callee
-  const { funcExp, messages } = typeFunctionCallee(scope, expression);
+  const messageStore = new MessageStore();
+
+  // Type the function callee
+  const funcExp = messageStore.store(typeFunctionCallee(scope, expression));
 
   // Type each of the function args
   const { resultType, args } = typeFunctionCallArgs(expression, scope,
     funcExp.resultType);
 
   // Check if the number of arguments are correct.
-  const argCountError = checkArgumentCount(funcExp.resultType, args,
-    expression);
-  if (argCountError) {
-    messages.push(argCountError);
-  }
+  messageStore.add(checkArgumentCount(funcExp.resultType, args, expression));
 
   return {
     resultType,
@@ -177,6 +178,6 @@ export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionC
     kind: expression.kind,
     functionExpression: funcExp,
     tokens: expression.tokens,
-    messages: expression.messages.concat(messages),
+    messages: expression.messages.concat(messageStore.messages),
   };
 }

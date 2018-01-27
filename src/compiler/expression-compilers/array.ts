@@ -19,18 +19,20 @@ import 'rxjs/add/operator/filter';
 import { evaluateExpression } from '../evaluate-expression';
 import { isTypeOf } from '../../type/is-type-of';
 import { makeArrayType, makeUnionType } from '../../type/constructors';
+import { normalizeMessageResult } from '../compiler-utils/message-store';
 
 
 let buildArrayList = buildListInterpreter(TokenKind.OpenBracket, TokenKind.CloseBracket, TokenKind.Comma);
 
 export function interpretArray(tokens: Token[]): UntypedArrayExpression | undefined {
-  let list = buildArrayList(tokens);
-  if (list) {
+  let result = buildArrayList(tokens);
+  if (result) {
+    const [ list, messages ] = result;
     return {
       kind: 'Array',
       elements: list.expressions,
       tokens: list.tokens,
-      messages: list.messages,
+      messages: normalizeMessageResult(messages),
     };
   }
 }
