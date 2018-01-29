@@ -14,8 +14,10 @@ import { typeExpression } from '../../type-expression';
 import { TypedScope } from '../../../scope';
 import { isTypeOf } from '../../../type/is-type-of';
 import { makeFunctionType } from '../../../type/constructors';
-import { MessageStore} from 'compiler/compiler-utils/message-store';
-import { MessageResult } from '../../compiler-utils/message-store';
+import {
+  MessageResult,
+  MessageStore,
+} from '../../compiler-utils/message-store';
 
 interface PartialApplication {
   expectedArgs: Type[],

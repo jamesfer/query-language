@@ -11,6 +11,7 @@ import {
 import { makeCustomIdentifierExpression } from '../identifier';
 import { buildListInterpreter } from '../../compiler-utils/interpret-list';
 import { hasHigherPrecedence, precedences } from './precedences';
+import { normalizeMessageResult } from '../../compiler-utils/message-store';
 
 let buildArrayAccessList = buildListInterpreter(TokenKind.OpenBrace, TokenKind.CloseBrace, TokenKind.Comma, 3);
 
@@ -21,7 +22,7 @@ export function interpretArraySliceOperator(tokens: Token[], leftExpression: Unt
     if (result) {
       const [ list, messages ] = result;
       const identifier = makeCustomIdentifierExpression('[]', []);
-      const expression = makeFunctionCallExpression(identifier, list.expressions, messages, list.tokens);
+      const expression = makeFunctionCallExpression(identifier, list.expressions, normalizeMessageResult(messages), list.tokens);
 
       // Check if any indexes were given
       if (every(list.expressions, arg => arg.kind === 'None')) {
