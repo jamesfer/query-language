@@ -1,36 +1,37 @@
-import { FloatType, makeFunctionType } from '../../type';
+import { makeFunctionType } from '../../type/constructors';
 import { Library, LibraryEntry } from '../library';
 import { bindFloatFunction } from '../library-utils';
+import { floatType } from '../../type/constructors';
 
 
 
 const add: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], FloatType),
+  type: makeFunctionType([ floatType, floatType ], floatType),
   impl: bindFloatFunction((a, b) => a + b),
 };
 
 const subtract: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], FloatType),
+  type: makeFunctionType([ floatType, floatType ], floatType),
   impl: bindFloatFunction((a, b) => a - b),
 };
 
 const multiply: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], FloatType),
+  type: makeFunctionType([ floatType, floatType ], floatType),
   impl: bindFloatFunction((a, b) => a * b),
 };
 
 const divide: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], FloatType),
+  type: makeFunctionType([ floatType, floatType ], floatType),
   impl: bindFloatFunction((a, b) => a / b),
 };
 
 const modulo: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], FloatType),
+  type: makeFunctionType([ floatType, floatType ], floatType),
   impl: bindFloatFunction((a, b) => a % b),
 };
 
 const power: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], FloatType),
+  type: makeFunctionType([ floatType, floatType ], floatType),
   impl: bindFloatFunction((a, b) => a ** b),
 };
 

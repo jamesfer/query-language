@@ -7,7 +7,7 @@ import { Observable } from 'rxjs/Observable';
 import { Expression } from '../expression';
 import { assertNever } from '../utils';
 import { LazyNoneValue, LazyValue, Value } from '../value';
-import { EvaluationScope } from './evaluation-scope';
+import { EvaluationScope } from '../scope';
 import { evaluateArray } from './expression-compilers/array';
 import { evaluateFunctionCall } from './expression-compilers/function/evaluate-function-call';
 import {

@@ -1,8 +1,6 @@
 import { mapValues } from 'lodash';
-import { Type } from './type';
+import { Type } from './type/type';
 import { LazyValue, } from './value';
-import { TypedScope } from './compiler/typed-scope.model';
-import { EvaluationScope } from './compiler/evaluation-scope';
 
 export interface ScopeEntry {
   type: Type,
@@ -13,9 +11,17 @@ export interface Scope {
   [k: string]: ScopeEntry,
 }
 
+export interface TypedScope {
+  [k: string]: Type;
+}
+
 export function extractTypedScope(scope: Scope): TypedScope {
   return mapValues(scope, val => val.type);
 }
+
+export type EvaluationScope = {
+  [k: string]: LazyValue,
+};
 
 export function extractEvaluationScope(scope: Scope): EvaluationScope {
   return mapValues(scope, val => val.value);

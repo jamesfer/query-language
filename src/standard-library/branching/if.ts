@@ -1,11 +1,10 @@
 import {
-  BooleanType,
-  makeFunctionType,
   makeUnionType,
-} from '../../type';
+} from '../../type/constructors';
 import { BooleanValue, LazyValue } from '../../value';
 import { LibraryEntry } from '../library';
 import 'rxjs/add/operator/switchMap';
+import { booleanType, makeFunctionType } from '../../type/constructors';
 
 
 function ifFunc(condition: LazyValue<BooleanValue>, truth: LazyValue, fallacy: LazyValue): LazyValue {
@@ -13,7 +12,7 @@ function ifFunc(condition: LazyValue<BooleanValue>, truth: LazyValue, fallacy: L
 }
 
 export const _if: LibraryEntry = {
-  type: makeFunctionType([ BooleanType, 'T', 'F', ],
+  type: makeFunctionType([ booleanType, 'T', 'F', ],
     makeUnionType([ 'T', 'F' ])),
   impl: ifFunc,
 };

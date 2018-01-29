@@ -1,12 +1,8 @@
 import 'rxjs/add/observable/range';
 import { Observable } from 'rxjs/Observable';
 import {
-  IntegerType,
-  makeArrayType,
-  makeFunctionType,
   makeUnionType,
-  NoneType,
-} from '../../type';
+  } from '../../type/constructors';
 import {
   ArrayValue,
   LazyValue,
@@ -15,6 +11,10 @@ import {
 } from '../../value';
 import { LibraryEntry } from '../library';
 import { evalArgs } from '../library-utils';
+import {
+  integerType, makeArrayType, makeFunctionType,
+  noneType,
+} from '../../type/constructors';
 
 
 export function rangeFunc(a: number | null, b: number | null): LazyValue<ArrayValue> {
@@ -32,8 +32,8 @@ export function rangeFunc(a: number | null, b: number | null): LazyValue<ArrayVa
 
 export const range: LibraryEntry = {
   type: makeFunctionType([
-    makeUnionType([IntegerType, NoneType]),
-    makeUnionType([IntegerType, NoneType]),
-  ], makeArrayType(IntegerType)),
+    makeUnionType([integerType, noneType]),
+    makeUnionType([integerType, noneType]),
+  ], makeArrayType(integerType)),
   impl: evalArgs(rangeFunc),
 };

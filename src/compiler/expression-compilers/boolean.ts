@@ -1,9 +1,9 @@
 import { addType, BooleanExpression, } from '../../expression';
 import { Token, TokenKind } from '../../token';
-import { BooleanType } from '../../type';
+import { booleanType } from '../../type/constructors';
 import { UntypedBooleanExpression, } from '../../untyped-expression';
-import { TypedScope } from '../typed-scope.model';
-import { EvaluationScope } from '../evaluation-scope';
+import { TypedScope } from '../../scope';
+import { EvaluationScope } from '../../scope';
 import { BooleanValue, LazyValue, makeBooleanValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
 import { tokenArrayMatches } from '../../utils';
@@ -22,7 +22,7 @@ export function interpretBoolean(tokens: Token[]): UntypedBooleanExpression | un
 }
 
 export function typeBoolean(scope: TypedScope, expression: UntypedBooleanExpression): BooleanExpression {
-  return addType(expression, BooleanType);
+  return addType(expression, booleanType);
 }
 
 export function evaluateBoolean(scope: EvaluationScope, expression: BooleanExpression): LazyValue<BooleanValue> {

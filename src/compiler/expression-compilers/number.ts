@@ -1,7 +1,7 @@
 import { FloatExpression, IntegerExpression, } from '../../expression';
 import { makeMessage, Message } from '../../message';
 import { Token, TokenKind, } from '../../token';
-import { FloatType, IntegerType } from '../../type';
+import { floatType, integerType } from '../../type/constructors';
 import {
   UntypedFloatExpression,
   UntypedIntegerExpression,
@@ -11,8 +11,8 @@ import {
   FloatValue, IntegerValue, LazyValue, makeLazyFloatValue,
   makeLazyIntegerValue,
 } from '../../value';
-import { EvaluationScope } from '../evaluation-scope';
-import { TypedScope } from '../typed-scope.model';
+import { EvaluationScope } from '../../scope';
+import { TypedScope } from '../../scope';
 import { toNumber } from 'lodash';
 
 
@@ -62,12 +62,12 @@ export function typeNumber(scope: TypedScope, expression: UntypedFloatExpression
   if (expression.kind === 'Integer') {
     return {
       ...expression,
-      resultType: IntegerType,
+      resultType: integerType,
     };
   }
   return {
     ...expression,
-    resultType: FloatType,
+    resultType: floatType,
   }
 }
 

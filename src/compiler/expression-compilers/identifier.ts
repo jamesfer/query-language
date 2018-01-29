@@ -4,8 +4,8 @@ import { Token, TokenKind } from '../../token';
 import { UntypedIdentifierExpression, } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { LazyValue } from '../../value';
-import { EvaluationScope } from '../evaluation-scope';
-import { TypedScope } from '../typed-scope.model';
+import { EvaluationScope } from '../../scope';
+import { TypedScope } from '../../scope';
 
 
 export function makeIdentifierExpression(token: Token): UntypedIdentifierExpression {

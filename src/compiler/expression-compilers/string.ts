@@ -2,14 +2,14 @@ import { head, last } from 'lodash';
 import { addType, StringExpression, } from '../../expression';
 import { makeMessage, Message } from '../../message';
 import { Token, TokenKind } from '../../token';
-import { StringType } from '../../type';
+import { stringType } from '../../type/constructors';
 import {
   UntypedExpression,
   UntypedStringExpression,
 } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
-import { TypedScope } from '../typed-scope.model';
-import { EvaluationScope } from '../evaluation-scope';
+import { TypedScope } from '../../scope';
+import { EvaluationScope } from '../../scope';
 import { LazyValue, makeStringValue, StringValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
 
@@ -39,7 +39,7 @@ export function intepretString(tokens: Token[]): UntypedExpression | undefined {
 }
 
 export function typeString(scope: TypedScope, expression: UntypedStringExpression): StringExpression {
-  return addType(expression, StringType);
+  return addType(expression, stringType);
 }
 
 export function evaluateString(scope: EvaluationScope, expression: StringExpression): LazyValue<StringValue> {

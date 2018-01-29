@@ -2,10 +2,8 @@ import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/map';
 import {
-  BooleanType,
   makeArrayType,
-  makeFunctionType,
-} from '../../type';
+  } from '../../type/constructors';
 import {
   BooleanValue,
   LazyValue,
@@ -15,6 +13,7 @@ import {
 import { LibraryEntry } from '../library';
 import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';
+import { booleanType, makeFunctionType } from '../../type/constructors';
 
 
 function inFunc(item: any, list: Observable<Value>): LazyValue<BooleanValue> {
@@ -23,6 +22,6 @@ function inFunc(item: any, list: Observable<Value>): LazyValue<BooleanValue> {
 }
 
 export const _in: LibraryEntry = {
-  type: makeFunctionType([ 'T', makeArrayType('T') ], BooleanType),
+  type: makeFunctionType([ 'T', makeArrayType('T') ], booleanType),
   impl: evalArgs(inFunc),
 };

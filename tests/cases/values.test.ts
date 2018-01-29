@@ -8,7 +8,7 @@ import {
   stringExpression,
   stringToken,
 } from '../utils';
-import { IntegerType } from '../../src/type';
+import { integerType } from '../../src/type/constructors';
 import { makeMessage } from '../../src/message';
 
 describe('values', function() {
@@ -103,7 +103,7 @@ describe('values', function() {
       integerToken('3', 1),
       closeBracketToken(),
     ],
-    expression: arrayExpression(IntegerType, [
+    expression: arrayExpression(integerType, [
       integerExpression(1),
       integerExpression(2),
       integerExpression(3),
@@ -122,7 +122,7 @@ describe('values', function() {
       commaToken(),
       closeBracketToken(),
     ],
-    expression: arrayExpression(IntegerType, [
+    expression: arrayExpression(integerType, [
       integerExpression(1),
       integerExpression(2),
       integerExpression(3),
@@ -140,7 +140,7 @@ describe('values', function() {
       integerToken('3', 1),
       closeBracketToken(),
     ],
-    expression: arrayExpression(IntegerType, [
+    expression: arrayExpression(integerType, [
       integerExpression(1),
       integerExpression(2),
       integerExpression(3),

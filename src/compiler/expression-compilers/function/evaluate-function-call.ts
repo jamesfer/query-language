@@ -2,7 +2,7 @@ import { filter, map, partial } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
 import { FunctionCallExpression } from '../../../expression';
-import { FunctionType } from '../../../type';
+import { FunctionType } from '../../../type/type';
 import { Expression } from '../../../expression';
 import {
   LazyValue,
@@ -10,7 +10,7 @@ import {
   PlainFunctionValue,
 } from '../../../value';
 import { evaluateExpression, PartialPlaceholder } from '../../evaluate-expression';
-import { EvaluationScope } from '../../evaluation-scope';
+import { EvaluationScope } from '../../../scope';
 
 interface Placeholder {
   (...a: any[]): any;

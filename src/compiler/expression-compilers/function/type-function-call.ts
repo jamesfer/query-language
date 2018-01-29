@@ -4,16 +4,20 @@ import { makeMessage, Message } from '../../../message';
 import {
   applyGenericMap,
   createGenericMap,
-  isTypeOf,
-  makeFunctionType,
   Type,
-} from '../../../type';
+} from '../../../type/type';
 import {
   Expression,
   FunctionCallExpression,
 } from '../../../expression';
 import { typeExpression } from '../../type-expression';
-import { TypedScope } from '../../typed-scope.model';
+import { TypedScope } from '../../../scope';
+import { isTypeOf } from '../../../type/is-type-of';
+import { makeFunctionType } from '../../../type/constructors';
+import {
+  MessageResult,
+  MessageStore,
+} from '../../compiler-utils/message-store';
 
 interface PartialApplication {
   expectedArgs: Type[],
@@ -83,10 +87,11 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
   return null;
 }
 
-export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
+function typeFunctionCallee(scope: TypedScope, expression: UntypedFunctionCallExpression): MessageResult<Expression> {
   let funcExp = typeExpression(scope, expression.functionExpression);
   let funcType = funcExp.resultType;
   let messages: Message[] = [];
+
   if (funcType && funcType.kind !== 'Function') {
     messages.push(makeMessage(
       'Error',
@@ -95,11 +100,19 @@ export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionC
     ));
   }
 
+  return [ funcExp, messages ];
+}
+
+function typeFunctionCallArgs(
+  expression: UntypedFunctionCallExpression,
+  scope: TypedScope,
+  funcType: Type | null,
+) {
   let partial = makeInitialPartial(funcType);
   let typedArgs: (Expression | null)[] = [];
   let index = -1;
   while (++index < expression.args.length) {
-    let arg = expression.args[index];
+    let arg = expression.args[ index ];
     if (arg) {
       // The expected type of the argument
       // let expectedType = getNextArgType(partial);
@@ -115,7 +128,7 @@ export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionC
         typedArg.messages.push(makeMessage(
           'Error',
           'Argument has an incorrect type.',
-          typedArg.tokens[0],
+          typedArg.tokens[ 0 ],
           last(typedArg.tokens),
         ));
       }
@@ -126,23 +139,47 @@ export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionC
       partial = applyArg(partial, null);
     }
   }
+  return {
+    args: typedArgs,
+    resultType: inlineFunctionApplication(partial),
+  };
+}
 
-  // Check if the number of arguments are correct.
-  if (funcType && funcType.kind === 'Function' && typedArgs.length > funcType.argTypes.length) {
-    messages.push(makeMessage(
+function checkArgumentCount(
+  funcType: Type | null,
+  typedArgs: (Expression | any)[],
+  expression: UntypedFunctionCallExpression,
+): Message | undefined {
+  if (funcType && funcType.kind === 'Function'
+    && typedArgs.length > funcType.argTypes.length) {
+    return makeMessage(
       'Error',
       'Too many arguments supplied to function call.',
-      expression.tokens[0],
-      last(expression.tokens)
-    ));
+      expression.tokens[ 0 ],
+      last(expression.tokens),
+    );
   }
+}
+
+export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
+  const messageStore = new MessageStore();
+
+  // Type the function callee
+  const funcExp = messageStore.store(typeFunctionCallee(scope, expression));
+
+  // Type each of the function args
+  const { resultType, args } = typeFunctionCallArgs(expression, scope,
+    funcExp.resultType);
+
+  // Check if the number of arguments are correct.
+  messageStore.add(checkArgumentCount(funcExp.resultType, args, expression));
 
   return {
+    resultType,
+    args,
     kind: expression.kind,
     functionExpression: funcExp,
-    args: typedArgs,
     tokens: expression.tokens,
-    resultType: inlineFunctionApplication(partial),
-    messages: expression.messages.concat(messages),
+    messages: expression.messages.concat(messageStore.messages),
   };
 }

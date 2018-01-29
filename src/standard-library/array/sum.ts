@@ -1,9 +1,7 @@
 import 'rxjs/add/operator/reduce';
 import {
-  FloatType,
   makeArrayType,
-  makeFunctionType,
-} from '../../type';
+  } from '../../type/constructors';
 import {
   FloatValue,
   LazyValue,
@@ -12,6 +10,7 @@ import {
 import { LibraryEntry } from '../library';
 import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';
+import { floatType, makeFunctionType } from '../../type/constructors';
 
 function sumFunc(list: Observable<Value>): LazyValue<FloatValue> {
   return list.reduce((sum, { value }) => sum + (value as number), 0)
@@ -19,6 +18,6 @@ function sumFunc(list: Observable<Value>): LazyValue<FloatValue> {
 }
 
 export const sum: LibraryEntry = {
-  type: makeFunctionType([makeArrayType(FloatType)], FloatType),
+  type: makeFunctionType([makeArrayType(floatType)], floatType),
   impl: evalArgs(sumFunc),
 };

@@ -1,34 +1,35 @@
 import { Library, LibraryEntry } from '../library';
-import { BooleanType, FloatType, makeFunctionType } from '../../type';
+import { makeFunctionType } from '../../type/constructors';
 import { bindBooleanFunction } from '../library-utils';
+import { booleanType, floatType } from '../../type/constructors';
 
 const greaterThan: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], BooleanType),
+  type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a > b),
 };
 
 const greaterEqual: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], BooleanType),
+  type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a >= b),
 };
 
 const lessThan: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], BooleanType),
+  type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a < b),
 };
 
 const lessEqual: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], BooleanType),
+  type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a <= b),
 };
 
 const equal: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], BooleanType),
+  type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a === b),
 };
 
 const notEqual: LibraryEntry = {
-  type: makeFunctionType([ FloatType, FloatType ], BooleanType),
+  type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => {
     return a !== b;
   }),

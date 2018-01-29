@@ -20,7 +20,7 @@ import {
 } from '../src/expression';
 import { Message } from '../src/message';
 import { Token } from '../src/token';
-import { Type } from '../src/type';
+import { Type } from '../src/type/type';
 import { assertNever } from '../src/utils';
 import { addPositions } from '../src/compiler/tokenize/tokenize-code';
 

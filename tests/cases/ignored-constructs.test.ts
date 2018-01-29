@@ -4,7 +4,7 @@ import {
   closeBracketToken, commaToken, commentToken, integerExpression, integerToken,
   openBracketToken,
 } from '../utils';
-import { IntegerType } from '../../src/type';
+import { integerType } from '../../src/type/constructors';
 
 describe('ignored constructs', function() {
   evaluates('ignores spaces and tabs', '[      1 \t \t,2    ]', {
@@ -16,7 +16,7 @@ describe('ignored constructs', function() {
       integerToken('2'),
       closeBracketToken(4),
     ],
-    expression: arrayExpression(IntegerType, [
+    expression: arrayExpression(integerType, [
       integerExpression(1),
       integerExpression(2),
     ]),
@@ -31,7 +31,7 @@ describe('ignored constructs', function() {
       integerToken('2', [ 1, 2 ]),
       closeBracketToken([ 1, 0 ]),
     ],
-    expression: arrayExpression(IntegerType, [
+    expression: arrayExpression(integerType, [
       integerExpression(1),
       integerExpression(2),
     ]),
@@ -57,7 +57,7 @@ describe('ignored constructs', function() {
       integerToken('3', [ 1, 1 ]),
       closeBracketToken(),
     ],
-    expression: arrayExpression(IntegerType, [
+    expression: arrayExpression(integerType, [
       integerExpression(1),
       integerExpression(2),
       integerExpression(3),
