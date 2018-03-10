@@ -26,8 +26,8 @@ export function isTypeOf(base: Type, subtype?: Type | null): boolean {
       return isSubtypeOfArray(base, subtype);
     case 'Function':
       return isSubtypeOfFunction(base, subtype);
-    case 'Union':
-      return isSubtypeOfUnion(base, subtype);
+    // case 'Union':
+    //   return isSubtypeOfUnion(base, subtype);
     case 'Boolean':
       return isSubtypeOfBoolean(subtype);
     case 'None':
@@ -97,13 +97,13 @@ function isSubtypeOfFunction(base: FunctionType, subtype: Type): boolean {
   return isTypeOf(base.returnType, subtype.returnType);
 }
 
-function isSubtypeOfUnion(base: UnionType, subtype: Type): boolean {
-  if (subtype.kind === 'Union') {
-    return every(subtype.types, type => isSubtypeOfUnion(base, subtype));
-  }
-
-  return some(base.types, type => isTypeOf(type, subtype));
-}
+// function isSubtypeOfUnion(base: UnionType, subtype: Type): boolean {
+//   if (subtype.kind === 'Union') {
+//     return every(subtype.types, type => isSubtypeOfUnion(base, subtype));
+//   }
+//
+//   return some(base.types, type => isTypeOf(type, subtype));
+// }
 
 function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
   if (base.derives) {

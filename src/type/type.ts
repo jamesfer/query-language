@@ -1,6 +1,6 @@
 import { assign, Dictionary, get, map, } from 'lodash';
 import { assertNever } from '../utils';
-import { makeArrayType, makeFunctionType, makeUnionType } from './constructors';
+import { makeArrayType, makeFunctionType } from './constructors';
 
 
 // TODO turn into an enum
@@ -11,7 +11,7 @@ export type TypeKind = 'Integer'
   | 'None'
   | 'Array'
   | 'Function'
-  | 'Union'
+  // | 'Union'
   | 'Generic'
   | 'Record';
 
@@ -26,7 +26,7 @@ export type Type = IntegerType
   | NoneType
   | ArrayType
   | FunctionType
-  | UnionType
+  // | UnionType
   | GenericType
   | RecordType;
 
@@ -49,9 +49,9 @@ export interface FunctionType extends TypeInterface<'Function'> {
   returnType: Type;
 }
 
-export interface UnionType extends TypeInterface<'Union'> {
-  types: Type[];
-}
+// export interface UnionType extends TypeInterface<'Union'> {
+//   types: Type[];
+// }
 
 export interface GenericType extends TypeInterface<'Generic'> {
   name: string;
@@ -111,11 +111,11 @@ export function createGenericMap(generic: Type | null, concrete: Type | null): D
       // TODO
       return {};
 
-    case 'Union':
-      let genericMaps = map(generic.types, type => {
-        return createGenericMap(type, concrete)
-      });
-      return assign({}, ...genericMaps);
+    // case 'Union':
+    //   let genericMaps = map(generic.types, type => {
+    //     return createGenericMap(type, concrete)
+    //   });
+    //   return assign({}, ...genericMaps);
 
     case 'Integer':
     case 'Float':
@@ -148,10 +148,10 @@ export function applyGenericMap(generic: Type, genericMap: Dictionary<Type>): Ty
       });
       return makeFunctionType(argTypes, returnType);
 
-    case 'Union':
-      return makeUnionType(map(generic.types, type => {
-        return applyGenericMap(type, genericMap)
-      }));
+    // case 'Union':
+    //   return makeUnionType(map(generic.types, type => {
+    //     return applyGenericMap(type, genericMap)
+    //   }));
 
     case 'Record':
       // TODO
