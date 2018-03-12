@@ -1,6 +1,7 @@
 import { UntypedFunctionCallExpression } from 'untyped-expression';
 import { filter, map, last } from 'lodash';
 import { makeMessage, Message } from '../../../message';
+import { Scope } from '../../../scope';
 import {
   applyGenericMap,
   createGenericMap,
@@ -11,7 +12,6 @@ import {
   FunctionCallExpression,
 } from '../../../expression';
 import { typeExpression } from '../../type-expression';
-import { TypedScope } from '../../../scope';
 import { isTypeOf } from '../../../type/is-type-of';
 import { makeFunctionType } from '../../../type/constructors';
 import {
@@ -87,7 +87,7 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
   return null;
 }
 
-function typeFunctionCallee(scope: TypedScope, expression: UntypedFunctionCallExpression): MessageResult<Expression> {
+function typeFunctionCallee(scope: Scope, expression: UntypedFunctionCallExpression): MessageResult<Expression> {
   let funcExp = typeExpression(scope, expression.functionExpression);
   let funcType = funcExp.resultType;
   let messages: Message[] = [];
@@ -105,7 +105,7 @@ function typeFunctionCallee(scope: TypedScope, expression: UntypedFunctionCallEx
 
 function typeFunctionCallArgs(
   expression: UntypedFunctionCallExpression,
-  scope: TypedScope,
+  scope: Scope,
   funcType: Type | null,
 ) {
   let partial = makeInitialPartial(funcType);
@@ -161,7 +161,7 @@ function checkArgumentCount(
   }
 }
 
-export function typeFunctionCall(scope: TypedScope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
+export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
   const messageStore = new MessageStore();
 
   // Type the function callee

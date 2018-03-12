@@ -2,6 +2,7 @@ import { filter, map, partial } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
 import { FunctionCallExpression } from '../../../expression';
+import { Scope } from '../../../scope';
 import { FunctionType } from '../../../type/type';
 import { Expression } from '../../../expression';
 import {
@@ -10,7 +11,6 @@ import {
   PlainFunctionValue,
 } from '../../../value';
 import { evaluateExpression, PartialPlaceholder } from '../../evaluate-expression';
-import { EvaluationScope } from '../../../scope';
 
 interface Placeholder {
   (...a: any[]): any;
@@ -18,7 +18,7 @@ interface Placeholder {
 }
 
 
-function evaluateFunctionExpression(scope: EvaluationScope, expression: Expression): Observable<PlainFunctionValue> {
+function evaluateFunctionExpression(scope: Scope, expression: Expression): Observable<PlainFunctionValue> {
   // TODO Remove synchronous throws
   let lazyFunc = evaluateExpression(scope, expression);
   if (!lazyFunc) {
@@ -40,7 +40,7 @@ function evaluateFunctionExpression(scope: EvaluationScope, expression: Expressi
   });
 }
 
-function evaluateArguments(scope: EvaluationScope, expressions: (Expression | null)[]): (LazyValue | PartialPlaceholder)[] {
+function evaluateArguments(scope: Scope, expressions: (Expression | null)[]): (LazyValue | PartialPlaceholder)[] {
   // Evaluate each of the arguments
   return map(expressions, (arg): LazyValue | PartialPlaceholder => {
     let result = arg ? evaluateExpression(scope, arg) : null;
@@ -48,7 +48,7 @@ function evaluateArguments(scope: EvaluationScope, expressions: (Expression | nu
   });
 }
 
-export function evaluateFunctionCall(scope: EvaluationScope, expression: FunctionCallExpression): LazyValue {
+export function evaluateFunctionCall(scope: Scope, expression: FunctionCallExpression): LazyValue {
   const argCount = filter(expression.args, arg => !!arg).length;
   const arity = (expression.functionExpression.resultType as FunctionType).argTypes.length;
 

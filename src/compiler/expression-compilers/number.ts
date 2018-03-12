@@ -1,5 +1,6 @@
 import { FloatExpression, IntegerExpression, } from '../../expression';
 import { makeMessage, Message } from '../../message';
+import { Scope } from '../../scope';
 import { Token, TokenKind, } from '../../token';
 import { floatType, integerType } from '../../type/constructors';
 import {
@@ -11,8 +12,6 @@ import {
   FloatValue, IntegerValue, LazyValue, makeLazyFloatValue,
   makeLazyIntegerValue,
 } from '../../value';
-import { EvaluationScope } from '../../scope';
-import { TypedScope } from '../../scope';
 import { toNumber } from 'lodash';
 
 
@@ -58,7 +57,7 @@ export function interpretNumber(tokens: Token[]): UntypedFloatExpression | Untyp
   }
 }
 
-export function typeNumber(scope: TypedScope, expression: UntypedFloatExpression | UntypedIntegerExpression): IntegerExpression | FloatExpression {
+export function typeNumber(scope: Scope, expression: UntypedFloatExpression | UntypedIntegerExpression): IntegerExpression | FloatExpression {
   if (expression.kind === 'Integer') {
     return {
       ...expression,
@@ -71,10 +70,10 @@ export function typeNumber(scope: TypedScope, expression: UntypedFloatExpression
   }
 }
 
-export function evaluateInteger(scope: EvaluationScope, expression: IntegerExpression): LazyValue<IntegerValue> {
+export function evaluateInteger(scope: Scope, expression: IntegerExpression): LazyValue<IntegerValue> {
   return makeLazyIntegerValue(toNumber(expression.value));
 }
 
-export function evaluateFloat(scope: EvaluationScope, expression: FloatExpression): LazyValue<FloatValue> {
+export function evaluateFloat(scope: Scope, expression: FloatExpression): LazyValue<FloatValue> {
   return makeLazyFloatValue(toNumber(expression.value));
 }

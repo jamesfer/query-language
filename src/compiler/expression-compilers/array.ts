@@ -1,14 +1,13 @@
 import { ArrayExpression, Expression } from '../../expression';
 import { makeMessage, Message } from '../../message';
+import { Scope } from '../../scope';
 import { Token, TokenKind, } from '../../token';
 import { Type } from '../../type/type';
 import {
   UntypedArrayExpression,
 } from '../../untyped-expression';
 import { typeExpression } from '../type-expression';
-import { TypedScope } from '../../scope';
 import { buildListInterpreter } from '../compiler-utils/interpret-list';
-import { EvaluationScope } from '../../scope';
 import {
   ArrayValue, LazyValue, makeLazyArrayValue,
   Value,
@@ -37,7 +36,7 @@ export function interpretArray(tokens: Token[]): UntypedArrayExpression | undefi
   }
 }
 
-export function typeArray(scope: TypedScope, expression: UntypedArrayExpression): ArrayExpression {
+export function typeArray(scope: Scope, expression: UntypedArrayExpression): ArrayExpression {
   let messages: Message[] = [];
   let elements: Expression[] = new Array(expression.elements.length);
   let elementType: Type | null = null;
@@ -73,7 +72,7 @@ export function typeArray(scope: TypedScope, expression: UntypedArrayExpression)
   };
 }
 
-export function evaluateArray(scope: EvaluationScope, expression: ArrayExpression): LazyValue<ArrayValue> {
+export function evaluateArray(scope: Scope, expression: ArrayExpression): LazyValue<ArrayValue> {
   let elements = Observable.from(expression.elements)
     .map(element => evaluateExpression(scope, element))
     .filter(element => !!element) as Observable<Observable<Value>>;

@@ -1,4 +1,3 @@
-import { mapValues } from 'lodash';
 import { Type } from './type/type';
 import { LazyValue, } from './value';
 
@@ -11,22 +10,20 @@ export interface Scope {
   [k: string]: ScopeEntry,
 }
 
-export interface TypedScope {
-  [k: string]: Type;
+export function findScopeEntry(scope: Scope, key: string): ScopeEntry | null {
+  return scope[key] || null;
 }
 
-export function extractTypedScope(scope: Scope): TypedScope {
-  return mapValues(scope, val => val.type);
+export function findScopeType(scope: Scope, key: string): Type | null {
+  const entry = findScopeEntry(scope, key);
+  return entry ? entry.type : null;
 }
 
-export type EvaluationScope = {
-  [k: string]: LazyValue,
-};
-
-export function extractEvaluationScope(scope: Scope): EvaluationScope {
-  return mapValues(scope, val => val.value);
+export function findScopeValue(scope: Scope, key: string): LazyValue | null {
+  const entry = findScopeEntry(scope, key);
+  return entry ? entry.value : null;
 }
 
-export function addScopeEntries(scope: Scope, ...entries: ScopeEntry[]): Scope {
-  return Object.assign({}, scope, ...entries);
-}
+// export function addScopeEntries(scope: Scope, ...entries: ScopeEntry[]): Scope {
+//   return Object.assign({}, scope, ...entries);
+// }
