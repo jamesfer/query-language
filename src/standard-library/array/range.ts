@@ -6,7 +6,7 @@ import {
   makeArrayValue,
   makeIntegerValue,
 } from '../../value';
-import { LibraryEntry } from '../library';
+import { LibraryFunction } from '../library';
 import { evalArgs } from '../library-utils';
 import {
   integerType, makeArrayType, makeFunctionType,
@@ -25,7 +25,7 @@ export function rangeFunc(start: number, end: number): LazyValue<ArrayValue> {
 
 
 
-export const range: LibraryEntry = {
+export const range: LibraryFunction = {
   type: makeFunctionType([ integerType, integerType ],
     makeArrayType(integerType)),
   impl: evalArgs(rangeFunc),

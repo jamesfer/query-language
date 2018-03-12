@@ -7,7 +7,7 @@ import {
   LazyValue,
   makeFloatValue, Value,
 } from '../../value';
-import { LibraryEntry } from '../library';
+import { LibraryFunction } from '../library';
 import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';
 import { floatType, makeFunctionType } from '../../type/constructors';
@@ -17,7 +17,7 @@ function sumFunc(list: Observable<Value>): LazyValue<FloatValue> {
     .map(makeFloatValue);
 }
 
-export const sum: LibraryEntry = {
+export const sum: LibraryFunction = {
   type: makeFunctionType([makeArrayType(floatType)], floatType),
   impl: evalArgs(sumFunc),
 };

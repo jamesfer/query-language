@@ -7,10 +7,12 @@ import { range } from './range';
 import { Library } from 'standard-library/library';
 
 export const array: Library = {
-  sum,
-  map,
-  head,
-  take,
-  'in': _in,
-  '..': range,
+  functions: {
+    sum,
+    map,
+    head,
+    take,
+    'in': _in,
+    '..': range,
+  },
 };

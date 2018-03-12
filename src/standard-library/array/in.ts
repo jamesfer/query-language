@@ -10,7 +10,7 @@ import {
   makeBooleanValue,
   Value,
 } from '../../value';
-import { LibraryEntry } from '../library';
+import { LibraryFunction } from '../library';
 import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';
 import { booleanType, makeFunctionType } from '../../type/constructors';
@@ -21,7 +21,7 @@ function inFunc(item: any, list: Observable<Value>): LazyValue<BooleanValue> {
     .map(makeBooleanValue);
 }
 
-export const _in: LibraryEntry = {
+export const _in: LibraryFunction = {
   type: makeFunctionType([ 'T', makeArrayType('T') ], booleanType),
   impl: evalArgs(inFunc),
 };
