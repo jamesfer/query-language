@@ -60,17 +60,9 @@ export function typeArray(scope: TypedScope, expression: UntypedArrayExpression)
           typedExpression.tokens[0],
           typedExpression.tokens[typedExpression.tokens.length],
         ));
-
-        // Combine that elements type into the existing definition
-        // elementType = makeUnionType([elementType, typedExpression.resultType]);
       }
     }
   }
-
-  // Extract the internal type of the union if it only has one.
-  // if (elementType && elementType.kind === 'Union' && elementType.types.length === 1) {
-  //   elementType = elementType.types[0];
-  // }
 
   return {
     kind: expression.kind,
