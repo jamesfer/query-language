@@ -11,11 +11,10 @@ import { evalArgs } from '../library-utils';
 import {
   integerType, makeArrayType, makeFunctionType,
 } from '../../type/constructors';
+import 'rxjs/add/operator/map';
 
 
-export function rangeFunc(a: number | null, b: number | null): LazyValue<ArrayValue> {
-  let start: number = a !== null ? a : 0;
-  let end: number = b !== null ? b : Infinity;
+export function rangeFunc(start: number, end: number): LazyValue<ArrayValue> {
   let sign = start < end ? 1 : -1;
   let count = end === Infinity ? Infinity : Math.abs(start - end);
   let arr = Observable.range(0, count)

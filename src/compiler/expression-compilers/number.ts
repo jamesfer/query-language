@@ -25,7 +25,7 @@ function makeFloatExpression(value: number, token: Token, messages: Message[] = 
   };
 }
 
-function makeIntegerExpression(value: number, token: Token, messages: Message[] = []): UntypedIntegerExpression {
+export function makeIntegerExpression(value: number, token: Token, messages: Message[] = []): UntypedIntegerExpression {
   return {
     kind: 'Integer',
     tokens: [token],

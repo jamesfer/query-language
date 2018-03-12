@@ -11,6 +11,7 @@ import {
 } from '../function/interpret-function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
 import { makeUntypedNoneExpression } from '../../../untyped-expression';
+import { makeIntegerExpression } from '../number';
 import { hasHigherPrecedence, precedences } from './precedences';
 import { first, last } from 'lodash';
 
@@ -21,23 +22,19 @@ export function interpretRangeOperator(tokens: Token[], leftExpression: UntypedE
     let rangeToken: Token = tokens[0];
     tokens = tokens.slice(1);
 
-    let start = leftExpression || makeUntypedNoneExpression();
-    let end = interpretExpression(tokens, null, precedences.range.precedence);
-    if (!end) {
-      end = makeUntypedNoneExpression();
-    }
+    const rightExpression = interpretExpression(tokens, null, precedences.range.precedence);
 
     let messages: Message[] = [];
-    if (start.kind === 'None' && end.kind === 'None') {
-      const beginToken = first(start.tokens) || rangeToken;
-      const endToken = last(start.tokens) || rangeToken;
+    if (!leftExpression && !rightExpression) {
       messages.push(makeMessage(
         'Error',
         'Range operator was not given a lower or an upper bound.',
-        beginToken,
-        endToken
+        rangeToken,
       ));
     }
+
+    const start = leftExpression || makeIntegerExpression(0, rangeToken);
+    const end = rightExpression || makeIntegerExpression(Infinity, rangeToken);
 
     const identifier = makeCustomIdentifierExpression('..', [rangeToken]);
     return makeFunctionCallExpression(identifier, [start, end], messages);
