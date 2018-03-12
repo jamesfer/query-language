@@ -8,9 +8,6 @@ import {
   openParenToken,
 } from '../utils';
 import {
-  makeUnionType,
-} from '../../src/type/constructors';
-import {
   booleanType, floatType,
   integerType, makeArrayType, makeFunctionType,
 } from '../../src/type/constructors';
@@ -27,7 +24,7 @@ describe('functions', function() {
   );
 
   let ifIdentifier = identifierExpression(
-    makeFunctionType([ booleanType, 'T', 'F' ], makeUnionType(['T', 'F'])),
+    makeFunctionType([ booleanType, 'T', 'T' ], 'T'),
     'if',
   );
 
@@ -92,9 +89,9 @@ describe('functions', function() {
     expression: functionCallExpression(
       integerType,
       functionCallExpression(
-        makeFunctionType([ 'F' ], makeUnionType([ integerType, 'F' ])),
+        makeFunctionType([ integerType ], integerType ),
         functionCallExpression(
-          makeFunctionType([ 'T', 'F' ], makeUnionType(['F', 'T'])),
+          makeFunctionType([ 'T', 'T' ], 'T'),
           ifIdentifier,
           [ integerExpression(1) ]
         ),

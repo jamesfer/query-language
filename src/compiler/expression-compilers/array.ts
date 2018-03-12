@@ -1,5 +1,5 @@
 import { ArrayExpression, Expression } from '../../expression';
-import { Message } from '../../message';
+import { makeMessage, Message } from '../../message';
 import { Token, TokenKind, } from '../../token';
 import { Type } from '../../type/type';
 import {
@@ -18,7 +18,7 @@ import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/filter';
 import { evaluateExpression } from '../evaluate-expression';
 import { isTypeOf } from '../../type/is-type-of';
-import { makeArrayType, makeUnionType } from '../../type/constructors';
+import { makeArrayType } from '../../type/constructors';
 import { normalizeMessageResult } from '../compiler-utils/message-store';
 
 
@@ -54,15 +54,14 @@ export function typeArray(scope: TypedScope, expression: UntypedArrayExpression)
         elementType = typedExpression.resultType;
       }
       else if (!isTypeOf(elementType, typedExpression.resultType)) {
-        // Combine that elements type into the existing definition
-        elementType = makeUnionType([elementType, typedExpression.resultType]);
+        messages.push(makeMessage(
+          'Error',
+          'Element type does not fit into array',
+          typedExpression.tokens[0],
+          typedExpression.tokens[typedExpression.tokens.length],
+        ));
       }
     }
-  }
-
-  // Extract the internal type of the union if it only has one.
-  if (elementType && elementType.kind === 'Union' && elementType.types.length === 1) {
-    elementType = elementType.types[0];
   }
 
   return {

@@ -16,4 +16,3 @@ export { makeFunctionType } from './type/constructors';
 export { makeArrayType } from './type/constructors';
 export { makeGenericType } from './type/constructors';
 export { makeRecordType } from './type/constructors';
-export { makeUnionType } from './type/constructors';

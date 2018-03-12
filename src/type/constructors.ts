@@ -73,38 +73,3 @@ export function makeRecordType(fields: Record<string, TypeShorthand>): RecordTyp
     fields: mapValues(fields, evaluateShorthand),
   };
 }
-
-export function makeUnionType(shortTypes: TypeShorthand[]): Type {
-  let types = map(shortTypes, evaluateShorthand);
-
-  function flattenUnionTypes(types: Type[]): Type[] {
-    return reduce(types, (list, type): Type[] => {
-      if (type.kind === 'Union') {
-        return [ ...list, ...flattenUnionTypes(type.types) ];
-      }
-      return [ ...list, type ];
-    }, []);
-  }
-
-  types = flattenUnionTypes(types);
-
-  // Only adds type to the list of existing types if it is not a subtype of the list.
-  function combineTypes(list: Type[], type: Type): Type[] {
-    for (let includedType of list) {
-      if (isTypeOf(includedType, type)) {
-        return list;
-      }
-    }
-    return [ ...list, type ];
-  }
-
-  types = reduceRight(reduce(types, combineTypes, []), combineTypes, []);
-
-  if (types.length === 1) {
-    return types[ 0 ];
-  }
-  return {
-    kind: 'Union',
-    types: types,
-  };
-}
