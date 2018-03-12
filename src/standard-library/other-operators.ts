@@ -3,10 +3,10 @@ import {
   makeLazyFunctionValue,
   PlainFunctionValue,
 } from '../value';
-import { Library, LibraryEntry } from './library';
+import { Library, LibraryFunction } from './library';
 import { evalArgs } from './library-utils';
 
-const compose: LibraryEntry = {
+const compose: LibraryFunction = {
   type: makeFunctionType([
     makeFunctionType(['T2'], 'R'),
     makeFunctionType(['T1'], 'T2'),
@@ -17,5 +17,7 @@ const compose: LibraryEntry = {
 };
 
 export const otherOperators: Library = {
-  '&': compose,
+  functions: {
+    '&': compose,
+  },
 };

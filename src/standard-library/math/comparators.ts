@@ -1,34 +1,34 @@
-import { Library, LibraryEntry } from '../library';
+import { Library, LibraryFunction } from '../library';
 import { makeFunctionType } from '../../type/constructors';
 import { bindBooleanFunction } from '../library-utils';
 import { booleanType, floatType } from '../../type/constructors';
 
-const greaterThan: LibraryEntry = {
+const greaterThan: LibraryFunction = {
   type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a > b),
 };
 
-const greaterEqual: LibraryEntry = {
+const greaterEqual: LibraryFunction = {
   type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a >= b),
 };
 
-const lessThan: LibraryEntry = {
+const lessThan: LibraryFunction = {
   type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a < b),
 };
 
-const lessEqual: LibraryEntry = {
+const lessEqual: LibraryFunction = {
   type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a <= b),
 };
 
-const equal: LibraryEntry = {
+const equal: LibraryFunction = {
   type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => a === b),
 };
 
-const notEqual: LibraryEntry = {
+const notEqual: LibraryFunction = {
   type: makeFunctionType([ floatType, floatType ], booleanType),
   impl: bindBooleanFunction((a, b) => {
     return a !== b;
@@ -37,10 +37,12 @@ const notEqual: LibraryEntry = {
 
 
 export const comparators: Library = {
-  '=': equal,
-  '!=': notEqual,
-  '>': greaterThan,
-  '>=': greaterEqual,
-  '<': lessThan,
-  '<=': lessEqual,
+  functions: {
+    '=': equal,
+    '!=': notEqual,
+    '>': greaterThan,
+    '>=': greaterEqual,
+    '<': lessThan,
+    '<=': lessEqual,
+  },
 };

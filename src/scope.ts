@@ -1,32 +1,42 @@
-import { mapValues } from 'lodash';
 import { Type } from './type/type';
 import { LazyValue, } from './value';
 
-export interface ScopeEntry {
+export interface ScopeVariable {
   type: Type,
   value: LazyValue,
 }
 
 export interface Scope {
-  [k: string]: ScopeEntry,
+  /**
+   * List of all available variables. Each variable must have a real value
+   * such as a number, string or function.
+   */
+  variables: {
+    [k: string]: ScopeVariable,
+  },
+  /**
+   * List of all available types. Each type refers to something that is entirely
+   * static in the program.
+   */
+  types: {
+    [k: string]: Type,
+  },
 }
 
-export interface TypedScope {
-  [k: string]: Type;
+export function findScopeVariableEntry(scope: Scope, name: string): ScopeVariable | null {
+  return scope.variables[name] || null;
 }
 
-export function extractTypedScope(scope: Scope): TypedScope {
-  return mapValues(scope, val => val.type);
+export function findScopeVariableType(scope: Scope, name: string): Type | null {
+  const entry = findScopeVariableEntry(scope, name);
+  return entry ? entry.type : null;
 }
 
-export type EvaluationScope = {
-  [k: string]: LazyValue,
-};
-
-export function extractEvaluationScope(scope: Scope): EvaluationScope {
-  return mapValues(scope, val => val.value);
+export function findScopeVariableValue(scope: Scope, name: string): LazyValue | null {
+  const entry = findScopeVariableEntry(scope, name);
+  return entry ? entry.value : null;
 }
 
-export function addScopeEntries(scope: Scope, ...entries: ScopeEntry[]): Scope {
-  return Object.assign({}, scope, ...entries);
+export function findScopeType(scope: Scope, name: string): Type | null {
+  return scope.types[name] || null;
 }

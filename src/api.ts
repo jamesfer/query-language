@@ -2,11 +2,7 @@ import { every, reduce } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { Message } from './message';
 import { convertToScope } from './standard-library/library';
-import {
-  extractEvaluationScope,
-  extractTypedScope,
-  Scope,
-} from './scope';
+import { Scope } from './scope';
 import { standardLibrary } from './standard-library/standard-library';
 import { Token } from './token';
 import { Expression } from './expression';
@@ -60,8 +56,7 @@ export function compile(code: string, scope?: Scope): CompilationResult {
     // Type syntax tree
     if (expressions.length > 0) {
       scope = scope || convertToScope(standardLibrary);
-      let typedScope = extractTypedScope(scope);
-      let typedExpression = typeExpression(typedScope, expressions[0]);
+      let typedExpression = typeExpression(scope, expressions[0]);
       if (typedExpression.kind !== 'Unrecognized') {
         result.expression = typedExpression;
       }
@@ -75,10 +70,9 @@ export function compile(code: string, scope?: Scope): CompilationResult {
 
 export function evaluate(expression: Expression, scope?: Scope): EvaluationResult {
   scope = scope || convertToScope(standardLibrary);
-  let evalScope = extractEvaluationScope(scope);
   return {
     messages: [],
-    result: evaluateSyntaxTree(evalScope, expression),
+    result: evaluateSyntaxTree(scope, expression),
     evaluated: true,
   };
 }

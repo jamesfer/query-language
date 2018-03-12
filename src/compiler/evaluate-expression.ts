@@ -3,11 +3,12 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/toArray';
+import 'rxjs/add/observable/combineLatest';
 import { Observable } from 'rxjs/Observable';
 import { Expression } from '../expression';
+import { Scope } from '../scope';
 import { assertNever } from '../utils';
 import { LazyNoneValue, LazyValue, Value } from '../value';
-import { EvaluationScope } from '../scope';
 import { evaluateArray } from './expression-compilers/array';
 import { evaluateFunctionCall } from './expression-compilers/function/evaluate-function-call';
 import {
@@ -22,7 +23,7 @@ import { evaluateString } from './expression-compilers/string';
 
 export type PartialPlaceholder = {};
 
-export function evaluateExpression(scope: EvaluationScope, expression: Expression): LazyValue | undefined {
+export function evaluateExpression(scope: Scope, expression: Expression): LazyValue | undefined {
   switch (expression.kind) {
     case 'String':
       return evaluateString(scope, expression);
@@ -72,7 +73,7 @@ export function stripLazyValue(lazyValue: LazyValue): Observable<any> | undefine
   return lazyValue.map(stripValue).mergeAll();
 }
 
-export function evaluateSyntaxTree(scope: EvaluationScope, expression: Expression): Observable<any> | undefined {
+export function evaluateSyntaxTree(scope: Scope, expression: Expression): Observable<any> | undefined {
   let lazyValue = evaluateExpression(scope, expression);
   if (lazyValue) {
     return stripLazyValue(lazyValue);

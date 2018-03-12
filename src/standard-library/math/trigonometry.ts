@@ -1,45 +1,47 @@
 import { makeFunctionType } from '../../type/constructors';
-import { Library, LibraryEntry } from '../library';
+import { Library, LibraryFunction } from '../library';
 import { bindFloatFunction } from '../library-utils';
 import { floatType } from '../../type/constructors';
 
 
-const tan: LibraryEntry = {
+const tan: LibraryFunction = {
   type: makeFunctionType([floatType], floatType),
   impl: bindFloatFunction(Math.tan),
 };
 
-const sin: LibraryEntry = {
+const sin: LibraryFunction = {
   type: makeFunctionType([floatType], floatType),
   impl: bindFloatFunction(Math.sin),
 };
 
-const cos: LibraryEntry = {
+const cos: LibraryFunction = {
   type: makeFunctionType([floatType], floatType),
   impl: bindFloatFunction(Math.cos),
 };
 
-const atan: LibraryEntry = {
+const atan: LibraryFunction = {
   type: makeFunctionType([floatType], floatType),
   impl: bindFloatFunction(Math.atan),
 };
 
-const asin: LibraryEntry = {
+const asin: LibraryFunction = {
   type: makeFunctionType([floatType], floatType),
   impl: bindFloatFunction(Math.asin),
 };
 
-const acos: LibraryEntry = {
+const acos: LibraryFunction = {
   type: makeFunctionType([floatType], floatType),
   impl: bindFloatFunction(Math.acos),
 };
 
 
 export const trigonometry: Library = {
-  tan,
-  sin,
-  cos,
-  atan,
-  asin,
-  acos,
+  functions: {
+    tan,
+    sin,
+    cos,
+    atan,
+    asin,
+    acos,
+  },
 };
