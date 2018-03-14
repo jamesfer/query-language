@@ -48,6 +48,7 @@ export interface IdentifierExpression extends ExpressionInterface<'Identifier'> 
 export interface FunctionCallExpression extends ExpressionInterface<'FunctionCall'> {
   functionExpression: Expression,
   args: (Expression | null)[],
+  methodImplementations?: string[],
 }
 
 export interface ArrayExpression extends ExpressionInterface<'Array', ArrayType> {

@@ -55,6 +55,7 @@ export function stripValue(value: Value): Observable<any> {
     case 'String':
     case 'Boolean':
     case 'Function':
+    case 'Method':
     case 'None':
       return Observable.of(value.value);
     case 'Array':

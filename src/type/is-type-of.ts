@@ -1,4 +1,6 @@
-import { every, some } from 'lodash';
+import { every, isEmpty, map, some } from 'lodash';
+import { makeFunctionType } from './constructors';
+import { InterfaceType, MethodType } from './type';
 import { assertNever } from '../utils';
 import {
   ArrayType,
@@ -33,6 +35,10 @@ export function isTypeOf(base: Type, subtype?: Type | null): boolean {
       return isSubtypeOfGeneric(base, subtype);
     case 'Record':
       return isSubtypeOfRecord(base, subtype);
+    case 'Interface':
+      return isSubtypeOfInterface(base, subtype);
+    case 'Method':
+      return isSubtypeOfMethod(base, subtype);
     default:
       return assertNever(base);
   }
@@ -102,7 +108,7 @@ function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
   return false;
 }
 
-function isSubtypeOfRecord(base: RecordType, subtype: Type) {
+function isSubtypeOfRecord(base: RecordType | InterfaceType, subtype: Type) {
   if (subtype.kind === 'Record') {
     return every(
       base.fields,
@@ -110,4 +116,48 @@ function isSubtypeOfRecord(base: RecordType, subtype: Type) {
     );
   }
   return false;
+}
+
+function isSubtypeOfMethod(base: MethodType, subtype: Type) {
+  if (subtype.kind === 'Function') {
+    return isSubtypeOfFunction(base.signature, subtype);
+  }
+  if (subtype.kind === 'Method') {
+    return isSubtypeOfFunction(base.signature, subtype.signature);
+  }
+  return false;
+}
+
+function instantiateMethodSignature(
+  signature: FunctionType,
+  type: Type
+): FunctionType {
+  const replaceSelf = (arg: Type) => {
+    return arg.kind === 'Generic' && arg.name === 'self' ? type : arg;
+  };
+  return makeFunctionType(
+    map(signature.argTypes, replaceSelf),
+    replaceSelf(signature.returnType),
+  );
+}
+
+function isSubtypeOfInterface(base: InterfaceType, subtype: Type) {
+  // Check fields match
+  if (!isEmpty(base.fields)) {
+    if (!isSubtypeOfRecord(base, subtype)) {
+      return false;
+    }
+  }
+
+  // Check methods match
+  return every(base.methods, method => {
+    const signature = method.type.signature;
+    // Replace all 'self's in the signature with the subtype
+    const subtypeSignature = instantiateMethodSignature(signature, subtype);
+    return some(method.type.implementations, instanceType => {
+      // Replace all 'self's in the signature with the instance type
+      const instanceSignature = instantiateMethodSignature(signature, instanceType);
+      return isSubtypeOfFunction(instanceSignature, subtypeSignature);
+    });
+  });
 }

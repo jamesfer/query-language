@@ -1,13 +1,13 @@
-import { filter, map, partial } from 'lodash';
+import { Dictionary, filter, map, partial, isFunction, pick, mapValues } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
 import { FunctionCallExpression } from '../../../expression';
 import { Scope } from '../../../scope';
-import { FunctionType } from '../../../type/type';
+import { FunctionType, Type } from '../../../type/type';
 import { Expression } from '../../../expression';
 import {
   LazyValue,
-  makeFunctionValue,
+  makeFunctionValue, makeMethodValue,
   PlainFunctionValue,
 } from '../../../value';
 import { evaluateExpression, PartialPlaceholder } from '../../evaluate-expression';
@@ -18,7 +18,7 @@ interface Placeholder {
 }
 
 
-function evaluateFunctionExpression(scope: Scope, expression: Expression): Observable<PlainFunctionValue> {
+function evaluateFunctionExpression(scope: Scope, expression: Expression): Observable<PlainFunctionValue | Dictionary<PlainFunctionValue>> {
   // TODO Remove synchronous throws
   let lazyFunc = evaluateExpression(scope, expression);
   if (!lazyFunc) {
@@ -31,12 +31,12 @@ function evaluateFunctionExpression(scope: Scope, expression: Expression): Obser
   // }
 
   return lazyFunc.map(func => {
-    if (func.kind !== 'Function') {
-      throw new Error('Attempted to call an expression that is not a function');
-    }
     // TODO check the result is not null
     // TODO check that value is is a function type
-    return func.value;
+    if (func.kind === 'Function' || func.kind === 'Method') {
+      return func.value;
+    }
+    throw new Error('Attempted to call an expression that is not a function');
   });
 }
 
@@ -48,24 +48,68 @@ function evaluateArguments(scope: Scope, expressions: (Expression | null)[]): (L
   });
 }
 
+function getArity(type: Type | null): number {
+  if (type) {
+    if (type.kind === 'Function') {
+      return type.argTypes.length;
+    }
+    if (type.kind === 'Method') {
+      return type.signature.argTypes.length;
+    }
+  }
+  return 0;
+}
+
 export function evaluateFunctionCall(scope: Scope, expression: FunctionCallExpression): LazyValue {
   const argCount = filter(expression.args, arg => !!arg).length;
-  const arity = (expression.functionExpression.resultType as FunctionType).argTypes.length;
+  const arity = getArity(expression.functionExpression.resultType);
 
-  let func = evaluateFunctionExpression(scope, expression.functionExpression);
+  let lazyFuncs = evaluateFunctionExpression(scope, expression.functionExpression);
   let args = evaluateArguments(scope, expression.args);
 
-  if (argCount === arity) {
-    return func.switchMap(f => f(...args as LazyValue[]));
-  }
-  else if (argCount < arity) {
-    return func.map(f => {
-      let partialFunc = partial(f, ...args) as PlainFunctionValue;
-      return makeFunctionValue(partialFunc);
-    });
-  }
-  else {
+  if (argCount > arity) {
     // TODO remove synchronous throw
     throw new Error('Too many arguments');
   }
+
+  return lazyFuncs.switchMap(funcs => {
+    // funcs is a plain function
+    if (isFunction(funcs)) {
+      if (argCount === arity) {
+        return funcs(...args as LazyValue[]);
+      }
+      let partialFunc = partial(funcs, ...args) as PlainFunctionValue;
+      return Observable.of(makeFunctionValue(partialFunc));
+    }
+
+
+    // funcs is a method
+    const implementations = expression.methodImplementations;
+    if (!implementations) {
+      throw new Error('Attempted to evaluate a method without identifying any method implementations. This should never happen.');
+    }
+
+    if (implementations.length === 0) {
+      throw new Error('Attempted to evaluate a method that has no matching implementations');
+    }
+
+    if (argCount === arity) {
+      if (implementations.length !== 1) {
+        throw new Error(
+          'Attempted to evaluate a method that had all arguments filled but still could not be narrowed to a single implementation');
+      }
+
+      const selectedImplementation = funcs[implementations[0]];
+      if (!selectedImplementation) {
+        throw new Error('During typing a signature was selected that did not have a corresponding implementation');
+      }
+      return selectedImplementation(...args as LazyValue[]);
+    }
+
+    const selectedImplementations = pick<Dictionary<PlainFunctionValue>, Dictionary<PlainFunctionValue>>(funcs, implementations);
+    const partialedImplementations = mapValues(selectedImplementations, impl => {
+      return partial(impl, ...args) as PlainFunctionValue;
+    });
+    return Observable.of(makeMethodValue(partialedImplementations))
+  });
 }

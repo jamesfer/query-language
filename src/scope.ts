@@ -1,11 +1,16 @@
 import { Type } from './type/type';
-import { LazyValue, } from './value';
+import { LazyValue, makeLazy, } from './value';
 
 export interface ScopeVariable {
   type: Type,
   value: LazyValue,
 }
 
+/**
+ * Full scope of the entire language. Everything that can be referenced by a
+ * name is stored in the scope. Each key is an identifier in the language and
+ * the entry can be a variable, function or interface.
+ */
 export interface Scope {
   /**
    * List of all available variables. Each variable must have a real value
@@ -24,7 +29,26 @@ export interface Scope {
 }
 
 export function findScopeVariableEntry(scope: Scope, name: string): ScopeVariable | null {
-  return scope.variables[name] || null;
+  const variable = scope.variables[name];
+  if (variable) {
+    return variable;
+  }
+
+  for (const typeName in scope.types) {
+    const type = scope.types[typeName];
+    if (type.kind === 'Interface') {
+      for (const methodName in type.methods) {
+        if (methodName === name) {
+          const method = type.methods[methodName];
+          return {
+            type: method.type,
+            value: makeLazy(method.value),
+          };
+        }
+      }
+    }
+  }
+  return null;
 }
 
 export function findScopeVariableType(scope: Scope, name: string): Type | null {

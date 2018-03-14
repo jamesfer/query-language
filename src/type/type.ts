@@ -1,5 +1,6 @@
 import { assign, Dictionary, get, map, } from 'lodash';
 import { assertNever } from '../utils';
+import { FunctionValue, LazyValue, MethodValue } from '../value';
 import { makeArrayType, makeFunctionType } from './constructors';
 
 
@@ -12,6 +13,8 @@ export type TypeKind = 'Integer'
   | 'Array'
   | 'Function'
   | 'Generic'
+  | 'Interface'
+  | 'Method'
   | 'Record';
 
 export interface TypeInterface<K extends TypeKind> {
@@ -26,6 +29,8 @@ export type Type = IntegerType
   | ArrayType
   | FunctionType
   | GenericType
+  | InterfaceType
+  | MethodType
   | RecordType;
 
 // Basic types
@@ -52,6 +57,18 @@ export interface GenericType extends TypeInterface<'Generic'> {
   derives: Type | null;
 }
 
+export interface MethodType extends TypeInterface<'Method'> {
+  signature: FunctionType,
+  implementations: Dictionary<Type>,
+}
+
+export interface InterfaceType extends TypeInterface<'Interface'> {
+  fields: Dictionary<Type>,
+  methods: Dictionary<{
+    type: MethodType,
+    value: MethodValue,
+  }>,
+}
 
 // Utility Functions
 
@@ -95,6 +112,8 @@ export function createGenericMap(generic: Type | null, concrete: Type | null): D
       );
       return genericMap;
 
+    case 'Method':
+    case 'Interface':
     case 'Record':
       // TODO
       return {};
@@ -130,6 +149,8 @@ export function applyGenericMap(generic: Type, genericMap: Dictionary<Type>): Ty
       });
       return makeFunctionType(argTypes, returnType);
 
+    case 'Method':
+    case 'Interface':
     case 'Record':
       // TODO
       return generic;
