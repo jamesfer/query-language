@@ -26,7 +26,7 @@ function makeStringExpression(token: Token, messages: Message[] = []): UntypedSt
   };
 }
 
-export function intepretString(tokens: Token[]): UntypedExpression | undefined {
+export function interpretString(tokens: Token[]): UntypedExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.StringLiteral)) {
     let messages: Message[] = [];
     let strToken = tokens[0];
