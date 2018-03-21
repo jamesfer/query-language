@@ -1,5 +1,5 @@
 import { UntypedFunctionCallExpression } from 'untyped-expression';
-import { filter, map, last, pickBy, keys } from 'lodash';
+import { filter, map, last, findIndex, reduce, pickBy, take, every, zip, Dictionary } from 'lodash';
 import { makeMessage, Message } from '../../../message';
 import { Scope } from '../../../scope';
 import {
@@ -9,35 +9,36 @@ import {
 } from '../../../type/type';
 import {
   Expression,
-  FunctionCallExpression,
+  FunctionCallExpression, IdentifierExpression, MethodCallExpression, MethodExpression,
 } from '../../../expression';
 import { typeExpression } from '../../type-expression';
-import { isTypeOf } from '../../../type/is-type-of';
+import { instantiateMethodSignature, isTypeOf } from '../../../type/is-type-of';
 import { makeFunctionType, makeMethodType } from '../../../type/constructors';
 import {
   MessageResult,
   MessageStore,
 } from '../../compiler-utils/message-store';
+import { FunctionValue } from '../../../value';
 
 interface PartialApplication {
   expectedArgs: Type[],
   suppliedArgs: (Type | null)[],
   returnType: Type,
   genericMap: { [name: string]: Type },
-  methodImplementations?: { [name: string]: Type },
+  // methodImplementations?: { [name: string]: Type },
 }
 
 function makeInitialPartial(funcType: Type | null): PartialApplication | null {
   if (funcType) {
-    if (funcType.kind === 'Method') {
-      return {
-        expectedArgs: funcType.signature.argTypes,
-        returnType: funcType.signature.returnType,
-        suppliedArgs: [],
-        genericMap: {},
-        methodImplementations: funcType.implementations,
-      };
-    }
+    // if (funcType.kind === 'Method') {
+    //   return {
+    //     expectedArgs: funcType.signature.argTypes,
+    //     returnType: funcType.signature.returnType,
+    //     suppliedArgs: [],
+    //     genericMap: {},
+    //     methodImplementations: funcType.implementations,
+    //   };
+    // }
     if (funcType.kind === 'Function') {
       return {
         expectedArgs: funcType.argTypes,
@@ -73,12 +74,12 @@ function applyArg(partial: PartialApplication | null, arg: Type | null): Partial
     };
 
     // Reduce the number of possible implementations
-    if ('self' in partial.genericMap && partial.methodImplementations) {
-      const selfType = partial.genericMap.self;
-      partial.methodImplementations = pickBy(partial.methodImplementations, type => {
-        return isTypeOf(type, selfType);
-      })
-    }
+    // if ('self' in partial.genericMap && partial.methodImplementations) {
+    //   const selfType = partial.genericMap.self;
+    //   partial.methodImplementations = pickBy(partial.methodImplementations, type => {
+    //     return isTypeOf(type, selfType);
+    //   })
+    // }
 
     return partial;
   }
@@ -113,7 +114,7 @@ function typeFunctionCallee(scope: Scope, expression: UntypedFunctionCallExpress
   let funcType = funcExp.resultType;
   let messages: Message[] = [];
 
-  if (funcType && funcType.kind !== 'Function' && funcType.kind !== 'Method') {
+  if (funcType && funcType.kind !== 'Function' /*&& funcType.kind !== 'Method'*/) {
     messages.push(makeMessage(
       'Error',
       'Cannot call an expression that is not a function.',
@@ -163,7 +164,7 @@ function typeFunctionCallArgs(
   return {
     args: typedArgs,
     resultType: inlineFunctionApplication(partial),
-    methodImplementations: partial ? partial.methodImplementations : undefined,
+    // methodImplementations: partial ? partial.methodImplementations : undefined,
   };
 }
 
@@ -183,26 +184,62 @@ function checkArgumentCount(
   }
 }
 
-export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
+function narrowMethodImplementations(method: MethodExpression | MethodCallExpression, args: (Type | null)[]): Dictionary<{
+  instance: Type,
+  value: FunctionValue | Expression,
+  argumentNames: string[],
+}> {
+  const methodType = method.resultType;
+  if (!methodType || methodType.kind !== 'Function') {
+    return {};
+  }
+
+  return pickBy(method.implementations, implementation => {
+    // Instantiate method
+    const implementationType = instantiateMethodSignature(methodType, implementation.instance);
+    const implementationArgs = take(implementationType.argTypes, args.length);
+    return every(zip(implementationArgs, args), ([ base, subtype ]) => (
+      base !== null && isTypeOf(base, subtype)
+    ))
+  });
+}
+
+export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallExpression): FunctionCallExpression | MethodCallExpression {
   const messageStore = new MessageStore();
 
   // Type the function callee
   const funcExp = messageStore.store(typeFunctionCallee(scope, expression));
 
   // Type each of the function args
-  const { resultType, args, methodImplementations } = typeFunctionCallArgs(expression, scope,
+  const { resultType, args } = typeFunctionCallArgs(expression, scope,
     funcExp.resultType);
 
   // Check if the number of arguments are correct.
   messageStore.add(checkArgumentCount(funcExp.resultType, args, expression));
 
-  return {
+  const result: FunctionCallExpression = {
     resultType,
     args,
-    methodImplementations: keys(methodImplementations),
-    kind: expression.kind,
+    kind: 'FunctionCall',
     functionExpression: funcExp,
     tokens: expression.tokens,
     messages: expression.messages.concat(messageStore.messages),
   };
+
+  const argTypes = map(args, arg => arg === null ? null : arg.resultType);
+  if (funcExp.kind === 'Method') {
+    return {
+      ...result,
+      kind: 'MethodCall',
+      implementations: narrowMethodImplementations(funcExp, argTypes),
+    };
+  } else if (funcExp.kind === 'Identifier' && funcExp.expression.kind === 'Method') {
+    return {
+      ...result,
+      kind: 'MethodCall',
+      implementations: narrowMethodImplementations(funcExp.expression, argTypes),
+    };
+  }
+
+  return result;
 }

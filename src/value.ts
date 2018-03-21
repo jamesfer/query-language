@@ -1,6 +1,7 @@
 import { Dictionary } from 'lodash';
 import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
+import { Expression } from './expression';
 
 export type ValueKind = 'String'
   | 'Integer'
@@ -20,7 +21,8 @@ export type PlainValue = string
   | Observable<Value>
   | PlainFunctionValue
   | Dictionary<PlainFunctionValue>
-  | Dictionary<Value>;
+  | Dictionary<Value>
+  | Expression;
 
 export interface ValueInterface<K extends ValueKind, V extends PlainValue> {
   kind: K,

@@ -34,6 +34,7 @@ export function typeExpression(scope: Scope, expression: UntypedExpression): Exp
     case 'None':
       return makeNoneExpression(scope, expression);
     case 'Unrecognized':
+    case 'Function':
       return makeUnrecognizedExpression(scope, expression);
     default:
       return assertNever(expression);

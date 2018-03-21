@@ -1,10 +1,12 @@
 import { Type } from './type/type';
 import { LazyValue, makeLazy, } from './value';
+import { Expression } from './expression';
+import { evaluateExpression } from './compiler/evaluate-expression';
 
-export interface ScopeVariable {
-  type: Type,
-  value: LazyValue,
-}
+// export interface ScopeVariable {
+//   type: Type,
+//   value: LazyValue,
+// }
 
 /**
  * Full scope of the entire language. Everything that can be referenced by a
@@ -13,11 +15,19 @@ export interface ScopeVariable {
  */
 export interface Scope {
   /**
+   * List of all pre evaluated values. Only used when calling function expressions. Hopefully should
+   * be removed one day.
+   */
+  values: {
+    [k: string]: LazyValue,
+  }
+
+  /**
    * List of all available variables. Each variable must have a real value
    * such as a number, string or function.
    */
   variables: {
-    [k: string]: ScopeVariable,
+    [k: string]: Expression,
   },
   /**
    * List of all available types. Each type refers to something that is entirely
@@ -28,7 +38,7 @@ export interface Scope {
   },
 }
 
-export function findScopeVariableEntry(scope: Scope, name: string): ScopeVariable | null {
+export function findScopeVariableEntry(scope: Scope, name: string): Expression | null {
   const variable = scope.variables[name];
   if (variable) {
     return variable;
@@ -39,11 +49,7 @@ export function findScopeVariableEntry(scope: Scope, name: string): ScopeVariabl
     if (type.kind === 'Interface') {
       for (const methodName in type.methods) {
         if (methodName === name) {
-          const method = type.methods[methodName];
-          return {
-            type: method.type,
-            value: makeLazy(method.value),
-          };
+          return type.methods[methodName];
         }
       }
     }
@@ -53,12 +59,20 @@ export function findScopeVariableEntry(scope: Scope, name: string): ScopeVariabl
 
 export function findScopeVariableType(scope: Scope, name: string): Type | null {
   const entry = findScopeVariableEntry(scope, name);
-  return entry ? entry.type : null;
+  return entry ? entry.resultType : null;
 }
 
 export function findScopeVariableValue(scope: Scope, name: string): LazyValue | null {
+  const value = scope.values[name];
+  if (value) {
+    return value;
+  }
+
   const entry = findScopeVariableEntry(scope, name);
-  return entry ? entry.value : null;
+  if (entry) {
+    return evaluateExpression(scope, entry) || null;
+  }
+  return null;
 }
 
 export function findScopeType(scope: Scope, name: string): Type | null {

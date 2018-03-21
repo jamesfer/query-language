@@ -1,6 +1,6 @@
 import { Dictionary, map, mapValues } from 'lodash';
-import { makeMethodValue, MethodValue, PlainFunctionValue } from '../value';
-import { InterfaceType, MethodType } from './type';
+import { PlainFunctionValue } from '../value';
+import { InterfaceType } from './type';
 import {
   ArrayType,
   BooleanType,
@@ -13,6 +13,7 @@ import {
   StringType,
   Type,
 } from './type';
+import { MethodExpression } from '../expression';
 
 export type TypeShorthand = string | Type;
 
@@ -78,7 +79,7 @@ export function makeRecordType(fields: Record<string, TypeShorthand>): RecordTyp
 export function makeMethodType(
   signature: FunctionType,
   implementations: Dictionary<Type> = {},
-): MethodType {
+) {
   return {
     kind: 'Method',
     signature,
@@ -105,16 +106,27 @@ export interface MethodShorthand {
   implementations: Dictionary<{ type: Type, func: PlainFunctionValue }>,
 }
 
+// export function makeInterfaceType(
+//   fields?: Dictionary<TypeShorthand> | null,
+//   methods?: Dictionary<MethodShorthand> | null,
+// ): InterfaceType {
+//   return {
+//     kind: 'Interface',
+//     fields: mapValues(fields, evaluateShorthand),
+//     methods: mapValues(methods, method => ({
+//       type: makeMethodType(method.signature, mapValues(method.implementations, 'type')),
+//       value: makeMethodValue(mapValues(method.implementations, 'func')),
+//     })),
+//   };
+// }
+
 export function makeInterfaceType(
   fields?: Dictionary<TypeShorthand> | null,
-  methods?: Dictionary<MethodShorthand> | null,
+  methods?: Dictionary<MethodExpression> | null,
 ): InterfaceType {
   return {
     kind: 'Interface',
     fields: mapValues(fields, evaluateShorthand),
-    methods: mapValues(methods, method => ({
-      type: makeMethodType(method.signature, mapValues(method.implementations, 'type')),
-      value: makeMethodValue(mapValues(method.implementations, 'func')),
-    })),
+    methods: methods || {},
   };
 }

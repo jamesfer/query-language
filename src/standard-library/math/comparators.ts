@@ -5,8 +5,9 @@ import {
 } from '../../type/constructors';
 import { bindBooleanFunction } from '../library-utils';
 import { booleanType, floatType, makeInterfaceType } from '../../type/constructors';
+import { makeFunctionValue } from '../../value';
 
-// const equalsFunction = bindBooleanFunction((a, b) => a === b);
+const equalsFunction = bindBooleanFunction((a, b) => a === b);
 // const Equateable: InterfaceType = makeInterfaceType(null, {
 //   '=': {
 //     signature: makeFunctionType([ 'self', 'self' ], booleanType),
@@ -43,6 +44,27 @@ import { booleanType, floatType, makeInterfaceType } from '../../type/constructo
 //     },
 //   },
 // });
+
+const Equateable: InterfaceType = makeInterfaceType(null, {
+  '=': {
+    kind: 'Method',
+    resultType: makeFunctionType([ 'self', 'self' ], booleanType),
+    messages: [],
+    tokens: [],
+    implementations: {
+      'float': {
+        instance: floatType,
+        value: makeFunctionValue(equalsFunction),
+        argumentNames: [],
+      },
+      'string': {
+        instance: stringType,
+        value: makeFunctionValue(equalsFunction),
+        argumentNames: [],
+      },
+    },
+  },
+});
 
 
 
@@ -81,7 +103,7 @@ const notEqual: LibraryFunction = {
 
 export const comparators: Library = {
   functions: {
-    '=': equal,
+    // '=': equal,
     '!=': notEqual,
     '>': greaterThan,
     '>=': greaterEqual,
@@ -89,7 +111,7 @@ export const comparators: Library = {
     '<=': lessEqual,
   },
   types: {
-    // Equateable,
+    Equateable,
     // Compareable,
   }
 };

@@ -1,5 +1,7 @@
 import { Message } from './message';
 import { Token } from './token';
+import { FunctionValue } from './value';
+import { Expression } from './expression';
 
 export interface UntypedExpressionInterface<K> {
   kind: K;
@@ -36,6 +38,10 @@ export interface UntypedBooleanExpression extends UntypedExpressionInterface<'Bo
   value: boolean;
 }
 
+export interface UntypedFunctionExpression extends UntypedExpressionInterface<'Function'> {
+  value: FunctionValue | Expression;
+}
+
 export interface UntypedNoneExpression extends UntypedExpressionInterface<'None'> {}
 
 export interface UntypedUnrecognizedExpression extends UntypedExpressionInterface<'Unrecognized'> {}
@@ -48,7 +54,8 @@ export type UntypedExpression = UntypedFunctionCallExpression
   | UntypedArrayExpression
   | UntypedIdentifierExpression
   | UntypedUnrecognizedExpression
-  | UntypedNoneExpression;
+  | UntypedNoneExpression
+  | UntypedFunctionExpression;
 
 export function makeUntypedNoneExpression(): UntypedNoneExpression {
   return {
