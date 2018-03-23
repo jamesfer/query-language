@@ -1,5 +1,5 @@
 import { UntypedFunctionCallExpression } from 'untyped-expression';
-import { filter, map, last, findIndex, reduce, pickBy, take, every, zip, Dictionary } from 'lodash';
+import { filter, map, last } from 'lodash';
 import { makeMessage, Message } from '../../../message';
 import { Scope } from '../../../scope';
 import {
@@ -9,11 +9,11 @@ import {
 } from '../../../type/type';
 import {
   Expression,
-  FunctionCallExpression, IdentifierExpression, MethodCallExpression, MethodExpression,
+  FunctionCallExpression,
 } from '../../../expression';
 import { typeExpression } from '../../type-expression';
-import { instantiateMethodSignature, isTypeOf } from '../../../type/is-type-of';
-import { makeFunctionType, makeMethodType } from '../../../type/constructors';
+import { isTypeOf } from '../../../type/is-type-of';
+import { makeFunctionType } from '../../../type/constructors';
 import {
   MessageResult,
   MessageStore,
@@ -164,7 +164,6 @@ function typeFunctionCallArgs(
   return {
     args: typedArgs,
     resultType: inlineFunctionApplication(partial),
-    // methodImplementations: partial ? partial.methodImplementations : undefined,
   };
 }
 
@@ -184,27 +183,7 @@ function checkArgumentCount(
   }
 }
 
-function narrowMethodImplementations(method: MethodExpression | MethodCallExpression, args: (Type | null)[]): Dictionary<{
-  instance: Type,
-  value: FunctionValue | Expression,
-  argumentNames: string[],
-}> {
-  const methodType = method.resultType;
-  if (!methodType || methodType.kind !== 'Function') {
-    return {};
-  }
-
-  return pickBy(method.implementations, implementation => {
-    // Instantiate method
-    const implementationType = instantiateMethodSignature(methodType, implementation.instance);
-    const implementationArgs = take(implementationType.argTypes, args.length);
-    return every(zip(implementationArgs, args), ([ base, subtype ]) => (
-      base !== null && isTypeOf(base, subtype)
-    ))
-  });
-}
-
-export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallExpression): FunctionCallExpression | MethodCallExpression {
+export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallExpression): FunctionCallExpression {
   const messageStore = new MessageStore();
 
   // Type the function callee
@@ -217,7 +196,7 @@ export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallEx
   // Check if the number of arguments are correct.
   messageStore.add(checkArgumentCount(funcExp.resultType, args, expression));
 
-  const result: FunctionCallExpression = {
+  return {
     resultType,
     args,
     kind: 'FunctionCall',
@@ -225,21 +204,4 @@ export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallEx
     tokens: expression.tokens,
     messages: expression.messages.concat(messageStore.messages),
   };
-
-  const argTypes = map(args, arg => arg === null ? null : arg.resultType);
-  if (funcExp.kind === 'Method') {
-    return {
-      ...result,
-      kind: 'MethodCall',
-      implementations: narrowMethodImplementations(funcExp, argTypes),
-    };
-  } else if (funcExp.kind === 'Identifier' && funcExp.expression.kind === 'Method') {
-    return {
-      ...result,
-      kind: 'MethodCall',
-      implementations: narrowMethodImplementations(funcExp.expression, argTypes),
-    };
-  }
-
-  return result;
 }

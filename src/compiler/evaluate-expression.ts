@@ -21,7 +21,6 @@ import { evaluateIdentifier } from './expression-compilers/identifier';
 import { evaluateInteger } from './expression-compilers/number';
 import { evaluateString } from './expression-compilers/string';
 import { evaluateFunction } from './expression-compilers/function';
-import { evaluateMethod } from './expression-compilers/function/evaluate-method';
 
 export type PartialPlaceholder = {};
 
@@ -40,8 +39,7 @@ export function evaluateExpression(scope: Scope, expression: Expression): LazyVa
     case 'Function':
       return evaluateFunction(scope, expression);
     case 'Method':
-    case 'MethodCall':
-      return evaluateMethod(scope, expression);
+      throw new Error('Cannot evaluate a method');
     case 'FunctionCall':
       return evaluateFunctionCall(scope, expression);
     case 'Identifier':

@@ -56,16 +56,6 @@ export interface FunctionCallExpression extends ExpressionInterface<'FunctionCal
   args: (Expression | null)[],
 }
 
-export interface MethodCallExpression extends ExpressionInterface<'MethodCall'> {
-  functionExpression: Expression,
-  args: (Expression | null)[],
-  implementations: Dictionary<{
-    instance: Type,
-    value: FunctionValue | Expression,
-    argumentNames: string[],
-  }>,
-}
-
 export interface FunctionExpression extends ExpressionInterface<'Function'> {
   value: FunctionValue | Expression,
   argumentNames: string[]
@@ -92,7 +82,6 @@ export type Expression = FunctionCallExpression
   | IntegerExpression
   | ArrayExpression
   | UnrecognizedExpression
-  | MethodCallExpression
   | MethodExpression
   | FunctionExpression;
 

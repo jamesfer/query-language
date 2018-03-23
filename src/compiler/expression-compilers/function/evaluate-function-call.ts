@@ -65,43 +65,10 @@ export function evaluateFunctionCall(scope: Scope, expression: FunctionCallExpre
   }
 
   return lazyFuncs.switchMap(funcs => {
-    // funcs is a plain function
-    // if (isFunction(funcs)) {
-      if (argCount === arity) {
-        return funcs(...args as LazyValue[]);
-      }
-      let partialFunc = partial(funcs, ...args) as PlainFunctionValue;
-      return Observable.of(makeFunctionValue(partialFunc));
-    // }
-
-
-    // funcs is a method
-    // const implementations = expression.methodImplementations;
-    // if (!implementations) {
-    //   throw new Error('Attempted to evaluate a method without identifying any method implementations. This should never happen.');
-    // }
-    //
-    // if (implementations.length === 0) {
-    //   throw new Error('Attempted to evaluate a method that has no matching implementations');
-    // }
-    //
-    // if (argCount === arity) {
-    //   if (implementations.length !== 1) {
-    //     throw new Error(
-    //       'Attempted to evaluate a method that had all arguments filled but still could not be narrowed to a single implementation');
-    //   }
-    //
-    //   const selectedImplementation = funcs[implementations[0]];
-    //   if (!selectedImplementation) {
-    //     throw new Error('During typing a signature was selected that did not have a corresponding implementation');
-    //   }
-    //   return selectedImplementation(...args as LazyValue[]);
-    // }
-    //
-    // const selectedImplementations = pick<Dictionary<PlainFunctionValue>, Dictionary<PlainFunctionValue>>(funcs, implementations);
-    // const partialedImplementations = mapValues(selectedImplementations, impl => {
-    //   return partial(impl, ...args) as PlainFunctionValue;
-    // });
-    // return Observable.of(makeMethodValue(partialedImplementations))
+    if (argCount === arity) {
+      return funcs(...args as LazyValue[]);
+    }
+    let partialFunc = partial(funcs, ...args) as PlainFunctionValue;
+    return Observable.of(makeFunctionValue(partialFunc));
   });
 }
