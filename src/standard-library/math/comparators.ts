@@ -45,25 +45,27 @@ const equalsFunction = bindBooleanFunction((a, b) => a === b);
 //   },
 // });
 
-const Equateable: InterfaceType = makeInterfaceType(null, {
-  '=': {
-    kind: 'Method',
-    resultType: makeFunctionType([ 'self', 'self' ], booleanType),
-    messages: [],
-    tokens: [],
-    implementations: {
-      'float': {
-        instance: floatType,
-        value: makeFunctionValue(equalsFunction),
-        argumentNames: [],
-      },
-      'string': {
-        instance: stringType,
-        value: makeFunctionValue(equalsFunction),
-        argumentNames: [],
+const Equateable: InterfaceType = makeInterfaceType({
+  methods: {
+    '=': {
+      kind: 'Method',
+      resultType: makeFunctionType([ 'self', 'self' ], booleanType),
+      messages: [],
+      tokens: [],
+      implementations: {
+        'float': {
+          instance: floatType,
+          value: makeFunctionValue(equalsFunction),
+          argumentNames: [],
+        },
+        'string': {
+          instance: stringType,
+          value: makeFunctionValue(equalsFunction),
+          argumentNames: [],
+        },
       },
     },
-  },
+  }
 });
 
 

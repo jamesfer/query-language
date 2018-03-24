@@ -65,6 +65,7 @@ export interface GenericType extends TypeInterface<'Generic'> {
 export interface InterfaceType extends TypeInterface<'Interface'> {
   fields: Dictionary<Type>,
   methods: Dictionary<MethodExpression>,
+  parents: InterfaceType[]
 }
 
 // Utility Functions

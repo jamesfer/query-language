@@ -148,6 +148,12 @@ function isSubtypeOfInterface(base: InterfaceType, subtype: Type) {
       return false;
     }
   }
+
+  // Check parents match
+  if (!every(base.parents, parent => isSubtypeOfInterface(parent, subtype))) {
+    return false;
+  }
+
   return true;
 
   // Check methods match

@@ -120,13 +120,16 @@ export interface MethodShorthand {
 //   };
 // }
 
-export function makeInterfaceType(
+export interface InterfaceShorthand {
   fields?: Dictionary<TypeShorthand> | null,
   methods?: Dictionary<MethodExpression> | null,
-): InterfaceType {
+  parents?: InterfaceType[],
+}
+export function makeInterfaceType({ fields, methods, parents }: InterfaceShorthand): InterfaceType {
   return {
     kind: 'Interface',
     fields: mapValues(fields, evaluateShorthand),
     methods: methods || {},
+    parents: parents || [],
   };
 }
