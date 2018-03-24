@@ -1,0 +1,11 @@
+<ul class="hint-list"
+    [style.left]="positionLeft$ | async"
+    [style.top]="positionTop$ | async"
+    (keydown.arrowDown)="goDown()"
+    (keydown.arrowUp)="goUp()"
+    tabindex="1"
+    autofocus>
+  <li *ngFor="let hint of hints$ | async" class="hint">{{ hint.name }}</li>
+  <li class="hint">sin</li>
+  <li class="hint">tan</li>
+</ul>

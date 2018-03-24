@@ -1,0 +1,25 @@
+<div class="content">
+  <h1>Query Language Editor</h1>
+
+  <div class="editor-wrapper">
+    <ql-editor class="code" readOnly="false" theme="monokai" [value]="initialContent"></ql-editor>
+
+    <ql-editor class="results" theme="monokai" [value]="resultString$ | async"></ql-editor>
+
+    <!--<div class="results-panel">-->
+      <!--<div class="fake-gutter"></div>-->
+
+      <!--<div class="results">-->
+        <!--<h2>Result</h2>-->
+
+        <!--<p class="result-string">-->
+          <!--{{ resultString$ | async }}-->
+          <!--{{ '{ name: "James Ferguson", password: "Password" }' }}-->
+        <!--</p>-->
+      <!--</div>-->
+
+    <!--</div>-->
+  </div>
+
+
+</div>

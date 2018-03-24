@@ -4,15 +4,14 @@ git:
 notifications:
   email: false
 node_js:
-  - "8"
   - "9"
 cache:
   yarn: true
   directories:
     - "node_modules"
-
 script:
-  - "npm run prod"
-  - "npm run test:ci"
+  - "cd packages/core"
+  - "yarn prod"
+  - "yarn test:ci"
 after_success:
-  - "./node_modules/.bin/nyc report --reporter=text-lcov | coveralls"
+  - "yarn nyc report --reporter=text-lcov | coveralls"
