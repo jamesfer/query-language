@@ -12,7 +12,7 @@ cache:
     - "node_modules"
 
 script:
-  - "npm run prod"
-  - "npm run test:ci"
+  - "cd packages/core && npm run prod"
+  - "cd packages/core && npm run test:ci"
 after_success:
-  - "./node_modules/.bin/nyc report --reporter=text-lcov | coveralls"
+  - "cd packages/core && ./node_modules/.bin/nyc report --reporter=text-lcov | coveralls"
