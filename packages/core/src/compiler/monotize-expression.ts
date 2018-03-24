@@ -18,12 +18,14 @@ export function monotizeExpression(expression: Expression, expectedType: Type): 
       return expression;
 
     case 'Identifier':
-      const newExpression = monotizeExpression(expression.expression, expectedType);
-      if (newExpression !== expression.expression) {
-        return {
-          ...expression,
-          expression: newExpression,
-        };
+      if (expression.expression) {
+        const newExpression = monotizeExpression(expression.expression, expectedType);
+        if (newExpression !== expression.expression) {
+          return {
+            ...expression,
+            expression: newExpression,
+          };
+        }
       }
       return expression;
 

@@ -44,7 +44,7 @@ export interface BooleanExpression extends ExpressionInterface<'Boolean', Boolea
 
 export interface IdentifierExpression extends ExpressionInterface<'Identifier'> {
   value: string;
-  expression: Expression,
+  expression: Expression | null,
 }
 
 export interface ArrayExpression extends ExpressionInterface<'Array', ArrayType> {

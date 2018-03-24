@@ -9,8 +9,11 @@ import {
 } from '../utils';
 import {
   booleanType, floatType,
-  integerType, makeArrayType, makeFunctionType,
+  integerType, makeArrayType, makeFunctionType, noneType,
 } from '../../src/type/constructors';
+import { makeMessage } from '../../';
+import { Position } from '../../src/token';
+import { MessageLevel } from '../../src/message';
 
 describe('functions', function() {
   let headIdentifier = identifierExpression(
@@ -121,5 +124,23 @@ describe('functions', function() {
       ),
       [ integerExpression(2) ]
     )
+  });
+
+  evaluates('Unknown identifiers', 'non_existent_function()', {
+    compiled: false,
+    evaluated: false,
+    tokens: [
+      identifierToken('non_existent_function'),
+      openParenToken(),
+      closeParenToken(),
+    ],
+    expression: functionCallExpression(
+      null,
+      identifierExpression(null, 'non_existent_function'),
+      []
+    ),
+    messages: [
+      makeMessage('Error', 'Unrecognized identifier non_existent_function', [0, 0], [0, 21]),
+    ],
   });
 });

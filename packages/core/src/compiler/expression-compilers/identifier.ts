@@ -31,30 +31,25 @@ export function interpretIdentifier(tokens: Token[]): UntypedIdentifierExpressio
 }
 
 export function typeIdentifier(scope: Scope, expression: UntypedIdentifierExpression): IdentifierExpression {
-  let resultType = findScopeVariableType(scope, expression.value);
+  const { value, tokens } = expression;
+  let resultType = findScopeVariableType(scope, value);
   let messages: Message[] = resultType ? [] : [
-    makeMessage('Error', `Unrecognized identifier ${expression.value}`, expression.tokens[0]),
+    makeMessage('Error', `Unrecognized identifier ${value}`, tokens[0]),
   ];
 
-
-  const identifiedExpression = findScopeVariableEntry(scope, expression.value);
-  if (!identifiedExpression) {
-    throw new Error('Unknown identifier');
-  }
-  
   return {
     kind: 'Identifier',
-    value: expression.value,
-    tokens: expression.tokens,
-    expression: identifiedExpression,
-    messages: [
-      ...messages,
-      ...expression.messages,
-    ],
+    value,
+    tokens,
+    expression: findScopeVariableEntry(scope, value),
+    messages: [ ...messages, ...expression.messages ],
     resultType,
   };
 }
 
 export function evaluateIdentifier(scope: Scope, expression: IdentifierExpression): LazyValue {
+  if (!expression.expression) {
+    throw new Error('Can not evaluate an unrecognized identifier');
+  }
   return evaluateExpression(scope, expression.expression) || LazyNoneValue;
 }

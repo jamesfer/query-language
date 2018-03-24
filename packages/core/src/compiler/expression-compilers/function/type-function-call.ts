@@ -112,7 +112,7 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
 function typeFunctionCallee(scope: Scope, expression: UntypedFunctionCallExpression): MessageResult<Expression> {
   let funcExp = typeExpression(scope, expression.functionExpression);
   let funcType = funcExp.resultType;
-  let messages: Message[] = [];
+  let messages: Message[] = [...funcExp.messages];
 
   if (funcType && funcType.kind !== 'Function' /*&& funcType.kind !== 'Method'*/) {
     messages.push(makeMessage(
@@ -122,7 +122,7 @@ function typeFunctionCallee(scope: Scope, expression: UntypedFunctionCallExpress
     ));
   }
 
-  return [ funcExp, messages ];
+  return [funcExp, messages];
 }
 
 function typeFunctionCallArgs(
@@ -187,7 +187,8 @@ export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallEx
   const messageStore = new MessageStore();
 
   // Type the function callee
-  const funcExp = messageStore.store(typeFunctionCallee(scope, expression));
+  const result = typeFunctionCallee(scope, expression);
+  const funcExp = messageStore.store(result);
 
   // Type each of the function args
   const { resultType, args } = typeFunctionCallArgs(expression, scope,

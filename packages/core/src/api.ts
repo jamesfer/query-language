@@ -1,4 +1,4 @@
-import { every, reduce } from 'lodash';
+import { some, reduce } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { Message } from './message';
 import { convertToScope } from './standard-library/library';
@@ -39,33 +39,40 @@ function extractMessages(expressions: MessageContainer[]): Message[] {
 
 export function compile(code: string, scope?: Scope): CompilationResult {
   // Parse Tokens
-  let tokenResult = tokenizeCode(code);
-  let result: CompilationResult = {
-    messages: tokenResult.messages,
-    tokens: tokenResult.tokens,
-    compiled: !tokenResult.failed,
-  };
-
-  // Build syntax tree
-  if (result.compiled) {
-    let expressions = interpretSyntaxTree(tokenResult.tokens);
-    result.messages = result.messages.concat(extractMessages(expressions));
-    result.compiled = expressions.length !== 0
-      && result.messages.length === 0
-      && every(expressions, e => e.kind !== 'Unrecognized');
-
-    // Type syntax tree
-    if (expressions.length > 0) {
-      scope = scope || convertToScope(standardLibrary);
-      let typedExpression = typeExpression(scope, expressions[0]);
-      if (typedExpression.kind !== 'Unrecognized') {
-        result.expression = monotizeBaseExpression(typedExpression);
-      } else {
-        result.compiled = false;
-      }
-    }
+  let { tokens, messages, failed } = tokenizeCode(code);
+  if (failed) {
+    return { tokens, messages, compiled: false };
   }
-  return result;
+
+  // Interpret expression
+  const expressions = interpretSyntaxTree(tokens);
+  const isUnrecognized = some(expressions, { kind: 'Unrecognized' });
+  messages = [...messages, ...extractMessages(expressions)];
+  if (expressions.length === 0 || messages.length > 0 || isUnrecognized) {
+    return { tokens, messages, compiled: false };
+  }
+
+  // Type expression
+  const typingScope = scope || convertToScope(standardLibrary);
+  const typedExpression = typeExpression(typingScope, expressions[0]);
+  messages = [...messages, ...typedExpression.messages];
+  if (typedExpression.kind === 'Unrecognized' || messages.length > 0) {
+    return {
+      tokens,
+      messages,
+      expression: typedExpression,
+      compiled: false,
+    };
+  }
+
+  // Monotize expression (convert poly-types to mono-types)
+  const monotypeExpression = monotizeBaseExpression(typedExpression);
+  messages = [...messages, ...monotypeExpression.messages];
+  const result = { tokens, messages, expression: monotypeExpression };
+  if (monotypeExpression.kind === 'Unrecognized' || messages.length > 0) {
+    return { ...result, compiled: false };
+  }
+  return { ...result, compiled: true };
 }
 
 export function evaluate(expression: Expression, scope?: Scope): EvaluationResult {
