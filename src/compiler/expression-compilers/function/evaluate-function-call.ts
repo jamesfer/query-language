@@ -1,13 +1,13 @@
-import { filter, map, partial } from 'lodash';
+import { Dictionary, filter, map, partial, isFunction, pick, mapValues } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
 import { FunctionCallExpression } from '../../../expression';
 import { Scope } from '../../../scope';
-import { FunctionType } from '../../../type/type';
+import { FunctionType, Type } from '../../../type/type';
 import { Expression } from '../../../expression';
 import {
   LazyValue,
-  makeFunctionValue,
+  makeMethodValue, makeFunctionValue,
   PlainFunctionValue,
 } from '../../../value';
 import { evaluateExpression, PartialPlaceholder } from '../../evaluate-expression';
@@ -31,12 +31,12 @@ function evaluateFunctionExpression(scope: Scope, expression: Expression): Obser
   // }
 
   return lazyFunc.map(func => {
-    if (func.kind !== 'Function') {
-      throw new Error('Attempted to call an expression that is not a function');
-    }
     // TODO check the result is not null
     // TODO check that value is is a function type
-    return func.value;
+    if (func.kind === 'Function') {
+      return func.value;
+    }
+    throw new Error('Attempted to call an expression that is not a function');
   });
 }
 
@@ -48,24 +48,27 @@ function evaluateArguments(scope: Scope, expressions: (Expression | null)[]): (L
   });
 }
 
+function getArity(type: Type | null): number {
+  return type && type.kind === 'Function' ? type.argTypes.length : 0;
+}
+
 export function evaluateFunctionCall(scope: Scope, expression: FunctionCallExpression): LazyValue {
   const argCount = filter(expression.args, arg => !!arg).length;
-  const arity = (expression.functionExpression.resultType as FunctionType).argTypes.length;
+  const arity = getArity(expression.functionExpression.resultType);
 
-  let func = evaluateFunctionExpression(scope, expression.functionExpression);
+  let lazyFuncs = evaluateFunctionExpression(scope, expression.functionExpression);
   let args = evaluateArguments(scope, expression.args);
 
-  if (argCount === arity) {
-    return func.switchMap(f => f(...args as LazyValue[]));
-  }
-  else if (argCount < arity) {
-    return func.map(f => {
-      let partialFunc = partial(f, ...args) as PlainFunctionValue;
-      return makeFunctionValue(partialFunc);
-    });
-  }
-  else {
+  if (argCount > arity) {
     // TODO remove synchronous throw
     throw new Error('Too many arguments');
   }
+
+  return lazyFuncs.switchMap(funcs => {
+    if (argCount === arity) {
+      return funcs(...args as LazyValue[]);
+    }
+    let partialFunc = partial(funcs, ...args) as PlainFunctionValue;
+    return Observable.of(makeFunctionValue(partialFunc));
+  });
 }

@@ -1,10 +1,14 @@
 import { addType, IdentifierExpression, } from '../../expression';
 import { makeMessage, Message } from '../../message';
-import { findScopeVariableType, findScopeVariableValue, Scope } from '../../scope';
+import {
+  findScopeVariableEntry, findScopeVariableType, findScopeVariableValue,
+  Scope,
+} from '../../scope';
 import { Token, TokenKind } from '../../token';
 import { UntypedIdentifierExpression, } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { LazyNoneValue, LazyValue } from '../../value';
+import { evaluateExpression } from '../evaluate-expression';
 
 
 export function makeIdentifierExpression(token: Token): UntypedIdentifierExpression {
@@ -32,9 +36,25 @@ export function typeIdentifier(scope: Scope, expression: UntypedIdentifierExpres
     makeMessage('Error', `Unrecognized identifier ${expression.value}`, expression.tokens[0]),
   ];
 
-  return addType(expression, resultType, messages);
+
+  const identifiedExpression = findScopeVariableEntry(scope, expression.value);
+  if (!identifiedExpression) {
+    throw new Error('Unknown identifier');
+  }
+  
+  return {
+    kind: 'Identifier',
+    value: expression.value,
+    tokens: expression.tokens,
+    expression: identifiedExpression,
+    messages: [
+      ...messages,
+      ...expression.messages,
+    ],
+    resultType,
+  };
 }
 
 export function evaluateIdentifier(scope: Scope, expression: IdentifierExpression): LazyValue {
-  return findScopeVariableValue(scope, expression.value) || LazyNoneValue;
+  return evaluateExpression(scope, expression.expression) || LazyNoneValue;
 }

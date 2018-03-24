@@ -20,6 +20,7 @@ import {
 import { evaluateIdentifier } from './expression-compilers/identifier';
 import { evaluateInteger } from './expression-compilers/number';
 import { evaluateString } from './expression-compilers/string';
+import { evaluateFunction } from './expression-compilers/function';
 
 export type PartialPlaceholder = {};
 
@@ -35,6 +36,10 @@ export function evaluateExpression(scope: Scope, expression: Expression): LazyVa
       return evaluateBoolean(scope, expression);
     case 'Array':
       return evaluateArray(scope, expression);
+    case 'Function':
+      return evaluateFunction(scope, expression);
+    case 'Method':
+      throw new Error('Cannot evaluate a method');
     case 'FunctionCall':
       return evaluateFunctionCall(scope, expression);
     case 'Identifier':
@@ -55,6 +60,7 @@ export function stripValue(value: Value): Observable<any> {
     case 'String':
     case 'Boolean':
     case 'Function':
+    case 'Method':
     case 'None':
       return Observable.of(value.value);
     case 'Array':

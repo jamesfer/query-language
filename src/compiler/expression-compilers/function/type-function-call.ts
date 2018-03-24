@@ -18,22 +18,35 @@ import {
   MessageResult,
   MessageStore,
 } from '../../compiler-utils/message-store';
+import { FunctionValue } from '../../../value';
 
 interface PartialApplication {
   expectedArgs: Type[],
   suppliedArgs: (Type | null)[],
   returnType: Type,
   genericMap: { [name: string]: Type },
+  // methodImplementations?: { [name: string]: Type },
 }
 
 function makeInitialPartial(funcType: Type | null): PartialApplication | null {
-  if (funcType && funcType.kind === 'Function') {
-    return {
-      expectedArgs: funcType.argTypes,
-      returnType: funcType.returnType,
-      suppliedArgs: [],
-      genericMap: {},
-    };
+  if (funcType) {
+    // if (funcType.kind === 'Method') {
+    //   return {
+    //     expectedArgs: funcType.signature.argTypes,
+    //     returnType: funcType.signature.returnType,
+    //     suppliedArgs: [],
+    //     genericMap: {},
+    //     methodImplementations: funcType.implementations,
+    //   };
+    // }
+    if (funcType.kind === 'Function') {
+      return {
+        expectedArgs: funcType.argTypes,
+        returnType: funcType.returnType,
+        suppliedArgs: [],
+        genericMap: {},
+      };
+    }
   }
   return null;
 }
@@ -59,6 +72,15 @@ function applyArg(partial: PartialApplication | null, arg: Type | null): Partial
       ...partial.genericMap,
       ...createGenericMap(expectedArg, arg),
     };
+
+    // Reduce the number of possible implementations
+    // if ('self' in partial.genericMap && partial.methodImplementations) {
+    //   const selfType = partial.genericMap.self;
+    //   partial.methodImplementations = pickBy(partial.methodImplementations, type => {
+    //     return isTypeOf(type, selfType);
+    //   })
+    // }
+
     return partial;
   }
   return null;
@@ -92,7 +114,7 @@ function typeFunctionCallee(scope: Scope, expression: UntypedFunctionCallExpress
   let funcType = funcExp.resultType;
   let messages: Message[] = [];
 
-  if (funcType && funcType.kind !== 'Function') {
+  if (funcType && funcType.kind !== 'Function' /*&& funcType.kind !== 'Method'*/) {
     messages.push(makeMessage(
       'Error',
       'Cannot call an expression that is not a function.',
@@ -177,7 +199,7 @@ export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallEx
   return {
     resultType,
     args,
-    kind: expression.kind,
+    kind: 'FunctionCall',
     functionExpression: funcExp,
     tokens: expression.tokens,
     messages: expression.messages.concat(messageStore.messages),

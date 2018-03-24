@@ -1,6 +1,7 @@
 import { Dictionary } from 'lodash';
 import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
+import { Expression } from './expression';
 
 export type ValueKind = 'String'
   | 'Integer'
@@ -9,6 +10,7 @@ export type ValueKind = 'String'
   | 'None'
   | 'Array'
   | 'Function'
+  | 'Method'
   | 'Record';
 
 export type PlainFunctionValue<R extends Value = Value> = (...args: LazyValue[]) => LazyValue<R>;
@@ -18,7 +20,9 @@ export type PlainValue = string
   | null
   | Observable<Value>
   | PlainFunctionValue
-  | Dictionary<Value>;
+  | Dictionary<PlainFunctionValue>
+  | Dictionary<Value>
+  | Expression;
 
 export interface ValueInterface<K extends ValueKind, V extends PlainValue> {
   kind: K,
@@ -33,6 +37,7 @@ export interface NoneValue extends ValueInterface<'None', null> {}
 export interface ArrayValue extends ValueInterface<'Array', Observable<Value>> {}
 export interface FunctionValue extends ValueInterface<'Function', PlainFunctionValue> {}
 export interface RecordValue extends ValueInterface<'Record', Dictionary<Value>> {}
+export interface MethodValue extends ValueInterface<'Method', Dictionary<PlainFunctionValue>> {}
 
 export type Value = StringValue
   | IntegerValue
@@ -41,7 +46,8 @@ export type Value = StringValue
   | NoneValue
   | FunctionValue
   | ArrayValue
-  | RecordValue;
+  | RecordValue
+  | MethodValue;
 
 export type LazyValue<T extends Value = Value> = Observable<T>;
 
@@ -118,6 +124,16 @@ export function makeFunctionValue(value: PlainFunctionValue): FunctionValue {
 }
 export function makeLazyFunctionValue(value: PlainFunctionValue) {
   return makeLazy(makeFunctionValue(value));
+}
+
+export function makeMethodValue(value: Dictionary<PlainFunctionValue>): MethodValue {
+  return {
+    kind: 'Method',
+    value,
+  };
+}
+export function makeLazyMethodValue(value: Dictionary<PlainFunctionValue>) {
+  return makeLazy(makeMethodValue(value));
 }
 
 export function makeRecordValue(value: Dictionary<Value>): RecordValue {

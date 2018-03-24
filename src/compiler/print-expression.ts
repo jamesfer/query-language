@@ -19,7 +19,8 @@ export function printExpression(expression: UntypedExpression): string {
         return funcExp + '(' + args.join(', ') + ')';
       }
       return '(' + args[0] + ' ' + funcExp + ' ' + args[1] + ')';
-
+    case 'Function':
+      return 'function';
     case 'None':
       return 'none';
     case 'Unrecognized':

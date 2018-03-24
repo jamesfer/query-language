@@ -10,6 +10,7 @@ import { tokenizeCode } from './compiler/tokenize/tokenize-code';
 import { interpretSyntaxTree } from './compiler/interpret-expression';
 import { typeExpression } from './compiler/type-expression';
 import { evaluateSyntaxTree } from './compiler/evaluate-expression';
+import { monotizeBaseExpression } from './compiler/monotize-expression';
 
 
 export interface CompilationResult {
@@ -58,9 +59,8 @@ export function compile(code: string, scope?: Scope): CompilationResult {
       scope = scope || convertToScope(standardLibrary);
       let typedExpression = typeExpression(scope, expressions[0]);
       if (typedExpression.kind !== 'Unrecognized') {
-        result.expression = typedExpression;
-      }
-      else {
+        result.expression = monotizeBaseExpression(typedExpression);
+      } else {
         result.compiled = false;
       }
     }

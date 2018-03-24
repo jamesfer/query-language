@@ -1,7 +1,11 @@
 import { mapValues, assign, map } from 'lodash';
 import { Type } from '../type/type';
-import { makeLazyFunctionValue, PlainFunctionValue, } from '../value';
+import {
+  FunctionValue, makeFunctionValue, makeLazyFunctionValue,
+  PlainFunctionValue,
+} from '../value';
 import { Scope } from '../scope';
+import { Expression } from '../expression';
 
 export interface LibraryFunction {
   type: Type,
@@ -27,9 +31,18 @@ export function mergeLibraries(...libraries: Library[]): Library {
 export function convertToScope(library: Library): Scope {
   return {
     types: library.types || {},
-    variables: mapValues(library.functions, entry => ({
-      type: entry.type,
-      value: makeLazyFunctionValue(entry.impl),
+    // variables: mapValues(library.functions, entry => ({
+    //   type: entry.type,
+    //   value: makeLazyFunctionValue(entry.impl),
+    // })),
+    variables: mapValues(library.functions, (entry): Expression => ({
+      kind: 'Function',
+      tokens: [],
+      messages: [],
+      value: makeFunctionValue(entry.impl),
+      resultType: entry.type,
+      argumentNames: [],
     })),
+    values: {},
   };
 }

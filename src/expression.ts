@@ -1,4 +1,4 @@
-import { assign } from 'lodash';
+import { assign, Dictionary } from 'lodash';
 import { Message } from './message';
 import { Token } from './token';
 import {
@@ -17,6 +17,7 @@ import {
   UntypedNoneExpression,
   UntypedStringExpression,
 } from './untyped-expression';
+import { FunctionValue } from './value';
 
 export interface ExpressionInterface<K extends string, T extends (Type | null) = Type | null> {
   kind: K;
@@ -43,6 +44,11 @@ export interface BooleanExpression extends ExpressionInterface<'Boolean', Boolea
 
 export interface IdentifierExpression extends ExpressionInterface<'Identifier'> {
   value: string;
+  expression: Expression,
+}
+
+export interface ArrayExpression extends ExpressionInterface<'Array', ArrayType> {
+  elements: Expression[],
 }
 
 export interface FunctionCallExpression extends ExpressionInterface<'FunctionCall'> {
@@ -50,8 +56,17 @@ export interface FunctionCallExpression extends ExpressionInterface<'FunctionCal
   args: (Expression | null)[],
 }
 
-export interface ArrayExpression extends ExpressionInterface<'Array', ArrayType> {
-  elements: Expression[],
+export interface FunctionExpression extends ExpressionInterface<'Function'> {
+  value: FunctionValue | Expression,
+  argumentNames: string[]
+}
+
+export interface MethodExpression extends ExpressionInterface<'Method'> {
+  implementations: Dictionary<{
+    instance: Type,
+    value: FunctionValue | Expression,
+    argumentNames: string[],
+  }>,
 }
 
 export interface UnrecognizedExpression extends ExpressionInterface<'Unrecognized', null> {};
@@ -66,7 +81,9 @@ export type Expression = FunctionCallExpression
   | NoneExpression
   | IntegerExpression
   | ArrayExpression
-  | UnrecognizedExpression;
+  | UnrecognizedExpression
+  | MethodExpression
+  | FunctionExpression;
 
 
 export function addType(expression: UntypedStringExpression, resultType: StringType, messages?: Message[]): StringExpression;
