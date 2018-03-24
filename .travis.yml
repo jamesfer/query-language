@@ -9,10 +9,9 @@ cache:
   yarn: true
   directories:
     - "node_modules"
-
 script:
   - "cd packages/core"
-  - "npm run prod"
-  - "npm run test:ci"
+  - "yarn prod"
+  - "yarn test:ci"
 after_success:
-  - "cd packages/core && ./node_modules/.bin/nyc report --reporter=text-lcov | coveralls"
+  - "yarn nyc report --reporter=text-lcov | coveralls"
