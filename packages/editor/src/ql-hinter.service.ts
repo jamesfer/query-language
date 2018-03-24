@@ -2,13 +2,10 @@ import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
 import { Editor, registerHelper, Pos, Hint, Hints, Position as CMPosition, Token } from 'codemirror';
 import { Position, IdentifierExpression, Expression, standardLibrary, ExecutionResult, Type } from 'query-language';
-import { QLCompiler } from './ql-compiler';
 import { assertNever } from './utils';
-import { startsWith, bind, join, reject, filter, omitBy, first, last, map, pickBy, defer } from 'lodash';
+import { startsWith, bind, join, reject, filter, map, reduce } from 'lodash';
 import { QLCompilerService } from './ql-compiler.service';
 import { QLEditorService } from './ql-editor.service';
-import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { showHint } from 'codemirror';
 
@@ -20,11 +17,19 @@ export interface QLHint {
 
 // We only want to show completions for standard functions that
 // do not contain symbols.
-const isOperatorRegex = /[^a-z]/i;
-const completableLibrary = reject(map(standardLibrary, (value, name) => ({
-  name,
-  type: value.type,
-})), hint => isOperatorRegex.test(hint.name));
+const allLibraryCompletions = [
+  ...map(standardLibrary.functions, (value, name) => ({ name, type: value.type })),
+  ...reduce(standardLibrary.types, (list, type) => {
+    if (type.kind === 'Interface') {
+      return [
+        ...list,
+        ...map(type.methods, (method, name) => ({ name, type: method.resultType })),
+      ];
+    }
+    return list;
+  }, []),
+];
+const completableLibrary = reject(allLibraryCompletions, hint => /[^a-z0-9]/i.test(hint.name));
 
 
 function typeToString(type: Type): string {
@@ -39,8 +44,8 @@ function typeToString(type: Type): string {
     case 'Generic':
       return type.name;
 
-    case 'Union':
-      return join(map(type.types, typeToString), ' | ');
+    // case 'Union':
+    //   return join(map(type.types, typeToString), ' | ');
 
     case 'Record':
       const fieldsString = map(type.fields, (fieldType, name) => {
@@ -55,6 +60,9 @@ function typeToString(type: Type): string {
         return elementString + '[]';
       }
       return 'any[]';
+
+    case 'Interface':
+      return '<< Interface >>';
 
     case 'Function':
       const returnString = typeToString(type.returnType);

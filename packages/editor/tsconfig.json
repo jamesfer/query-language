@@ -4,6 +4,7 @@
     "alwaysStrict": true,
     "downlevelIteration": true,
     "outDir": "./dist",
+    "skipLibCheck": true,
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -11,12 +12,16 @@
     "experimentalDecorators": true,
     "target": "es5",
     "module": "commonjs",
-    "strict": true,
+    "strict": false,
     "suppressImplicitAnyIndexErrors": true,
     "lib": [
       "es2015",
       "es2016",
       "dom"
     ]
-  }
+  },
+  "include": [
+    "src/*.ts",
+    "typings/*.d.ts"
+  ]
 }

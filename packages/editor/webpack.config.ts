@@ -31,7 +31,7 @@ module.exports = function(env?: { [k: string]: any }): webpack.Configuration {
     context: srcPath(),
     entry: isDemo ? demoPath('main.ts') : srcPath('ql-editor.module.ts'),
     target: 'node',
-    devtool: 'source-map',
+    // devtool: 'source-map',
     output: {
       path: distPath(),
       filename: 'query-language-editor.js',
