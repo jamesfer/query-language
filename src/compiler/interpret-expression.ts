@@ -7,7 +7,7 @@ import { interpretIdentifier } from './expression-compilers/identifier';
 import { buildOperatorExpression } from './expression-compilers/operators/operator';
 import { interpretParenthesis } from './expression-compilers/parenthesis';
 import { makeUntypedUnrecognizedExpression } from '../untyped-expression';
-import { intepretString } from './expression-compilers/string';
+import { interpretString } from './expression-compilers/string';
 import { interpretNumber } from './expression-compilers/number';
 import { interpretArray } from './expression-compilers/array';
 import { interpretBoolean } from './expression-compilers/boolean';
@@ -16,7 +16,7 @@ import { interpretBoolean } from './expression-compilers/boolean';
 function buildLiteralExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
   if (prevExpression === null) {
     return firstResult([
-      intepretString,
+      interpretString,
       interpretNumber,
       interpretArray,
       interpretBoolean,
