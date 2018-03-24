@@ -1,7 +1,7 @@
 import { execute } from '../../src/api';
 import { expect } from 'chai';
 
-describe.only('interfaces', function() {
+describe('interfaces', function() {
   describe('Equatable', function() {
     it('should be possible to call a method defined in an interface', async function() {
       const result = execute("5 = 5").result;
