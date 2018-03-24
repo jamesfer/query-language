@@ -1,0 +1,22 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "downlevelIteration": true,
+    "outDir": "./dist",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "module": "commonjs",
+    "strict": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "lib": [
+      "es2015",
+      "es2016",
+      "dom"
+    ]
+  }
+}

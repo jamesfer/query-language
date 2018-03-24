@@ -1,0 +1,22 @@
+.hint-list {
+  background: white;
+  position: absolute;
+  width: 200px;
+  margin: 0;
+  list-style: none;
+  padding: 0;
+
+  .hint {
+    font-size: 15px;
+    line-height: 20px;
+    min-width: 200px;
+    padding: 2px 12px;
+    font-family: monospace;
+
+    &.highlighted {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+
