@@ -1,11 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { QLEditorModule } from '../src/ql-editor.module';
-
-import { QLDemoComponent } from './ql-demo.component';
 import { CommonModule } from '@angular/common';
-
+import { QLEditorModule } from 'query-language-editor';
+import { QLDemoComponent } from './ql-demo.component';
 
 @NgModule({
   bootstrap: [

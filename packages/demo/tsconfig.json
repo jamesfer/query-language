@@ -6,7 +6,7 @@
     "outDir": "./dist",
     "skipLibCheck": true,
     "sourceMap": true,
-    "declaration": true,
+    "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -15,7 +15,6 @@
     "strict": false,
     "suppressImplicitAnyIndexErrors": true,
     "lib": [
-      "es2015",
       "es2016",
       "dom"
     ]

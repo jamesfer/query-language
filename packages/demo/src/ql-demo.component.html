@@ -1,0 +1,4 @@
+<div class="editor-wrapper">
+    <ql-editor class="code" readOnly="false" theme="monokai" [value]="codePrompt"></ql-editor>
+    <ql-editor class="results" theme="monokai" [value]="resultString$ | async"></ql-editor>
+</div>

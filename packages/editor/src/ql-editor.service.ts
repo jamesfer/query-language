@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { Editor } from 'codemirror';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class QLEditorService {
@@ -17,7 +18,7 @@ export class QLEditorService {
 
   // readonly onKeyHandled$ = new Subject<{ editor: Editor, name: string, event: Event}>();
 
-  readonly code$ = this.onChanges$.map(editor => editor.getValue());
+  readonly code$: Observable<string> = this.onChanges$.map(editor => editor.getValue());
 
 
   // readonly cursorPosition$ = new Subject<Position>();

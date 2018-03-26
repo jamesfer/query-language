@@ -8,6 +8,7 @@ import { QLCompilerService } from './ql-compiler.service';
 import { QLEditorService } from './ql-editor.service';
 import { Injectable } from '@angular/core';
 import { showHint } from 'codemirror';
+import { Observable } from 'rxjs/Observable';
 
 
 export interface QLHint {
@@ -81,7 +82,7 @@ function typeToString(type: Type): string {
 
 @Injectable()
 export class QLHinterService {
-  hintPanelOpen$ = this.editorService.onHintsShown$
+  hintPanelOpen$: Observable<boolean> = this.editorService.onHintsShown$
     .mapTo(true)
     .merge(this.editorService.onHintsClosed$.mapTo(false))
     .startWith(false);

@@ -128,8 +128,12 @@ export class QLEditorComponent implements AfterViewInit, OnDestroy {
       lint: this.lintOptions(),
     });
 
-    this.registerListeners(editor);
+    // Update all computed values on the editor
+    editor.setValue(this._value);
+    editor.setOption('readOnly', this._readOnly);
+    editor.setOption('theme', this._theme);
 
+    this.registerListeners(editor);
     return editor;
   }
 

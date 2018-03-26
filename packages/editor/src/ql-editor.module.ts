@@ -20,6 +20,10 @@ import 'rxjs/add/operator/publish';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/observable/of';
 
+export {
+  QLEditorComponent,
+};
+
 
 @NgModule({
   imports: [
