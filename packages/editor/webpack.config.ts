@@ -23,41 +23,40 @@ function distPath(...paths: string[]) {
 }
 
 
-module.exports = function(env?: { [k: string]: any }): webpack.Configuration {
-  const isDemo = !!(env && env.demo);
+module.exports = (): webpack.Configuration => {
   const tsConfigFile = rootPath('tsconfig.json');
-
   return {
     context: srcPath(),
-    entry: isDemo ? demoPath('main.ts') : srcPath('ql-editor.module.ts'),
-    target: 'node',
-    // devtool: 'source-map',
+    entry: srcPath('ql-editor.module.ts'),
+    target: 'web',
+    devtool: 'cheap-eval-source-map',
     output: {
       path: distPath(),
       filename: 'query-language-editor.js',
       library: 'query-language-editor',
       libraryTarget: 'umd',
     },
+    stats: {
+      version: false,
+      hash: false,
+      children: false,
+      maxModules: 0,
+      chunks: false,
+    },
+    resolve: {
+      extensions: ['.ts', '.js', '.json', '*'],
+    },
     module: {
       rules: [
-        // {
-        //   test: /\.tsx?$/,
-        //   enforce: 'pre',
-        //   loader: 'tslint-loader',
-        //   options: {
-        //     tsConfigFile,
-        //     typeCheck: true,
-        //   },
-        // },
         {
           test: /\.tsx?$/,
           use: [
             {
               loader: 'ts-loader',
               options: {
-                transpileOnly: true,
                 configFile: tsConfigFile,
-                silent: true,
+                // transpileOnly: true,
+                // silent: true,
               }
             },
             'angular2-template-loader',
@@ -161,51 +160,21 @@ module.exports = function(env?: { [k: string]: any }): webpack.Configuration {
         }
       ]
     },
-    resolve: {
-      extensions: ['.ts', '.js', '.json', '*'],
-    },
     plugins: [
-      new ForkCheckerPlugin({
-        tsconfig: tsConfigFile,
-        watch: srcPath(),
-        silent: true,
-      }),
-      new webpack.WatchIgnorePlugin([
-        new RegExp(`^(?!(${srcPath()}|${demoPath()})).*$`),
-      ]),
-      // new webpack.ProvidePlugin({
-      //   'jQuery': 'jquery',
-      //   '$': 'jquery',
-      //   'window.jQuery': 'jquery',
-      //   'Tether': 'tether',
+      // new ForkCheckerPlugin({
+      //   tsconfig: tsConfigFile,
+      //   watch: srcPath(),
+      //   silent: true,
       // }),
       new webpack.ContextReplacementPlugin(
         /angular[\\/]core[\\/]/,
         __dirname
       ),
-      new HtmlWebpackPlugin({
-        filename: distPath('index.html'),
-        template: demoPath('index.html'),
-        env,
-      }),
       new CleanWebpackPlugin(distPath(), {
         verbose: false,
         watch: false
       }),
       new ExtractTextPlugin('[name].css'),
-      // new webpack.optimize.UglifyJsPlugin({
-      //   sourceMap: true,
-      // }),
-      // new LiveReloadPlugin({
-      //   appendScriptTag: true,
-      // }),
     ],
-    stats: {
-      version: false,
-      hash: false,
-      children: false,
-      maxModules: 0,
-      chunks: false,
-    },
   };
 };

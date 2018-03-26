@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css?family=Orbitron:500|Raleway:200,400');
+
+body {
+  margin: 0;
+  background: #f9f9f9;
+  font-family: "Raleway", sans-serif;
+  font-weight: lighter;
+}
+
+h1, h2 {
+  font-family: "Orbitron", sans-serif;
+}
+
+.page-title {
+  text-transform: uppercase;
+  font-size: 55px;
+}
+
+.page-subtitle {
+  font-size: 20px;
+}
+
+.hero {
+  //background-color: rgba(6, 52, 255, 0.72);
+  //background-image: url(assets/background-pattern.png);
+  //background-position: center;
+  color: white;
+  position: relative;
+
+  // Background image needs to be placed in a pseudo element so that we can control its opacity
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    background: url(assets/background-pattern.jpg) center bottom;
+    opacity: 0.9;
+  }
+
+  & > * {
+    z-index: 2;
+    position: relative;
+  }
+}
+
+.hero-content {
+  text-align: center;
+}
+
+.content {
+  padding: 40px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.feature {
+  padding: 10px 40px;
+  display: flex;
+}
+
+.feature-title {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-weight: normal;
+}
+
+.feature-description {
+  font-size: 18px;
+}
+
+.feature-description + .feature-image,
+.feature-image + .feature-description {
+  padding-left: 20px;
+}
+
+.feature-image .coming-soon {
+  background-color: #dddddd;
+  color: rgba(0, 0, 0, 0.5);
+  width: 300px;
+  height: 150px;
+  line-height: 150px;
+  font-size: 26px;
+  text-align: center;
+}
+
+.tag {
+  padding: 8px;
+  background-color: #fda438;
+  color: white;
+  border-radius: 5px;
+  font-size: 0.7em;
+  vertical-align: text-top;
+}
+
+.title-tag {
+  font-size: 20px;
+}
+
+.editor-wrapper {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.code, .results {
+  display: block;
+  box-sizing: border-box;
+}
+
+.code {
+  height: 150px;
+}
+
+.results {
+  height: 75px;
+  border-top: 3px solid transparent;
+}

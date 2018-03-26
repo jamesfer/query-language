@@ -1,13 +1,14 @@
 {
-  "name": "query-language-editor",
+  "name": "demo-code",
   "version": "0.1.0",
-  "author": "James Ferguson <jamesferguson497@gmail.com>",
-  "main": "src/ql-editor.module.ts",
-  "types": "dist/ql-editor.module.d.ts",
+  "main": "dist/index.js",
+  "repository": "https://github.com/github:jamesfer/query-language",
+  "author": "James Ferguson",
   "license": "MIT",
   "scripts": {
     "build": "webpack --progress",
-    "watch": "webpack  --progress --watch"
+    "watch": "webpack --progress --watch",
+    "prod": "webpack --progress --env.optimize=true --optimize-minimize"
   },
   "dependencies": {
     "@angular/common": "^5.1.0",
@@ -26,16 +27,16 @@
     "clean-webpack-plugin": "^0.1.17",
     "codelyzer": "^4.0.1",
     "codemirror": "^5.32.0",
+    "compression-webpack-plugin": "^1.1.11",
     "css-loader": "^0.28.7",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.5",
-    "fork-ts-checker-webpack-plugin": "^0.2.9",
     "html-loader": "^0.5.1",
     "html-webpack-plugin": "^2.30.1",
     "lodash": "^4.17.4",
     "node-sass": "^4.7.2",
     "postcss-loader": "^2.0.9",
-    "query-language": "0.1.0",
+    "query-language-editor": "0.1.0",
     "raw-loader": "^0.5.1",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.5.5",
