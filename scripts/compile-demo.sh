@@ -12,8 +12,7 @@ cd ../demo
 yarn prod
 
 echo "Deploying the demo"
-git fetch origin gh-pages
-git worktree add gh-pages gh-pages
+git worktree add gh-pages origin/gh-pages
 rm -r gh-pages/*
 cp -r dist/* gh-pages
 cd gh-pages
