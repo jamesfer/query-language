@@ -1,4 +1,4 @@
-import { some, reduce } from 'lodash';
+import { uniqWith, isEqual, reduce } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { Message } from './message';
 import { convertToScope } from './standard-library/library';
@@ -46,28 +46,23 @@ export function compile(code: string, scope?: Scope): CompilationResult {
 
   // Interpret expression
   const expressions = interpretSyntaxTree(tokens);
-  const isUnrecognized = some(expressions, { kind: 'Unrecognized' });
+  const [ expression ] = expressions;
   messages = [...messages, ...extractMessages(expressions)];
-  if (expressions.length === 0 || messages.length > 0 || isUnrecognized) {
+  if (!expression) {
     return { tokens, messages, compiled: false };
   }
 
   // Type expression
   const typingScope = scope || convertToScope(standardLibrary);
-  const typedExpression = typeExpression(typingScope, expressions[0]);
+  const typedExpression = typeExpression(typingScope, expression);
   messages = [...messages, ...typedExpression.messages];
-  if (typedExpression.kind === 'Unrecognized' || messages.length > 0) {
-    return {
-      tokens,
-      messages,
-      expression: typedExpression,
-      compiled: false,
-    };
-  }
 
   // Monotize expression (convert poly-types to mono-types)
   const monotypeExpression = monotizeBaseExpression(typedExpression);
   messages = [...messages, ...monotypeExpression.messages];
+  // TODO we should not have to unique the arrays before returning them
+  // TODO need a better protocol when generating messages in each step
+  messages = uniqWith(messages, isEqual);
   const result = { tokens, messages, expression: monotypeExpression };
   if (monotypeExpression.kind === 'Unrecognized' || messages.length > 0) {
     return { ...result, compiled: false };

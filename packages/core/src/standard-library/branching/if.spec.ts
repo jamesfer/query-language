@@ -1,6 +1,6 @@
 import { executeExpect } from '../../test-utils';
 
-describe.only('if', function() {
+describe('if', function() {
   it('should return the true branch', function() {
     return executeExpect('if(1, 1, 2)', 1);
   });
