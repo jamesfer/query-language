@@ -5,7 +5,7 @@ import { booleanType, makeFunctionType } from '../../type/constructors';
 
 
 function ifFunc(condition: LazyValue<BooleanValue>, truth: LazyValue, fallacy: LazyValue): LazyValue {
-  return condition.switchMap(c => c ? truth : fallacy);
+  return condition.switchMap(c => c.value ? truth : fallacy);
 }
 
 export const _if: LibraryFunction = {
