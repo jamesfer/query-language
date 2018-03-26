@@ -10,8 +10,6 @@ cache:
   directories:
     - "node_modules"
 script:
-  - "cd packages/core"
-  - "yarn prod"
-  - "yarn test:ci"
+  - "bash scripts/test.sh"
 after_success:
   - "yarn nyc report --reporter=text-lcov | coveralls"
