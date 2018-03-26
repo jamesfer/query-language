@@ -1,5 +1,18 @@
 @import url('https://fonts.googleapis.com/css?family=Orbitron:500|Raleway:200,400');
 
+@function toRem($px) {
+  @return #{$px / 16px}rem;
+}
+
+@mixin mediumUp {
+  @media (min-width: 575px) { @content }
+}
+
+@mixin largeUp {
+  @media (min-width: 768px) { @content }
+}
+
+
 body {
   margin: 0;
   background: #f9f9f9;
@@ -13,11 +26,11 @@ h1, h2 {
 
 .page-title {
   text-transform: uppercase;
-  font-size: 55px;
+  font-size: toRem(55px);
 }
 
 .page-subtitle {
-  font-size: 20px;
+  font-size: toRem(20px);
 }
 
 .hero {
@@ -51,14 +64,27 @@ h1, h2 {
 }
 
 .content {
-  padding: 40px;
+  padding: 40px 10px;
   max-width: 800px;
   margin: auto;
+
+  @include largeUp {
+    padding: 40px;
+  }
 }
 
 .feature {
-  padding: 10px 40px;
+  padding: 10px;
   display: flex;
+  flex-direction: column;
+
+  @include mediumUp {
+    flex-direction: row;
+  }
+
+  @include largeUp {
+    padding: 10px 40px;
+  }
 }
 
 .feature-title {
@@ -68,12 +94,16 @@ h1, h2 {
 }
 
 .feature-description {
-  font-size: 18px;
+  font-size: toRem(18px);
 }
 
-.feature-description + .feature-image,
-.feature-image + .feature-description {
-  padding-left: 20px;
+.feature-image {
+  margin: auto;
+  margin-top: 15px;
+
+  @include mediumUp {
+    margin: 0;
+  }
 }
 
 .feature-image .coming-soon {
@@ -82,8 +112,15 @@ h1, h2 {
   width: 300px;
   height: 150px;
   line-height: 150px;
-  font-size: 26px;
+  font-size: toRem(26px);
   text-align: center;
+}
+
+@include mediumUp {
+  .feature-description + .feature-image,
+  .feature-image + .feature-description {
+    padding-left: toRem(20px);
+  }
 }
 
 .tag {
@@ -91,12 +128,13 @@ h1, h2 {
   background-color: #fda438;
   color: white;
   border-radius: 5px;
-  font-size: 0.7em;
   vertical-align: text-top;
+  // This size needs to be em so that it scales with the surrounding text
+  font-size: 0.7em;
 }
 
 .title-tag {
-  font-size: 20px;
+  font-size: toRem(20px);
 }
 
 .editor-wrapper {
