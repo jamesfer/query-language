@@ -23,7 +23,7 @@ module.exports = (env?: Record<string, any>): webpack.Configuration => {
     context: srcPath(),
     entry: srcPath('main.ts'),
     target: 'web',
-    devtool: 'cheap-eval-source-map',
+    devtool: env.optimize ? false : 'cheap-eval-source-map',
     output: {
       path: distPath(),
       filename: 'query-language-demo.js',
@@ -179,6 +179,6 @@ module.exports = (env?: Record<string, any>): webpack.Configuration => {
         verbose: false,
         watch: false,
       }),
-    ].concat(env.optimize ? [new CompressionPlugin()] : []),
+    ],
   };
 };
