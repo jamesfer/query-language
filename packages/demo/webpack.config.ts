@@ -17,12 +17,13 @@ function distPath(...paths: string[]) {
   return path.resolve(__dirname, 'dist', ...paths);
 }
 
-module.exports = (env: Record<string, any>): webpack.Configuration => {
+module.exports = (env?: Record<string, any>): webpack.Configuration => {
+  env = env || {};
   return {
     context: srcPath(),
     entry: srcPath('main.ts'),
     target: 'web',
-    devtool: 'cheap-eval-source-map',
+    devtool: env.optimize ? false : 'cheap-eval-source-map',
     output: {
       path: distPath(),
       filename: 'query-language-demo.js',
@@ -50,37 +51,67 @@ module.exports = (env: Record<string, any>): webpack.Configuration => {
         },
         {
           test: /\.scss$/,
-          use: ExtractTextPlugin.extract({
-            fallback: [
-              {
-                loader: 'style-loader',
-                options: {
-                  sourceMap: true,
+          oneOf: [
+            {
+              test: /\.component.scss$/,
+              use: [
+                'to-string-loader',
+                {
+                  loader: 'css-loader',
+                  options: {
+                    sourceMap: true,
+                  }
                 },
-              }
-            ],
-            use: [
-              {
-                loader: 'css-loader',
-                options: {
-                  sourceMap: true,
-                }
-              },
-              {
-                loader: 'postcss-loader',
-                options: {
-                  sourceMap: true,
-                  plugins: [ require('autoprefixer') ],
+                {
+                  loader: 'postcss-loader',
+                  options: {
+                    sourceMap: true,
+                    plugins: [ require('autoprefixer') ],
+                  },
                 },
-              },
-              {
-                loader: 'sass-loader',
-                options: {
-                  sourceMap: true,
+                {
+                  loader: 'sass-loader',
+                  options: {
+                    sourceMap: true,
+                  },
                 },
-              },
-            ],
-          }),
+              ],
+            },
+            {
+              test: /$/,
+              use: ExtractTextPlugin.extract({
+                fallback: [
+                  {
+                    loader: 'style-loader',
+                    options: {
+                      sourceMap: true,
+                    },
+                  }
+                ],
+                use: [
+                  {
+                    loader: 'css-loader',
+                    options: {
+                      sourceMap: true,
+                    }
+                  },
+                  {
+                    loader: 'postcss-loader',
+                    options: {
+                      sourceMap: true,
+                      plugins: [ require('autoprefixer') ],
+                    },
+                  },
+                  {
+                    loader: 'sass-loader',
+                    options: {
+                      sourceMap: true,
+                    },
+                  },
+                ],
+              }),
+            },
+          ],
         },
         {
           test: /\.css$/,
@@ -148,6 +179,6 @@ module.exports = (env: Record<string, any>): webpack.Configuration => {
         verbose: false,
         watch: false,
       }),
-    ].concat(env.optimize ? [new CompressionPlugin()] : []),
+    ],
   };
 };
