@@ -16,7 +16,7 @@ export function makeMessage(level: MessageLevel, text: string, begin: Token, end
 export function makeMessage(level: MessageLevel, text: string, begin: Position | Token, end?: Position | Token): Message {
   const messageBegin = isArray(begin) ? begin : begin.begin;
   const messageEnd = end
-    ? isArray(end) ? end : end.begin
+    ? isArray(end) ? end : end.end
     : isArray(begin) ? begin : begin.end;
   return { text, level, begin: messageBegin, end: messageEnd };
 }

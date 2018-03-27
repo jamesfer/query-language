@@ -78,7 +78,7 @@ function nextToken(code: string, position: Position): { token: Token | null, ski
   const { length, code: strippedCode, position: strippedPosition } = skipWhitespace(code);
 
   // Collect unrecognized characters until a token is found or the string ends
-  const token = parseNextToken(strippedCode, strippedPosition);
+  const token = parseNextToken(strippedCode, addPositions(position, strippedPosition));
   // while (!token && code.length) {
   //   unrecognisedCharacters += code[0];
   //   pos.position += 1;

@@ -1,7 +1,7 @@
 import { Expression } from '../expression';
 import { assertNever } from '../utils';
 import { Type } from '../type/type';
-import { keys, map, pickBy } from 'lodash';
+import { keys, map, pickBy, filter } from 'lodash';
 import { makeFunctionType } from '../type/constructors';
 import { instantiateMethodSignature, isTypeOf } from '../type/is-type-of';
 
@@ -78,26 +78,27 @@ export function monotizeExpression(expression: Expression, expectedType: Type): 
         && expressionType.kind === 'Function'
         && expectedType.kind === 'Function'
       ) {
-        const implementations = pickBy(expression.implementations, (implementation) => {
+        const implementationValues = filter(expression.implementations, (implementation) => {
           const type = instantiateMethodSignature(expressionType, implementation.instance);
           return isTypeOf(expectedType, type);
         });
 
-        const implementationNames = keys(implementations);
-        if (implementationNames.length > 1) {
+        if (implementationValues.length > 1) {
           throw new Error('Method could not be narrowed to a monotype');
-        } else if (implementationNames.length === 0) {
+        }
+
+        const [implementationValue] = implementationValues;
+        if (!implementationValue) {
           throw new Error('No method types match the expected monotype');
         }
 
-        const implementation = implementations[implementationNames[0]];
         return {
           kind: 'Function',
           tokens: expression.tokens,
           messages: expression.messages,
           resultType: expectedType,
-          value: implementation.value,
-          argumentNames: implementation.argumentNames,
+          value: implementationValue.value,
+          argumentNames: implementationValue.argumentNames,
         };
       }
       return expression;

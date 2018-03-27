@@ -1,4 +1,4 @@
-import { reduce, flatMap, sortBy } from 'lodash';
+import { flatMap, sortBy, filter } from 'lodash';
 import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
 import { Message } from '../../../message';
 import { Token, TokenKind } from '../../../token';
@@ -13,10 +13,11 @@ export function makeFunctionCallExpression(
   messages: Message[] = [],
   argTokens?: Token[],
 ): UntypedFunctionCallExpression {
-  const tokens: Token[] = sortBy([
+  const unsortedTokens = [
     ...functionExpression.tokens,
-    ...argTokens || flatMap(args, 'tokens'),
-  ],                             'begin');
+    ...argTokens || flatMap(filter(args), 'tokens'),
+  ];
+  const tokens: Token[] = sortBy(unsortedTokens, 'begin');
   return {
     functionExpression,
     args,

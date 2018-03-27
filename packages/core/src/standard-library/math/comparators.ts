@@ -56,7 +56,7 @@ const equateable: InterfaceType = makeInterfaceType({
 
 const lessThanFunction = makeFunctionValue(bindBooleanFunction((a, b) => a < b));
 const orderable: InterfaceType = makeInterfaceType({
-  parents: [Equateable],
+  parents: [equateable],
   methods: {
     '<': {
       kind: 'Method',

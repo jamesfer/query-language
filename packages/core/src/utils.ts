@@ -26,6 +26,6 @@ export function tokenArrayMatches(tokens: Token[], ...types: TokenKind[]): boole
     return false;
   }
 
-  return every(types, type => (type, index) === tokens[index].kind);
+  return every(types, (type, index) => type === tokens[index].kind);
 }
 

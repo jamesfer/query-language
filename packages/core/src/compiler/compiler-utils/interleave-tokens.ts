@@ -25,7 +25,7 @@ export function interleaveTokens(expressionTokens: Token[][], separators: Token[
   }
 
   // Insert any remaining extra tokens. Eg. the last ]
-  arrayInsert(tokens, tokenIndex, separators.slice(i));
+  arrayInsert(tokens, tokenIndex, separators.slice(expressionTokens.length));
 
   return sortBy(tokens, 'begin');
 }
