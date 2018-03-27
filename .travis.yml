@@ -10,7 +10,7 @@ cache:
   directories:
     - "node_modules"
 script:
-  - "scripts/test.sh"
+  - "scripts/validate.sh"
   - "scripts/compile-demo.sh"
 after_success:
   - "scripts/report-coverage.sh"
