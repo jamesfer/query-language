@@ -21,7 +21,9 @@ module.exports = (env = {}) => {
       libraryTarget: 'umd',
     },
     externals: [
-      nodeExternals(),
+      nodeExternals({
+        modulesFromFile: true,
+      }),
     ],
     resolve: {
       extensions: ['.ts', '.js', '.json', '*'],
