@@ -1,5 +1,5 @@
 import { UntypedFunctionCallExpression } from 'untyped-expression';
-import { filter, last, map } from 'lodash';
+import { filter, last, map, flatMap, uniqBy, isEqual } from 'lodash';
 import { makeMessage, Message } from '../../../message';
 import { Scope } from '../../../scope';
 import { applyGenericMap, createGenericMap, Type } from '../../../type/type';
@@ -126,12 +126,10 @@ function typeFunctionCallArgs(
       // The expected type of the argument
       // let expectedType = getNextArgType(partial);
 
-      // Apply the next arg to the function signature
       const typedArg = typeExpression(scope, arg);
-      partial = applyArg(partial, typedArg.resultType);
+      const expectedType = getNextArgType(partial);
 
       // Check if the expected type matches the actual type
-      const expectedType = getNextArgType(partial);
       if (expectedType && typedArg.resultType
         && !isTypeOf(expectedType, typedArg.resultType)) {
         typedArg.messages.push(makeMessage(
@@ -142,6 +140,8 @@ function typeFunctionCallArgs(
         ));
       }
 
+      // Apply argument to the function
+      partial = applyArg(partial, typedArg.resultType);
       typedArgs.push(typedArg);
     } else {
       partial = applyArg(partial, null);
@@ -183,12 +183,19 @@ export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallEx
   // Check if the number of arguments are correct.
   messageStore.add(checkArgumentCount(funcExp.resultType, args, expression));
 
+  // Add all argument messages to the messageStore
+  const messages: Message[] = [
+    ...expression.messages,
+    ...messageStore.messages,
+    ...flatMap(args, 'messages'),
+  ];
+
   return {
     resultType,
     args,
     kind: 'FunctionCall',
     functionExpression: funcExp,
     tokens: expression.tokens,
-    messages: expression.messages.concat(messageStore.messages),
+    messages: uniqBy(messages, isEqual),
   };
 }
