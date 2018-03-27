@@ -1,30 +1,28 @@
-import {
-  UntypedExpression,
-  UntypedFunctionCallExpression,
-} from '../../../untyped-expression';
+import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
 import { makeMessage, Message } from '../../../message';
 import { Token, TokenKind } from '../../../token';
 import { tokenArrayMatches } from '../../../utils';
 import { interpretExpression } from '../../interpret-expression';
-import {
-  makeFunctionCallExpression,
-} from '../function/interpret-function-call';
+import { makeFunctionCallExpression } from '../function/interpret-function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
-import { makeUntypedNoneExpression } from '../../../untyped-expression';
 import { makeIntegerExpression } from '../number';
 import { hasHigherPrecedence, precedences } from './precedences';
-import { first, last } from 'lodash';
 
 
-export function interpretRangeOperator(tokens: Token[], leftExpression: UntypedExpression | null, prevPrecedence: number): UntypedFunctionCallExpression | undefined {
+export function interpretRangeOperator(
+  incomingTokens: Token[],
+  leftExpression: UntypedExpression | null,
+  prevPrecedence: number,
+): UntypedFunctionCallExpression | undefined {
+  let tokens = incomingTokens;
   const hasPrecedence = hasHigherPrecedence(precedences.range, prevPrecedence);
   if (tokenArrayMatches(tokens, TokenKind.RangeOperator) && hasPrecedence) {
-    let rangeToken: Token = tokens[0];
+    const rangeToken: Token = tokens[0];
     tokens = tokens.slice(1);
 
     const rightExpression = interpretExpression(tokens, null, precedences.range.precedence);
 
-    let messages: Message[] = [];
+    const messages: Message[] = [];
     if (!leftExpression && !rightExpression) {
       messages.push(makeMessage(
         'Error',

@@ -13,8 +13,8 @@ export function printExpression(expression: UntypedExpression): string {
     case 'Array':
       return '[' + expression.elements.map(printExpression).join(', ') + ']';
     case 'FunctionCall':
-      let funcExp = printExpression(expression.functionExpression);
-      let args = expression.args.map(printExpression);
+      const funcExp = printExpression(expression.functionExpression);
+      const args = expression.args.map(printExpression);
       if (funcExp.match(/[a-zA-Z_][a-zA-Z0-9_]*/) || args.length > 2) {
         return funcExp + '(' + args.join(', ') + ')';
       }

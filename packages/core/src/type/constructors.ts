@@ -1,6 +1,5 @@
 import { Dictionary, map, mapValues } from 'lodash';
 import { PlainFunctionValue } from '../value';
-import { InterfaceType } from './type';
 import {
   ArrayType,
   BooleanType,
@@ -8,6 +7,7 @@ import {
   FunctionType,
   GenericType,
   IntegerType,
+  InterfaceType,
   NoneType,
   RecordType,
   StringType,
@@ -63,9 +63,9 @@ export function makeGenericType(
   derives: TypeShorthand | null = null,
 ): GenericType {
   return {
+    name,
     kind: 'Generic',
     derives: derives ? evaluateShorthand(derives) : null,
-    name,
   };
 }
 
@@ -81,9 +81,9 @@ export function makeMethodType(
   implementations: Dictionary<Type> = {},
 ) {
   return {
-    kind: 'Method',
     signature,
     implementations,
+    kind: 'Method',
   };
 }
 
@@ -102,8 +102,8 @@ export function makeMethodType(
 // }
 
 export interface MethodShorthand {
-  signature: FunctionType,
-  implementations: Dictionary<{ type: Type, func: PlainFunctionValue }>,
+  signature: FunctionType;
+  implementations: Dictionary<{ type: Type, func: PlainFunctionValue }>;
 }
 
 // export function makeInterfaceType(
@@ -121,9 +121,9 @@ export interface MethodShorthand {
 // }
 
 export interface InterfaceShorthand {
-  fields?: Dictionary<TypeShorthand> | null,
-  methods?: Dictionary<MethodExpression> | null,
-  parents?: InterfaceType[],
+  fields?: Dictionary<TypeShorthand> | null;
+  methods?: Dictionary<MethodExpression> | null;
+  parents?: InterfaceType[];
 }
 export function makeInterfaceType({ fields, methods, parents }: InterfaceShorthand): InterfaceType {
   return {

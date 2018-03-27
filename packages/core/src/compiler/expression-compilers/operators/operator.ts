@@ -7,11 +7,16 @@ import { interpretRangeOperator } from './range-operator';
 import { interpretUnaryMinusOperator } from './unary-minus-operator';
 
 
-export function buildOperatorExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
-  return firstResult([
+export function buildOperatorExpression(
+  tokens: Token[],
+  prevExpression: UntypedExpression | null,
+  operatorPrecedence: number,
+): UntypedExpression | undefined {
+  const interpreters = [
     interpretUnaryMinusOperator,
     interpretInfixOperator,
     interpretArraySliceOperator,
     interpretRangeOperator,
-  ], tokens, prevExpression, operatorPrecedence);
+  ];
+  return firstResult(interpreters, tokens, prevExpression, operatorPrecedence);
 }

@@ -1,10 +1,13 @@
 import { InterfaceType } from '../../type/type';
 import { Library, LibraryFunction } from '../library';
 import {
-  makeFunctionType, stringType,
+  booleanType,
+  floatType,
+  makeFunctionType,
+  makeInterfaceType,
+  stringType,
 } from '../../type/constructors';
 import { bindBooleanFunction } from '../library-utils';
-import { booleanType, floatType, makeInterfaceType } from '../../type/constructors';
 import { makeFunctionValue } from '../../value';
 
 // const Equateable: InterfaceType = makeInterfaceType(null, {
@@ -28,45 +31,45 @@ import { makeFunctionValue } from '../../value';
 // });
 
 const equalsFunction = makeFunctionValue(bindBooleanFunction((a, b) => a === b));
-const Equateable: InterfaceType = makeInterfaceType({
+const equateable: InterfaceType = makeInterfaceType({
   methods: {
     '=': {
       kind: 'Method',
-      resultType: makeFunctionType([ 'self', 'self' ], booleanType),
+      resultType: makeFunctionType(['self', 'self'], booleanType),
       messages: [],
       tokens: [],
       implementations: {
-        'float': {
+        float: {
           instance: floatType,
           value: equalsFunction,
           argumentNames: [],
         },
-        'string': {
+        string: {
           instance: stringType,
           value: equalsFunction,
           argumentNames: [],
         },
       },
     },
-  }
+  },
 });
 
 const lessThanFunction = makeFunctionValue(bindBooleanFunction((a, b) => a < b));
-const Orderable: InterfaceType = makeInterfaceType({
-  parents: [ Equateable ],
+const orderable: InterfaceType = makeInterfaceType({
+  parents: [Equateable],
   methods: {
     '<': {
       kind: 'Method',
-      resultType: makeFunctionType([ 'self', 'self' ], booleanType),
+      resultType: makeFunctionType(['self', 'self'], booleanType),
       messages: [],
       tokens: [],
       implementations: {
-        'float': {
+        float: {
           instance: floatType,
           value: lessThanFunction,
           argumentNames: [],
         },
-        'string': {
+        string: {
           instance: stringType,
           value: lessThanFunction,
           argumentNames: [],
@@ -79,12 +82,12 @@ const Orderable: InterfaceType = makeInterfaceType({
 
 
 const greaterThan: LibraryFunction = {
-  type: makeFunctionType([ floatType, floatType ], booleanType),
+  type: makeFunctionType([floatType, floatType], booleanType),
   impl: bindBooleanFunction((a, b) => a > b),
 };
 
 const greaterEqual: LibraryFunction = {
-  type: makeFunctionType([ floatType, floatType ], booleanType),
+  type: makeFunctionType([floatType, floatType], booleanType),
   impl: bindBooleanFunction((a, b) => a >= b),
 };
 
@@ -94,17 +97,17 @@ const greaterEqual: LibraryFunction = {
 // };
 
 const lessEqual: LibraryFunction = {
-  type: makeFunctionType([ floatType, floatType ], booleanType),
+  type: makeFunctionType([floatType, floatType], booleanType),
   impl: bindBooleanFunction((a, b) => a <= b),
 };
 
 const equal: LibraryFunction = {
-  type: makeFunctionType([ floatType, floatType ], booleanType),
+  type: makeFunctionType([floatType, floatType], booleanType),
   impl: bindBooleanFunction((a, b) => a === b),
 };
 
 const notEqual: LibraryFunction = {
-  type: makeFunctionType([ floatType, floatType ], booleanType),
+  type: makeFunctionType([floatType, floatType], booleanType),
   impl: bindBooleanFunction((a, b) => {
     return a !== b;
   }),
@@ -121,7 +124,7 @@ export const comparators: Library = {
     '<=': lessEqual,
   },
   types: {
-    Equateable,
-    Orderable,
-  }
+    Equateable: equateable,
+    Orderable: orderable,
+  },
 };

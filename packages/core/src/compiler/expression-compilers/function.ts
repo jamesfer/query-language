@@ -1,11 +1,8 @@
-import { Expression, FunctionExpression, } from '../../expression';
+import { Expression, FunctionExpression } from '../../expression';
 import { Scope } from '../../scope';
-import {
-  LazyValue,
-  FunctionValue, PlainFunctionValue, LazyNoneValue,
-} from '../../value';
+import { FunctionValue, lazyNoneValue, LazyValue, PlainFunctionValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
-import { isFunction, zipObject, merge } from 'lodash';
+import { isFunction, merge, zipObject } from 'lodash';
 import { evaluateExpression } from '../evaluate-expression';
 
 
@@ -15,7 +12,8 @@ import { evaluateExpression } from '../evaluate-expression';
 //   }
 // }
 
-// export function typeFunction(scope: Scope, expression: UntypedFunctionExpression): FunctionExpression {
+// export function typeFunction(scope: Scope, expression: UntypedFunctionExpression)
+// : FunctionExpression {
 //   return ...;
 // }
 
@@ -23,7 +21,8 @@ function isFunctionValue(value: FunctionValue | Expression): value is FunctionVa
   return value.kind === 'Function' && isFunction(value.value);
 }
 
-export function evaluateFunction(scope: Scope, expression: FunctionExpression): LazyValue<FunctionValue> {
+export function evaluateFunction(scope: Scope, expression: FunctionExpression)
+: LazyValue<FunctionValue> {
   // Check if the value is a native function
   const funcValue = expression.value;
   if (isFunctionValue(funcValue)) {
@@ -40,11 +39,11 @@ export function evaluateFunction(scope: Scope, expression: FunctionExpression): 
     const argumentValues = zipObject(expression.argumentNames, args);
     const functionScope = merge({}, scope, { values: argumentValues });
     return Observable.of(evaluateExpression(functionScope, funcValue))
-      .switchMap(value => value === undefined ? LazyNoneValue : value);
+      .switchMap(value => value === undefined ? lazyNoneValue : value);
   };
   const functionValue: FunctionValue = {
     kind: 'Function',
-    value: expressionFunction
+    value: expressionFunction,
   };
   return Observable.of(functionValue);
 }

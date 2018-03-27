@@ -1,4 +1,4 @@
-import { uniqWith, isEqual, reduce } from 'lodash';
+import { isEqual, reduce, uniqWith } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { Message } from './message';
 import { convertToScope } from './standard-library/library';
@@ -14,16 +14,16 @@ import { monotizeBaseExpression } from './compiler/monotize-expression';
 
 
 export interface CompilationResult {
-  messages: Message[],
-  tokens: Token[],
-  expression?: Expression,
-  compiled: boolean,
+  messages: Message[];
+  tokens: Token[];
+  expression?: Expression;
+  compiled: boolean;
 }
 
 export interface EvaluationResult {
-  messages: Message[],
-  result?: Observable<any>,
-  evaluated: boolean,
+  messages: Message[];
+  result?: Observable<any>;
+  evaluated: boolean;
 }
 
 export interface ExecutionResult extends CompilationResult, EvaluationResult {}
@@ -32,21 +32,25 @@ export interface ExecutionResult extends CompilationResult, EvaluationResult {}
 type MessageContainer = { messages: Message[] };
 
 function extractMessages(expressions: MessageContainer[]): Message[] {
-  return reduce<MessageContainer, Message[]>(expressions, (list, exp) => {
-    return list.concat(exp.messages);
-  }, []);
+  return reduce<MessageContainer, Message[]>(
+    expressions,
+    (list, exp) => list.concat(exp.messages),
+    [],
+  );
 }
 
 export function compile(code: string, scope?: Scope): CompilationResult {
   // Parse Tokens
-  let { tokens, messages, failed } = tokenizeCode(code);
+  const tokenList = tokenizeCode(code);
+  const { tokens, failed } = tokenList;
+  let { messages } = tokenList;
   if (failed) {
     return { tokens, messages, compiled: false };
   }
 
   // Interpret expression
   const expressions = interpretSyntaxTree(tokens);
-  const [ expression ] = expressions;
+  const [expression] = expressions;
   messages = [...messages, ...extractMessages(expressions)];
   if (!expression) {
     return { tokens, messages, compiled: false };
@@ -71,18 +75,18 @@ export function compile(code: string, scope?: Scope): CompilationResult {
 }
 
 export function evaluate(expression: Expression, scope?: Scope): EvaluationResult {
-  scope = scope || convertToScope(standardLibrary);
+  const evalScope = scope || convertToScope(standardLibrary);
   return {
     messages: [],
-    result: evaluateSyntaxTree(scope, expression),
+    result: evaluateSyntaxTree(evalScope, expression),
     evaluated: true,
   };
 }
 
 export function execute(code: string, scope?: Scope): ExecutionResult {
-  let compRes = compile(code, scope);
+  const compRes = compile(code, scope);
   if (compRes.compiled && compRes.expression) {
-    let evalRes = evaluate(compRes.expression, scope);
+    const evalRes = evaluate(compRes.expression, scope);
 
     return {
       ...compRes,
@@ -92,6 +96,6 @@ export function execute(code: string, scope?: Scope): ExecutionResult {
   }
   return {
     evaluated: false,
-    ...compRes
+    ...compRes,
   };
 }

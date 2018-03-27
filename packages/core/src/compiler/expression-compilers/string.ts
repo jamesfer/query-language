@@ -1,13 +1,10 @@
 import { head, last } from 'lodash';
-import { addType, StringExpression, } from '../../expression';
+import { addType, StringExpression } from '../../expression';
 import { makeMessage, Message } from '../../message';
 import { Scope } from '../../scope';
 import { Token, TokenKind } from '../../token';
 import { stringType } from '../../type/constructors';
-import {
-  UntypedExpression,
-  UntypedStringExpression,
-} from '../../untyped-expression';
+import { UntypedExpression, UntypedStringExpression } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { LazyValue, makeStringValue, StringValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
@@ -19,17 +16,17 @@ function makeStringExpression(token: Token, messages: Message[] = []): UntypedSt
     ? value.slice(1, -1)
     : value.slice(1);
   return {
+    messages,
     kind: 'String',
     tokens: [token],
     value: contents,
-    messages,
   };
 }
 
 export function interpretString(tokens: Token[]): UntypedExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.StringLiteral)) {
-    let messages: Message[] = [];
-    let strToken = tokens[0];
+    const messages: Message[] = [];
+    const strToken = tokens[0];
     if (head(strToken.value) !== last(strToken.value)) {
       messages.push(makeMessage('Error', 'String literal is missing closing quote.', strToken.end));
     }

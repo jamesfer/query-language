@@ -3,12 +3,12 @@ import { Message } from './message';
 import { Token } from './token';
 import {
   ArrayType,
+  BooleanType,
   FloatType,
   IntegerType,
   NoneType,
   StringType,
   Type,
-  BooleanType,
 } from './type/type';
 import {
   UntypedBooleanExpression,
@@ -27,11 +27,11 @@ export interface ExpressionInterface<K extends string, T extends (Type | null) =
 }
 
 export interface IntegerExpression extends ExpressionInterface<'Integer', IntegerType> {
-  value: number,
+  value: number;
 }
 
 export interface FloatExpression extends ExpressionInterface<'Float', FloatType> {
-  value: number,
+  value: number;
 }
 
 export interface StringExpression extends ExpressionInterface<'String', StringType> {
@@ -44,21 +44,21 @@ export interface BooleanExpression extends ExpressionInterface<'Boolean', Boolea
 
 export interface IdentifierExpression extends ExpressionInterface<'Identifier'> {
   value: string;
-  expression: Expression | null,
+  expression: Expression | null;
 }
 
 export interface ArrayExpression extends ExpressionInterface<'Array', ArrayType> {
-  elements: Expression[],
+  elements: Expression[];
 }
 
 export interface FunctionCallExpression extends ExpressionInterface<'FunctionCall'> {
-  functionExpression: Expression,
-  args: (Expression | null)[],
+  functionExpression: Expression;
+  args: (Expression | null)[];
 }
 
 export interface FunctionExpression extends ExpressionInterface<'Function'> {
-  value: FunctionValue | Expression,
-  argumentNames: string[]
+  value: FunctionValue | Expression;
+  argumentNames: string[];
 }
 
 export interface MethodExpression extends ExpressionInterface<'Method'> {
@@ -66,12 +66,12 @@ export interface MethodExpression extends ExpressionInterface<'Method'> {
     instance: Type,
     value: FunctionValue | Expression,
     argumentNames: string[],
-  }>,
+  }>;
 }
 
-export interface UnrecognizedExpression extends ExpressionInterface<'Unrecognized', null> {};
+export interface UnrecognizedExpression extends ExpressionInterface<'Unrecognized', null> {}
 
-export interface NoneExpression extends ExpressionInterface<'None', NoneType> {};
+export interface NoneExpression extends ExpressionInterface<'None', NoneType> {}
 
 export type Expression = FunctionCallExpression
   | IdentifierExpression
@@ -86,6 +86,7 @@ export type Expression = FunctionCallExpression
   | FunctionExpression;
 
 
+/* tslint:disable:max-line-length */
 export function addType(expression: UntypedStringExpression, resultType: StringType, messages?: Message[]): StringExpression;
 export function addType(expression: UntypedBooleanExpression, resultType: BooleanType, messages?: Message[]): BooleanExpression;
 export function addType(expression: UntypedIdentifierExpression, resultType: Type | null, messages?: Message[]): IdentifierExpression;
@@ -95,6 +96,4 @@ export function addType(expression: UntypedExpression, resultType: Type | null, 
   expression.messages = expression.messages.concat(messages);
   return assign(expression, { resultType }) as Expression;
 }
-
-
-
+/* tslint:enable:max-line-length */

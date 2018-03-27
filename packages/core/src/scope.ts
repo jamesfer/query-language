@@ -1,5 +1,5 @@
 import { Type } from './type/type';
-import { LazyValue, makeLazy, } from './value';
+import { LazyValue } from './value';
 import { Expression } from './expression';
 import { evaluateExpression } from './compiler/evaluate-expression';
 
@@ -20,7 +20,7 @@ export interface Scope {
    */
   values: {
     [k: string]: LazyValue,
-  }
+  };
 
   /**
    * List of all available variables. Each variable must have a real value
@@ -28,14 +28,14 @@ export interface Scope {
    */
   variables: {
     [k: string]: Expression,
-  },
+  };
   /**
    * List of all available types. Each type refers to something that is entirely
    * static in the program.
    */
   types: {
     [k: string]: Type,
-  },
+  };
 }
 
 export function findScopeVariableEntry(scope: Scope, name: string): Expression | null {

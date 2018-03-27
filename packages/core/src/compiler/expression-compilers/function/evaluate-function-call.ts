@@ -1,15 +1,10 @@
-import { Dictionary, filter, map, partial, isFunction, pick, mapValues } from 'lodash';
+import { filter, map, partial } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
-import { FunctionCallExpression } from '../../../expression';
+import { Expression, FunctionCallExpression } from '../../../expression';
 import { Scope } from '../../../scope';
-import { FunctionType, Type } from '../../../type/type';
-import { Expression } from '../../../expression';
-import {
-  LazyValue,
-  makeMethodValue, makeFunctionValue,
-  PlainFunctionValue,
-} from '../../../value';
+import { Type } from '../../../type/type';
+import { LazyValue, makeFunctionValue, PlainFunctionValue } from '../../../value';
 import { evaluateExpression, PartialPlaceholder } from '../../evaluate-expression';
 
 interface Placeholder {
@@ -18,9 +13,10 @@ interface Placeholder {
 }
 
 
-function evaluateFunctionExpression(scope: Scope, expression: Expression): Observable<PlainFunctionValue> {
+function evaluateFunctionExpression(scope: Scope, expression: Expression)
+: Observable<PlainFunctionValue> {
   // TODO Remove synchronous throws
-  let lazyFunc = evaluateExpression(scope, expression);
+  const lazyFunc = evaluateExpression(scope, expression);
   if (!lazyFunc) {
     throw new Error('Attempted to call an unrecognized expression.');
   }
@@ -30,7 +26,7 @@ function evaluateFunctionExpression(scope: Scope, expression: Expression): Obser
   //   throw new Error('Attempted to call an array.');
   // }
 
-  return lazyFunc.map(func => {
+  return lazyFunc.map((func) => {
     // TODO check the result is not null
     // TODO check that value is is a function type
     if (func.kind === 'Function') {
@@ -40,10 +36,11 @@ function evaluateFunctionExpression(scope: Scope, expression: Expression): Obser
   });
 }
 
-function evaluateArguments(scope: Scope, expressions: (Expression | null)[]): (LazyValue | PartialPlaceholder)[] {
+function evaluateArguments(scope: Scope, expressions: (Expression | null)[])
+: (LazyValue | PartialPlaceholder)[] {
   // Evaluate each of the arguments
   return map(expressions, (arg): LazyValue | PartialPlaceholder => {
-    let result = arg ? evaluateExpression(scope, arg) : null;
+    const result = arg ? evaluateExpression(scope, arg) : null;
     return result || (partial as Placeholder).placeholder;
   });
 }
@@ -56,19 +53,19 @@ export function evaluateFunctionCall(scope: Scope, expression: FunctionCallExpre
   const argCount = filter(expression.args, arg => !!arg).length;
   const arity = getArity(expression.functionExpression.resultType);
 
-  let lazyFuncs = evaluateFunctionExpression(scope, expression.functionExpression);
-  let args = evaluateArguments(scope, expression.args);
+  const lazyFuncs = evaluateFunctionExpression(scope, expression.functionExpression);
+  const args = evaluateArguments(scope, expression.args);
 
   if (argCount > arity) {
     // TODO remove synchronous throw
     throw new Error('Too many arguments');
   }
 
-  return lazyFuncs.switchMap(funcs => {
+  return lazyFuncs.switchMap((funcs) => {
     if (argCount === arity) {
       return funcs(...args as LazyValue[]);
     }
-    let partialFunc = partial(funcs, ...args) as PlainFunctionValue;
+    const partialFunc = partial(funcs, ...args) as PlainFunctionValue;
     return Observable.of(makeFunctionValue(partialFunc));
   });
 }

@@ -1,12 +1,7 @@
 import { Scope } from '../scope';
-import { UntypedExpression } from '../untyped-expression';
-import {
-  addType,
-  Expression,
-  NoneExpression,
-} from '../expression';
+import { UntypedExpression, UntypedNoneExpression } from '../untyped-expression';
+import { addType, Expression, NoneExpression } from '../expression';
 import { assertNever } from '../utils';
-import { UntypedNoneExpression } from '../untyped-expression';
 import { typeArray } from './expression-compilers/array';
 import { typeFunctionCall } from './expression-compilers/function/type-function-call';
 import { typeIdentifier } from './expression-compilers/identifier';
@@ -41,11 +36,13 @@ export function typeExpression(scope: Scope, expression: UntypedExpression): Exp
   }
 }
 
-export function makeNoneExpression(scope: Scope, expression: UntypedNoneExpression): NoneExpression {
+export function makeNoneExpression(scope: Scope, expression: UntypedNoneExpression)
+: NoneExpression {
   return addType(expression, noneType);
 }
 
-export function makeUnrecognizedExpression(scope: Scope, expression: UntypedExpression): Expression {
+export function makeUnrecognizedExpression(scope: Scope, expression: UntypedExpression)
+: Expression {
   return addType(expression, null);
 }
 

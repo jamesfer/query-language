@@ -1,13 +1,17 @@
 import { UntypedExpression } from '../../untyped-expression';
-import { makeMessage, Message } from '../../message';
+import { makeMessage } from '../../message';
 import { Token, TokenKind } from '../../token';
 import { tokenArrayMatches } from '../../utils';
 import { interpretExpression } from '../interpret-expression';
-import { last, first } from 'lodash';
+import { first, last } from 'lodash';
 import { MessageResult, MessageStore } from './message-store';
 
-function consumeElementAndSep(sepToken: TokenKind, tokens: Token[]): { expression: UntypedExpression | null, sep: Token | null } {
-  let expression = interpretExpression(tokens);
+function consumeElementAndSep(
+  sepToken: TokenKind,
+  incomingTokens: Token[],
+): { expression: UntypedExpression | null, sep: Token | null } {
+  let tokens = incomingTokens;
+  const expression = interpretExpression(tokens);
   if (expression) {
     tokens = tokens.slice(expression.tokens.length);
   }
@@ -20,13 +24,18 @@ function consumeElementAndSep(sepToken: TokenKind, tokens: Token[]): { expressio
   return { expression, sep };
 }
 
-function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]): MessageResult<{ expressions: UntypedExpression[], tokens: Token[] }> {
-  let messageStore = new MessageStore();
-  let expressions: UntypedExpression[] = [];
+function consumeList(
+  closeToken: TokenKind,
+  sepToken: TokenKind,
+  incomingTokens: Token[],
+): MessageResult<{ expressions: UntypedExpression[], tokens: Token[] }> {
+  let tokens = incomingTokens;
+  const messageStore = new MessageStore();
+  const expressions: UntypedExpression[] = [];
   let usedTokens: Token[] = [];
 
   while (tokens.length && !tokenArrayMatches(tokens, closeToken)) {
-    let { expression, sep } = consumeElementAndSep(sepToken, tokens);
+    const { expression, sep } = consumeElementAndSep(sepToken, tokens);
 
     if (expression) {
       expressions.push(expression);
@@ -67,15 +76,22 @@ function consumeList(closeToken: TokenKind, sepToken: TokenKind, tokens: Token[]
   return messageStore.makeResult({
     expressions,
     tokens: usedTokens,
-  })
+  });
 }
 
-export function buildListInterpreter(openToken: TokenKind, closeToken: TokenKind, sepToken: TokenKind, maxItems: number = -1)
-: (tokens: Token[]) => MessageResult<{ expressions: UntypedExpression[], tokens: Token[] }> | undefined {
-  return tokens => {
+export type ListInterpreter = (tokens: Token[]) =>
+  MessageResult<{ expressions: UntypedExpression[], tokens: Token[] }> | undefined;
+export function buildListInterpreter(
+  openToken: TokenKind,
+  closeToken: TokenKind,
+  sepToken: TokenKind,
+  maxItems: number = -1,
+): ListInterpreter {
+  return (incomingTokens) => {
+    let tokens = incomingTokens;
     if (tokenArrayMatches(tokens, openToken)) {
       const messageStore = new MessageStore();
-      let openingToken = tokens[0];
+      const openingToken = tokens[0];
       tokens = tokens.slice(1);
 
       const list = messageStore.store(consumeList(closeToken, sepToken, tokens));
@@ -84,14 +100,9 @@ export function buildListInterpreter(openToken: TokenKind, closeToken: TokenKind
 
       if (tokenArrayMatches(tokens, closeToken)) {
         list.tokens.push(tokens[0]);
-      }
-      else {
+      } else {
         const lastToken = last(list.tokens) || openingToken;
-        messageStore.add(makeMessage(
-          'Error',
-          'Missing closing token',
-          lastToken
-        ));
+        messageStore.add(makeMessage('Error', 'Missing closing token', lastToken));
       }
 
       if (maxItems !== -1 && list.expressions.length > maxItems) {
@@ -107,5 +118,5 @@ export function buildListInterpreter(openToken: TokenKind, closeToken: TokenKind
 
       return messageStore.makeResult(list);
     }
-  }
+  };
 }

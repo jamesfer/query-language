@@ -1,27 +1,18 @@
 import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/map';
-import {
-  makeArrayType,
-  } from '../../type/constructors';
-import {
-  BooleanValue,
-  LazyValue,
-  makeBooleanValue,
-  Value,
-} from '../../value';
+import { booleanType, makeArrayType, makeFunctionType } from '../../type/constructors';
+import { BooleanValue, LazyValue, makeBooleanValue, Value } from '../../value';
 import { LibraryFunction } from '../library';
 import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';
-import { booleanType, makeFunctionType } from '../../type/constructors';
 
-
-function inFunc(item: any, list: Observable<Value>): LazyValue<BooleanValue> {
+function inImpl(item: any, list: Observable<Value>): LazyValue<BooleanValue> {
   return list.first(el => el.value === item, () => true, false)
     .map(makeBooleanValue);
 }
 
-export const _in: LibraryFunction = {
-  type: makeFunctionType([ 'T', makeArrayType('T') ], booleanType),
-  impl: evalArgs(inFunc),
+export const inFunc: LibraryFunction = {
+  type: makeFunctionType(['T', makeArrayType('T')], booleanType),
+  impl: evalArgs(inImpl),
 };

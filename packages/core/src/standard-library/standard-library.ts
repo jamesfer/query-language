@@ -1,5 +1,5 @@
 import { Library, mergeLibraries } from './library';
-import { _if } from './branching/if';
+import { ifFunc } from './branching/if';
 import { math } from './math/math';
 import { otherOperators } from './other-operators';
 import { array } from './array/array';
@@ -10,6 +10,6 @@ export const standardLibrary: Library = mergeLibraries(
   otherOperators,
   array,
   {
-    functions: { 'if': _if },
+    functions: { if: ifFunc },
   },
 );
