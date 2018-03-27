@@ -1,19 +1,25 @@
 const webpack = require('webpack');
 const path = require('path');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const { partial } = require('lodash');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-module.exports = env => {
-  let production = !!(env && env.production);
+const srcPath = partial(path.resolve, __dirname, 'src');
+const distPath = partial(path.resolve, __dirname, 'dist');
+
+module.exports = (env = {}) => {
+  const production = !!env.production;
   return {
-    context: path.resolve(__dirname, 'src'),
+    context: srcPath(),
     devtool: 'source-map',
     entry: './qlang.ts',
     output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: distPath(),
       filename: 'qlang.js',
       library: 'qlang',
       libraryTarget: 'umd',
+    },
+    resolve: {
+      extensions: ['.ts', '.js', '.json', '*'],
     },
     module: {
       rules: [{
@@ -29,20 +35,14 @@ module.exports = env => {
         exclude: [ /node_modules/ ],
       }],
     },
-    resolve: {
-      modules: [
-        'node_modules',
-      ],
-      extensions: ['.ts', '.js', '.json', '*'],
-    },
     plugins: [
-      new CleanWebpackPlugin(path.resolve(__dirname, 'dist'), {
+      new CleanWebpackPlugin(distPath(), {
         verbose: false,
         watch: false
       }),
     ]
       .concat(production ? [
-        new UglifyJSPlugin({
+        new webpack.optimize.UglifyJSPlugin({
           sourceMap: true,
         }),
       ]: []),
