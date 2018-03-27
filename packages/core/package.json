@@ -1,9 +1,22 @@
 {
   "name": "query-language",
   "version": "0.1.0",
+  "author": "James Ferguson",
   "description": "An intuitive and powerful query language for the web",
   "main": "dist/qlang.js",
   "typings": "dist/qlang.d.ts",
+  "license": "MIT",
+  "repository": "github:jamesfer/query-language",
+  "homepage": "jamesfer.me/query-language",
+  "bugs": {
+    "url": "https://github.com/jamesfer/query-language/issues"
+  },
+  "keywords": [
+    "query",
+    "language",
+    "functional",
+    "lazy"
+  ],
   "scripts": {
     "build": "webpack --progress",
     "watch": "webpack --progress --watch",
@@ -35,8 +48,6 @@
       "**/*.tests.ts"
     ]
   },
-  "author": "James Ferguson",
-  "license": "MIT",
   "dependencies": {
     "rxjs": "^5.5.0",
     "typescript": "^2.4.2"
