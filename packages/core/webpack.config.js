@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const { partial } = require('lodash');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 
 const srcPath = partial(path.resolve, __dirname, 'src');
 const distPath = partial(path.resolve, __dirname, 'dist');
@@ -12,12 +13,16 @@ module.exports = (env = {}) => {
     context: srcPath(),
     devtool: 'source-map',
     entry: './qlang.ts',
+    target: 'node',
     output: {
       path: distPath(),
       filename: 'qlang.js',
       library: 'qlang',
       libraryTarget: 'umd',
     },
+    externals: [
+      nodeExternals(),
+    ],
     resolve: {
       extensions: ['.ts', '.js', '.json', '*'],
     },
@@ -42,7 +47,7 @@ module.exports = (env = {}) => {
       }),
     ]
       .concat(production ? [
-        new webpack.optimize.UglifyJSPlugin({
+        new webpack.optimize.UglifyJsPlugin({
           sourceMap: true,
         }),
       ]: []),

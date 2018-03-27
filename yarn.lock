@@ -5125,7 +5125,7 @@ tsconfig@^7.0.0:
     strip-bom "^3.0.0"
     strip-json-comments "^2.0.0"
 
-tslib@^1.7.1, tslib@^1.8.0, tslib@^1.8.1:
+tslib@^1.7.1, tslib@^1.8.0, tslib@^1.8.1, tslib@^1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.0.tgz#e37a86fda8cbbaf23a057f473c9f4dc64e5fc2e8"
 
@@ -5380,6 +5380,10 @@ watchpack@^1.4.0:
     async "^2.1.2"
     chokidar "^1.7.0"
     graceful-fs "^4.1.2"
+
+webpack-node-externals@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/webpack-node-externals/-/webpack-node-externals-1.6.0.tgz#232c62ec6092b100635a3d29d83c1747128df9bd"
 
 webpack-sources@^1.0.1:
   version "1.0.1"
