@@ -15,8 +15,6 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "lib": [
-      "es5",
-      "es6",
       "es2016"
     ]
   },
