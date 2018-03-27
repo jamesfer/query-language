@@ -1,15 +1,15 @@
 import { TokenKind } from '../../../token';
 
 export interface Operator {
-  associativity: 'Left' | 'Right',
-  precedence: number,
+  associativity: 'Left' | 'Right';
+  precedence: number;
 }
 
 export interface PrecedenceMap {
-  [ k: number ]: Operator,
-  slice: Operator,
-  unaryMinus: Operator,
-  range: Operator,
+  [ k: number ]: Operator;
+  slice: Operator;
+  unaryMinus: Operator;
+  range: Operator;
 }
 
 
@@ -76,7 +76,7 @@ export const precedences: PrecedenceMap = {
   },
   [TokenKind.LessEqual]: {
     associativity: 'Left',
-    precedence: 7
+    precedence: 7,
   },
   [TokenKind.GreaterThan]: {
     associativity: 'Left',

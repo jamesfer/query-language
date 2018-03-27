@@ -1,18 +1,17 @@
-import {
-  UntypedExpression,
-  UntypedFunctionCallExpression,
-} from '../../../untyped-expression';
+import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
 import { Token, TokenKind } from '../../../token';
 import { tokenArrayMatches } from '../../../utils';
 import { interpretExpression } from '../../interpret-expression';
-import {
-  makeFunctionCallExpression,
-} from '../function/interpret-function-call';
+import { makeFunctionCallExpression } from '../function/interpret-function-call';
 import { makeIdentifierExpression } from '../identifier';
 import { hasHigherPrecedence, precedences } from './precedences';
 
 
-export function interpretUnaryMinusOperator(tokens: Token[], leftExpression: UntypedExpression | null, operatorPrecedence: number): UntypedFunctionCallExpression | undefined {
+export function interpretUnaryMinusOperator(
+  tokens: Token[],
+  leftExpression: UntypedExpression | null,
+  operatorPrecedence: number,
+): UntypedFunctionCallExpression | undefined {
   if (tokenArrayMatches(tokens, TokenKind.SubtractOperator)
     && leftExpression === null
     && hasHigherPrecedence(precedences.unaryMinus, operatorPrecedence)

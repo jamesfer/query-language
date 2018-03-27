@@ -3,12 +3,12 @@ import { LibraryFunction } from '../library';
 import 'rxjs/add/operator/switchMap';
 import { booleanType, makeFunctionType } from '../../type/constructors';
 
-
-function ifFunc(condition: LazyValue<BooleanValue>, truth: LazyValue, fallacy: LazyValue): LazyValue {
+function ifImpl(condition: LazyValue<BooleanValue>, truth: LazyValue, fallacy: LazyValue)
+: LazyValue {
   return condition.switchMap(c => c.value ? truth : fallacy);
 }
 
-export const _if: LibraryFunction = {
-  type: makeFunctionType([ booleanType, 'T', 'T', ], 'T'),
-  impl: ifFunc,
+export const ifFunc: LibraryFunction = {
+  type: makeFunctionType([booleanType, 'T', 'T'], 'T'),
+  impl: ifImpl,
 };

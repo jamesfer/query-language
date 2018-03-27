@@ -1,11 +1,11 @@
 import { Message } from '../../message';
-import { isArray, castArray } from 'lodash';
+import { castArray, isArray } from 'lodash';
 
 export type MessageResult<V> = [ V,
   Message | Message[] | MessageStore | undefined | null ];
 
 export function normalizeMessageResult(
-  messages: Message | Message[] | MessageStore | undefined | null
+  messages: Message | Message[] | MessageStore | undefined | null,
 ): Message[] {
   if (messages) {
     if (messages instanceof MessageStore) {
@@ -20,7 +20,7 @@ export class MessageStore {
   messages: Message[] = [];
 
   store<V>(result: MessageResult<V>): V {
-    const [ value, newMessages ] = result;
+    const [value, newMessages] = result;
 
     this.add(newMessages);
 
@@ -31,11 +31,9 @@ export class MessageStore {
     if (newMessages) {
       if (newMessages instanceof MessageStore) {
         this.messages = this.messages.concat(newMessages.messages);
-      }
-      else if (isArray(newMessages)) {
+      } else if (isArray(newMessages)) {
         this.messages = this.messages.concat(newMessages);
-      }
-      else {
+      } else {
         this.messages.push(newMessages);
       }
     }
@@ -43,8 +41,8 @@ export class MessageStore {
 
   makeResult<V>(value: V): MessageResult<V> {
     if (this.messages.length) {
-      return [ value, this.messages ];
+      return [value, this.messages];
     }
-    return [ value, null ];
+    return [value, null];
   }
 }

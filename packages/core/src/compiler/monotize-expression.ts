@@ -1,7 +1,7 @@
 import { Expression } from '../expression';
 import { assertNever } from '../utils';
 import { Type } from '../type/type';
-import { map, pickBy, keys } from 'lodash';
+import { keys, map, pickBy, filter } from 'lodash';
 import { makeFunctionType } from '../type/constructors';
 import { instantiateMethodSignature, isTypeOf } from '../type/is-type-of';
 
@@ -39,7 +39,7 @@ export function monotizeExpression(expression: Expression, expectedType: Type): 
           return {
             ...expression,
             elements,
-          }
+          };
         }
       }
       return expression;
@@ -49,7 +49,7 @@ export function monotizeExpression(expression: Expression, expectedType: Type): 
       const usedArgTypes: Type[] = map(expression.args, 'resultType');
       const returnType = expectedType.kind === 'Function' ? expectedType.returnType : expectedType;
       const argTypes: Type[] = expectedType.kind === 'Function'
-        ? [ ...usedArgTypes, ...expectedType.argTypes ]
+        ? [...usedArgTypes, ...expectedType.argTypes]
         : usedArgTypes;
       const calleeType = makeFunctionType(argTypes, returnType);
       const callee = monotizeExpression(expression.functionExpression, calleeType);
@@ -74,27 +74,31 @@ export function monotizeExpression(expression: Expression, expectedType: Type): 
 
     case 'Method':
       const expressionType = expression.resultType;
-      if (expressionType && expressionType.kind === 'Function' && expectedType.kind === 'Function') {
-        const implementations = pickBy(expression.implementations, implementation => {
-          const implementationType = instantiateMethodSignature(expressionType, implementation.instance);
-          return isTypeOf(expectedType, implementationType);
+      if (expressionType
+        && expressionType.kind === 'Function'
+        && expectedType.kind === 'Function'
+      ) {
+        const implementationValues = filter(expression.implementations, (implementation) => {
+          const type = instantiateMethodSignature(expressionType, implementation.instance);
+          return isTypeOf(expectedType, type);
         });
 
-        const implementationNames = keys(implementations);
-        if (implementationNames.length > 1) {
+        if (implementationValues.length > 1) {
           throw new Error('Method could not be narrowed to a monotype');
-        } else if (implementationNames.length === 0) {
+        }
+
+        const [implementationValue] = implementationValues;
+        if (!implementationValue) {
           throw new Error('No method types match the expected monotype');
         }
 
-        const implementation = implementations[implementationNames[0]];
         return {
           kind: 'Function',
           tokens: expression.tokens,
           messages: expression.messages,
           resultType: expectedType,
-          value: implementation.value,
-          argumentNames: implementation.argumentNames,
+          value: implementationValue.value,
+          argumentNames: implementationValue.argumentNames,
         };
       }
       return expression;

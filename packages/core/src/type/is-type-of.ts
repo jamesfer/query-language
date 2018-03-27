@@ -1,14 +1,7 @@
 import { every, isEmpty, map } from 'lodash';
 import { makeFunctionType } from './constructors';
-import { InterfaceType } from './type';
 import { assertNever } from '../utils';
-import {
-  ArrayType,
-  FunctionType,
-  GenericType,
-  RecordType,
-  Type,
-} from './type';
+import { ArrayType, FunctionType, GenericType, InterfaceType, RecordType, Type } from './type';
 
 
 export function isTypeOf(base: Type, subtype?: Type | null): boolean {
@@ -102,7 +95,7 @@ function isSubtypeOfFunction(base: FunctionType, subtype: Type): boolean {
 
 function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
   if (base.derives) {
-    let type = subtype.kind === 'Generic' ? subtype.derives : subtype;
+    const type = subtype.kind === 'Generic' ? subtype.derives : subtype;
     return isTypeOf(base.derives, type);
   }
   return false;
@@ -130,7 +123,7 @@ function isSubtypeOfRecord(base: RecordType | InterfaceType, subtype: Type) {
 
 export function instantiateMethodSignature(
   signature: FunctionType,
-  type: Type
+  type: Type,
 ): FunctionType {
   const replaceSelf = (arg: Type) => {
     return arg.kind === 'Generic' && arg.name === 'self' ? type : arg;

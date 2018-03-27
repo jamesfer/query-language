@@ -9,7 +9,7 @@ export const whitespacePattern = /^[\s]+/;
 export const patterns: TokenTest[] = [
   {
     test: /^--[^\n\r]*/,
-    type: TokenKind.Comment
+    type: TokenKind.Comment,
   },
   {
     test: /^{/,

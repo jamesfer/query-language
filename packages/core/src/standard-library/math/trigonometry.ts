@@ -1,8 +1,6 @@
-import { makeFunctionType } from '../../type/constructors';
 import { Library, LibraryFunction } from '../library';
 import { bindFloatFunction } from '../library-utils';
-import { floatType } from '../../type/constructors';
-
+import { floatType, makeFunctionType } from '../../type/constructors';
 
 const tan: LibraryFunction = {
   type: makeFunctionType([floatType], floatType),

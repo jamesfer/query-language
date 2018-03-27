@@ -1,4 +1,3 @@
-
 import { executeExpect } from '../../test-utils';
 
 describe('operators', function() {

@@ -1,13 +1,27 @@
 {
   "name": "query-language",
   "version": "0.1.0",
+  "author": "James Ferguson",
   "description": "An intuitive and powerful query language for the web",
   "main": "dist/qlang.js",
   "typings": "dist/qlang.d.ts",
+  "license": "MIT",
+  "repository": "github:jamesfer/query-language",
+  "homepage": "jamesfer.me/query-language",
+  "bugs": {
+    "url": "https://github.com/jamesfer/query-language/issues"
+  },
+  "keywords": [
+    "query",
+    "language",
+    "functional",
+    "lazy"
+  ],
   "scripts": {
     "build": "webpack --progress",
     "watch": "webpack --progress --watch",
     "prod": "webpack --progress --env.production",
+    "lint": "tslint -p tsconfig.json",
     "test": "nyc --reporter=html --reporter=text-summary mocha src/**/*.spec.ts tests/**/*.test.ts",
     "test:ci": "nyc --reporter=lcovonly --reporter=text-summary mocha src/**/*.spec.ts tests/**/*.test.ts",
     "test:watch": "nodemon -e js,ts -w tests -w src --exec 'npm run test'",
@@ -35,9 +49,12 @@
       "**/*.tests.ts"
     ]
   },
-  "author": "James Ferguson",
-  "license": "MIT",
   "dependencies": {
+    "lodash": "^4.17.4",
+    "rxjs": "^5.5.0",
+    "tslib": "^1.9.0"
+  },
+  "devDependencies": {
     "@types/chai": "^4.0.2",
     "@types/lodash": "^4.14.72",
     "@types/mocha": "^2.2.41",
@@ -45,16 +62,16 @@
     "chai": "^4.1.1",
     "clean-webpack-plugin": "^0.1.17",
     "coveralls": "^3.0.0",
-    "lodash": "^4.17.4",
     "mocha": "^3.5.0",
     "nodemon": "^1.14.3",
     "nyc": "^11.4.1",
-    "rxjs": "^5.5.0",
     "source-map-support": "^0.5.0",
     "ts-loader": "^3.1.1",
     "ts-node": "^3.3.0",
+    "tslint": "^5.5.0",
+    "tslint-config-airbnb": "^5.8.0",
     "typescript": "^2.4.2",
-    "uglifyjs-webpack-plugin": "^0.4.6",
-    "webpack": "^3.6.0"
+    "webpack": "^3.6.0",
+    "webpack-node-externals": "^1.6.0"
   }
 }

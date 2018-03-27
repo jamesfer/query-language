@@ -8,17 +8,12 @@ import { Observable } from 'rxjs/Observable';
 import { Expression } from '../expression';
 import { Scope } from '../scope';
 import { assertNever } from '../utils';
-import { LazyNoneValue, LazyValue, Value } from '../value';
+import { lazyNoneValue, LazyValue, Value } from '../value';
 import { evaluateArray } from './expression-compilers/array';
 import { evaluateFunctionCall } from './expression-compilers/function/evaluate-function-call';
-import {
-  evaluateBoolean,
-  } from './expression-compilers/boolean';
-import {
-  evaluateFloat,
-  } from './expression-compilers/number';
+import { evaluateBoolean } from './expression-compilers/boolean';
+import { evaluateFloat, evaluateInteger } from './expression-compilers/number';
 import { evaluateIdentifier } from './expression-compilers/identifier';
-import { evaluateInteger } from './expression-compilers/number';
 import { evaluateString } from './expression-compilers/string';
 import { evaluateFunction } from './expression-compilers/function';
 
@@ -45,7 +40,7 @@ export function evaluateExpression(scope: Scope, expression: Expression): LazyVa
     case 'Identifier':
       return evaluateIdentifier(scope, expression);
     case 'None':
-      return LazyNoneValue;
+      return lazyNoneValue;
     case 'Unrecognized':
       return undefined;
     default:
@@ -66,7 +61,7 @@ export function stripValue(value: Value): Observable<any> {
     case 'Array':
       return value.value.mergeMap(stripValue).toArray();
     case 'Record':
-      let properties = map(value.value, (property, key) => {
+      const properties = map(value.value, (property, key) => {
         return stripValue(property).map(stripped => [key, stripped]);
       });
       return Observable.combineLatest(properties).map(fromPairs);
@@ -79,8 +74,9 @@ export function stripLazyValue(lazyValue: LazyValue): Observable<any> | undefine
   return lazyValue.map(stripValue).mergeAll();
 }
 
-export function evaluateSyntaxTree(scope: Scope, expression: Expression): Observable<any> | undefined {
-  let lazyValue = evaluateExpression(scope, expression);
+export function evaluateSyntaxTree(scope: Scope, expression: Expression)
+: Observable<any> | undefined {
+  const lazyValue = evaluateExpression(scope, expression);
   if (lazyValue) {
     return stripLazyValue(lazyValue);
   }

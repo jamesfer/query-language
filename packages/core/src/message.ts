@@ -10,25 +10,14 @@ export interface Message {
   end: Position;
 }
 
+/* tslint:disable:max-line-length */
 export function makeMessage(level: MessageLevel, text: string, begin: Position, end?: Position): Message;
 export function makeMessage(level: MessageLevel, text: string, begin: Token, end?: Token): Message;
 export function makeMessage(level: MessageLevel, text: string, begin: Position | Token, end?: Position | Token): Message {
-  // If end is a token
-  if (end && !isArray(end)) {
-    end = end.end;
-  }
-
-  // If begin is a token
-  if (!isArray(begin)) {
-    if (!end) {
-      end = begin.end;
-    }
-    begin = begin.begin;
-  }
-
-  if (!end) {
-    end = begin;
-  }
-
-  return { text, level, begin, end };
+  const messageBegin = isArray(begin) ? begin : begin.begin;
+  const messageEnd = end
+    ? isArray(end) ? end : end.end
+    : isArray(begin) ? begin : begin.end;
+  return { text, level, begin: messageBegin, end: messageEnd };
 }
+/* tslint:enable:max-line-length */

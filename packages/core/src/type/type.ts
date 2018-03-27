@@ -1,4 +1,4 @@
-import { assign, Dictionary, get, map, } from 'lodash';
+import { assign, Dictionary, get, map } from 'lodash';
 import { assertNever } from '../utils';
 import { makeArrayType, makeFunctionType } from './constructors';
 import { MethodExpression } from '../expression';
@@ -63,9 +63,9 @@ export interface GenericType extends TypeInterface<'Generic'> {
 // }
 
 export interface InterfaceType extends TypeInterface<'Interface'> {
-  fields: Dictionary<Type>,
-  methods: Dictionary<MethodExpression>,
-  parents: InterfaceType[]
+  fields: Dictionary<Type>;
+  methods: Dictionary<MethodExpression>;
+  parents: InterfaceType[];
 }
 
 // Utility Functions
@@ -78,7 +78,7 @@ export function createGenericMap(generic: Type | null, concrete: Type | null): D
     return {};
   }
 
-  switch(generic.kind) {
+  switch (generic.kind) {
     case 'Generic':
       return {
         [generic.name]: concrete,
@@ -92,13 +92,12 @@ export function createGenericMap(generic: Type | null, concrete: Type | null): D
     case 'Function':
       // Create a generic map of the arguments
       let genericMap = {};
-      let genericArgs = generic.argTypes;
-      let concreteArgs = (concrete as FunctionType).argTypes;
-      let i = -1;
-      while (++i < genericArgs.length && i < concreteArgs.length) {
+      const genericArgs = generic.argTypes;
+      const concreteArgs = (concrete as FunctionType).argTypes;
+      for (let i = 0; i < genericArgs.length && i < concreteArgs.length; i += 1) {
         genericMap = assign(
           genericMap,
-          createGenericMap(genericArgs[i], concreteArgs[i])
+          createGenericMap(genericArgs[i], concreteArgs[i]),
         );
       }
 
@@ -140,10 +139,8 @@ export function applyGenericMap(generic: Type, genericMap: Dictionary<Type>): Ty
       return generic;
 
     case 'Function':
-      let returnType = applyGenericMap(generic.returnType, genericMap);
-      let argTypes = map(generic.argTypes, arg => {
-        return applyGenericMap(arg, genericMap);
-      });
+      const returnType = applyGenericMap(generic.returnType, genericMap);
+      const argTypes = map(generic.argTypes, arg => applyGenericMap(arg, genericMap));
       return makeFunctionType(argTypes, returnType);
 
     case 'Interface':

@@ -1,30 +1,36 @@
-import { UntypedExpression } from '../untyped-expression';
-import { Token, TokenKind } from '../token';
-import { dropWhile, includes } from 'lodash';
+import { makeUntypedUnrecognizedExpression, UntypedExpression } from '../untyped-expression';
+import { Token } from '../token';
 import { firstResult } from '../utils';
 import { interpretFunctionCall } from './expression-compilers/function/interpret-function-call';
 import { interpretIdentifier } from './expression-compilers/identifier';
 import { buildOperatorExpression } from './expression-compilers/operators/operator';
 import { interpretParenthesis } from './expression-compilers/parenthesis';
-import { makeUntypedUnrecognizedExpression } from '../untyped-expression';
 import { interpretString } from './expression-compilers/string';
 import { interpretNumber } from './expression-compilers/number';
 import { interpretArray } from './expression-compilers/array';
 import { interpretBoolean } from './expression-compilers/boolean';
 
 
-function buildLiteralExpression(tokens: Token[], prevExpression: UntypedExpression | null, operatorPrecedence: number): UntypedExpression | undefined {
+function buildLiteralExpression(
+  tokens: Token[],
+  prevExpression: UntypedExpression | null,
+  operatorPrecedence: number,
+): UntypedExpression | undefined {
   if (prevExpression === null) {
     return firstResult([
       interpretString,
       interpretNumber,
       interpretArray,
       interpretBoolean,
-    ], tokens)
+    ],                 tokens);
   }
 }
 
-function runExpressionBuilders(tokens: Token[], prevExpression: UntypedExpression | null = null, operatorPrecedence: number = 0): UntypedExpression | undefined {
+function runExpressionBuilders(
+  tokens: Token[],
+  prevExpression: UntypedExpression | null = null,
+  operatorPrecedence: number = 0,
+): UntypedExpression | undefined {
   if (tokens.length) {
     return firstResult([
       interpretParenthesis,
@@ -32,15 +38,19 @@ function runExpressionBuilders(tokens: Token[], prevExpression: UntypedExpressio
       interpretIdentifier,
       interpretFunctionCall,
       buildOperatorExpression,
-    ], tokens, prevExpression, operatorPrecedence);
+    ],                 tokens, prevExpression, operatorPrecedence);
   }
 }
 
-export function interpretExpression(tokens: Token[], prevExpression: UntypedExpression | null = null, operatorPrecedence: number = 0): UntypedExpression | null {
+export function interpretExpression(
+  tokens: Token[],
+  prevExpression: UntypedExpression | null = null,
+  operatorPrecedence: number = 0,
+): UntypedExpression | null {
   let result: UntypedExpression | undefined;
   let expressionPart = runExpressionBuilders(tokens, prevExpression, operatorPrecedence);
   while (expressionPart) {
-    let unusedTokens = tokens.slice(expressionPart.tokens.length);
+    const unusedTokens = tokens.slice(expressionPart.tokens.length);
     result = expressionPart;
     expressionPart = runExpressionBuilders(unusedTokens, expressionPart, operatorPrecedence);
   }
@@ -48,15 +58,14 @@ export function interpretExpression(tokens: Token[], prevExpression: UntypedExpr
 }
 
 export function interpretSyntaxTree(tokens: Token[]): UntypedExpression[] {
-  let expressions: UntypedExpression[] = [];
+  const expressions: UntypedExpression[] = [];
   let remainingTokens = tokens;
   while (remainingTokens.length) {
-    let result = interpretExpression(remainingTokens)
+    const result = interpretExpression(remainingTokens)
       || makeUntypedUnrecognizedExpression(remainingTokens);
     expressions.push(result);
 
     remainingTokens = remainingTokens.slice(result.tokens.length);
-    remainingTokens = remainingTokens;
   }
   return expressions;
 }

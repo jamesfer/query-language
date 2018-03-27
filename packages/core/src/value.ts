@@ -25,8 +25,8 @@ export type PlainValue = string
   | Expression;
 
 export interface ValueInterface<K extends ValueKind, V extends PlainValue> {
-  kind: K,
-  value: V,
+  kind: K;
+  value: V;
 }
 
 export interface StringValue extends ValueInterface<'String', string> {}
@@ -53,12 +53,12 @@ export type LazyValue<T extends Value = Value> = Observable<T>;
 
 
 // Type constants
-export const NoneValue: NoneValue = { kind: 'None', value: null };
-export const LazyNoneValue: LazyValue<NoneValue> = Observable.of(NoneValue);
-export const TrueValue: BooleanValue = { kind: 'Boolean', value: true };
-export const LazyTrueValue: LazyValue<BooleanValue> = Observable.of(TrueValue);
-export const FalseValue: BooleanValue = { kind: 'Boolean', value: false };
-export const LazyFalseValue: LazyValue<BooleanValue> = Observable.of(FalseValue);
+export const noneValue: NoneValue = { kind: 'None', value: null };
+export const lazyNoneValue: LazyValue<NoneValue> = Observable.of(noneValue);
+export const trueValue: BooleanValue = { kind: 'Boolean', value: true };
+export const lazyTrueValue: LazyValue<BooleanValue> = Observable.of(trueValue);
+export const falseValue: BooleanValue = { kind: 'Boolean', value: false };
+export const lazyFalseValue: LazyValue<BooleanValue> = Observable.of(falseValue);
 
 
 // Type constructors
@@ -68,8 +68,8 @@ export function makeLazy<T extends Value>(arg: T): LazyValue<T> {
 
 export function makeStringValue(value: string): StringValue {
   return {
-    kind: 'String',
     value,
+    kind: 'String',
   };
 }
 export function makeLazyStringValue(value: string) {
@@ -78,8 +78,8 @@ export function makeLazyStringValue(value: string) {
 
 export function makeIntegerValue(value: number): IntegerValue {
   return {
-    kind: 'Integer',
     value,
+    kind: 'Integer',
   };
 }
 export function makeLazyIntegerValue(value: number) {
@@ -88,8 +88,8 @@ export function makeLazyIntegerValue(value: number) {
 
 export function makeFloatValue(value: number): FloatValue {
   return {
-    kind: 'Float',
     value,
+    kind: 'Float',
   };
 }
 export function makeLazyFloatValue(value: number) {
@@ -98,8 +98,8 @@ export function makeLazyFloatValue(value: number) {
 
 export function makeBooleanValue(value: boolean): BooleanValue {
   return {
-    kind: 'Boolean',
     value,
+    kind: 'Boolean',
   };
 }
 export function makeLazyBooleanValue(value: boolean) {
@@ -108,8 +108,8 @@ export function makeLazyBooleanValue(value: boolean) {
 
 export function makeArrayValue(value: Observable<Value>): ArrayValue {
   return {
-    kind: 'Array',
     value,
+    kind: 'Array',
   };
 }
 export function makeLazyArrayValue(value: Observable<Value>) {
@@ -118,8 +118,8 @@ export function makeLazyArrayValue(value: Observable<Value>) {
 
 export function makeFunctionValue(value: PlainFunctionValue): FunctionValue {
   return {
-    kind: 'Function',
     value,
+    kind: 'Function',
   };
 }
 export function makeLazyFunctionValue(value: PlainFunctionValue) {
@@ -128,8 +128,8 @@ export function makeLazyFunctionValue(value: PlainFunctionValue) {
 
 export function makeMethodValue(value: Dictionary<PlainFunctionValue>): MethodValue {
   return {
-    kind: 'Method',
     value,
+    kind: 'Method',
   };
 }
 export function makeLazyMethodValue(value: Dictionary<PlainFunctionValue>) {
@@ -138,8 +138,8 @@ export function makeLazyMethodValue(value: Dictionary<PlainFunctionValue>) {
 
 export function makeRecordValue(value: Dictionary<Value>): RecordValue {
   return {
-    kind: 'Record',
     value,
+    kind: 'Record',
   };
 }
 export function makeLazyRecordValue(value: Dictionary<Value>) {

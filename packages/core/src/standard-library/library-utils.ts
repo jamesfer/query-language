@@ -3,9 +3,11 @@ import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/switch';
 import { Observable } from 'rxjs/Observable';
 import {
-  LazyValue, makeLazyBooleanValue,
+  LazyValue,
+  makeLazyBooleanValue,
   makeLazyFloatValue,
-  PlainFunctionValue, PlainValue,
+  PlainFunctionValue,
+  PlainValue,
 } from '../value';
 
 /**

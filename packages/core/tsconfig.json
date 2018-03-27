@@ -14,9 +14,8 @@
     "noImplicitThis": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
+    "importHelpers": true,
     "lib": [
-      "es5",
-      "es6",
       "es2016"
     ]
   },

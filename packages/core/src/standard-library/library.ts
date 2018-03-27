@@ -1,24 +1,21 @@
-import { mapValues, assign, map } from 'lodash';
+import { assign, map, mapValues } from 'lodash';
 import { Type } from '../type/type';
-import {
-  FunctionValue, makeFunctionValue, makeLazyFunctionValue,
-  PlainFunctionValue,
-} from '../value';
+import { makeFunctionValue, PlainFunctionValue } from '../value';
 import { Scope } from '../scope';
 import { Expression } from '../expression';
 
 export interface LibraryFunction {
-  type: Type,
-  impl: PlainFunctionValue,
+  type: Type;
+  impl: PlainFunctionValue;
 }
 
 export interface Library {
   functions?: {
     [name: string]: LibraryFunction,
-  },
+  };
   types?: {
     [name: string]: Type,
-  },
+  };
 }
 
 export function mergeLibraries(...libraries: Library[]): Library {
