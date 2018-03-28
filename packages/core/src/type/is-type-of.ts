@@ -45,7 +45,9 @@ export function isTypeOf(base: Type, subtype?: Type | null): boolean {
 }
 
 function isSubtypeOfInteger(subtype: Type): boolean {
-  return subtype.kind === 'Integer';
+  // TODO temporarily, all floats are considered integers until the float only functions are
+  // TODO converted to interfaces
+  return subtype.kind === 'Integer' || subtype.kind === 'Float';
 }
 
 function isSubtypeOfFloat(subtype: Type): boolean {
