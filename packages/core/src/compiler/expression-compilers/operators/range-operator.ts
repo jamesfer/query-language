@@ -35,6 +35,9 @@ export function interpretRangeOperator(
     const end = rightExpression || makeIntegerExpression(Infinity, rangeToken);
 
     const identifier = makeCustomIdentifierExpression('..', [rangeToken]);
-    return makeFunctionCallExpression(identifier, [start, end], messages);
+    return makeFunctionCallExpression(identifier, [start, end], messages, [
+      ...leftExpression ? leftExpression.tokens : [],
+      ...rightExpression ? rightExpression.tokens : [],
+    ]);
   }
 }

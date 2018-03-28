@@ -139,7 +139,7 @@ function assertProgramContents(program: ExecutionResult, expected: EvaluationExp
   compareExpressions(program.expression, expected.expression);
 
   // Assert the program result
-  if (program.result) {
+  if (program.result && expected.result) {
     return program.result.map(value => {
       if (isFunction(expected.result)) {
         expected.result(value);

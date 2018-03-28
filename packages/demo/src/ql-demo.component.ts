@@ -18,8 +18,9 @@ export class QLDemoComponent implements AfterViewInit {
   ngAfterViewInit() {
     setImmediate(() => {
       this.resultString$ = this.editor.compilerService.result$
-        .filter(result => result !== null && typeof result !== 'function')
-        .map(result => JSON.stringify(result))
+        .map(result => (
+          result !== null && typeof result !== 'function' ? JSON.stringify(result) : ''
+        ))
         .startWith(this.resultPrompt);
     });
   }
