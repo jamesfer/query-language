@@ -105,7 +105,8 @@ function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
     const type = subtype.kind === 'Generic' ? subtype.derives : subtype;
     return isTypeOf(base.derives, type);
   }
-  return false;
+  // TODO this should probably be false, changed it to true to make typing a little more forgiving.
+  return true;
 }
 
 function isSubtypeOfRecord(base: RecordType | InterfaceType, subtype: Type) {
