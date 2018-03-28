@@ -45,11 +45,8 @@ export function interpretNumber(tokens: Token[])
     const messages: Message[] = [];
     if (isNaN(value)) {
       messages.push(makeMessage('Error', 'Not a valid number.', token));
-    } else if (value >= Number.MAX_VALUE) {
-      const message = 'Value is larger than the maximum value of ' + Number.MAX_VALUE;
-      messages.push(makeMessage('Error', message, token));
-    } else if (value <= Number.MIN_VALUE) {
-      const message = 'Value is smaller than the minimum value of ' + Number.MIN_VALUE;
+    } else if (value === Infinity || value === -Infinity) {
+      const message = 'Value cannot be represented as a number.';
       messages.push(makeMessage('Error', message, token));
     }
 
