@@ -31,9 +31,9 @@ export class QLLinterService {
   protected convertToAnnotations(messages: Message[]): Annotation[] {
     return map(messages, message => ({
       message: message.text,
-      severity: message.level,
-      from: { line: 0, ch: 0 },
-      to: { line: 0, ch: 1 },
+      severity: 'error',
+      from: { line: message.begin[0], ch: message.begin[1] },
+      to: { line: message.end[0], ch: message.end[1] },
     }));
   }
 }
