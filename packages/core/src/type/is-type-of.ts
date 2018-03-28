@@ -1,7 +1,11 @@
 import { every, isEmpty, map } from 'lodash';
 import { makeFunctionType } from './constructors';
 import { assertNever } from '../utils';
-import { ArrayType, FunctionType, GenericType, InterfaceType, RecordType, Type } from './type';
+import {
+  applyGenericMap,
+  ArrayType, createGenericMap, FunctionType, GenericType, InterfaceType, RecordType,
+  Type,
+} from './type';
 
 
 export function isTypeOf(base: Type, subtype?: Type | null): boolean {
@@ -9,7 +13,10 @@ export function isTypeOf(base: Type, subtype?: Type | null): boolean {
     return false;
   }
 
-  switch (base.kind) {
+  const genericMap = createGenericMap(base, subtype);
+  const concreteBase = applyGenericMap(base, genericMap);
+
+  switch (concreteBase.kind) {
     case 'Integer':
       return isSubtypeOfInteger(subtype);
     case 'Float':
@@ -17,23 +24,23 @@ export function isTypeOf(base: Type, subtype?: Type | null): boolean {
     case 'String':
       return isSubtypeOfString(subtype);
     case 'Array':
-      return isSubtypeOfArray(base, subtype);
+      return isSubtypeOfArray(concreteBase, subtype);
     case 'Function':
-      return isSubtypeOfFunction(base, subtype);
+      return isSubtypeOfFunction(concreteBase, subtype);
     case 'Boolean':
       return isSubtypeOfBoolean(subtype);
     case 'None':
       return isSubtypeOfNone(subtype);
     case 'Generic':
-      return isSubtypeOfGeneric(base, subtype);
+      return isSubtypeOfGeneric(concreteBase, subtype);
     case 'Record':
-      return isSubtypeOfRecord(base, subtype);
+      return isSubtypeOfRecord(concreteBase, subtype);
     case 'Interface':
-      return isSubtypeOfInterface(base, subtype);
+      return isSubtypeOfInterface(concreteBase, subtype);
     // case 'Method':
-    //   return isSubtypeOfMethod(base, subtype);
+    //   return isSubtypeOfMethod(concreteBase, subtype);
     default:
-      return assertNever(base);
+      return assertNever(concreteBase);
   }
 }
 
