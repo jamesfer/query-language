@@ -12,7 +12,7 @@ import {
   integerType, makeArrayType, makeFunctionType, noneType,
 } from '../../src/type/constructors';
 import { makeMessage } from '../../';
-import { Position } from '../../src/token';
+import { Position } from '../../src/position';
 import { MessageLevel } from '../../src/message';
 
 describe('functions', function() {

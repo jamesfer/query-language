@@ -1,63 +1,39 @@
-// export type TokenKind = 'Identifier'
-//   | 'NumericLiteral'
-//   | 'StringLiteral'
-//   | 'OpenBrace'
-//   | 'CloseBrace'
-//   | 'OpenParen'
-//   | 'CloseParen'
-//   | 'OpenBracket'
-//   | 'CloseBracket'
-//   | 'Comma'
-//   | 'Colon'
-//   | 'AddOperator'
-//   | 'SubtractOperator'
-//   | 'MultiplyOperator'
-//   | 'DivideOperator'
-//   | 'ModuloOperator'
-//   | 'PowerOperator'
-//   | 'InOperator'
-//   | 'SpreadOperator';
+import { Position } from './position';
 
 export enum TokenKind {
-  Identifier,
-  IntegerLiteral,
-  FloatLiteral,
-  StringLiteral,
-  OpenBrace,
-  CloseBrace,
-  OpenParen,
-  CloseParen,
-  OpenBracket,
-  CloseBracket,
-  Comma,
-  Colon,
-  AddOperator,
-  SubtractOperator,
-  MultiplyOperator,
-  DivideOperator,
-  ModuloOperator,
-  PowerOperator,
-  LessThan,
-  LessEqual,
-  GreaterThan,
-  GreaterEqual,
-  Equal,
-  NotEqual,
-  InOperator,
-  SpreadOperator,
-  RangeOperator,
-  FatArrow,
-  ComposeOperator,
-  BooleanLiteral,
-  Comment,
+  WhiteSpace = 'WhiteSpace',
+  Identifier = 'Identifier',
+  IntegerLiteral = 'IntegerLiteral',
+  FloatLiteral = 'FloatLiteral',
+  StringLiteral = 'StringLiteral',
+  OpenBrace = 'OpenBrace',
+  CloseBrace = 'CloseBrace',
+  OpenParen = 'OpenParen',
+  CloseParen = 'CloseParen',
+  OpenBracket = 'OpenBracket',
+  CloseBracket = 'CloseBracket',
+  Comma = 'Comma',
+  Colon = 'Colon',
+  AddOperator = 'AddOperator',
+  SubtractOperator = 'SubtractOperator',
+  MultiplyOperator = 'MultiplyOperator',
+  DivideOperator = 'DivideOperator',
+  ModuloOperator = 'ModuloOperator',
+  PowerOperator = 'PowerOperator',
+  LessThan = 'LessThan',
+  LessEqual = 'LessEqual',
+  GreaterThan = 'GreaterThan',
+  GreaterEqual = 'GreaterEqual',
+  Equal = 'Equal',
+  NotEqual = 'NotEqual',
+  InOperator = 'InOperator',
+  // SpreadOperator = 'SpreadOperator',
+  RangeOperator = 'RangeOperator',
+  FatArrow = 'FatArrow',
+  ComposeOperator = 'ComposeOperator',
+  BooleanLiteral = 'BooleanLiteral',
+  Comment = 'Comment',
 }
-
-// export interface Position {
-//   line: number,
-//   position: number,
-// }
-
-export type Position = [number, number];
 
 export class Token {
   kind: TokenKind;

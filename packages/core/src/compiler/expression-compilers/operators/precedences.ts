@@ -6,7 +6,7 @@ export interface Operator {
 }
 
 export interface PrecedenceMap {
-  [ k: number ]: Operator;
+  [ k: string ]: Operator;
   slice: Operator;
   unaryMinus: Operator;
   range: Operator;

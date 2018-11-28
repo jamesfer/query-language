@@ -22,7 +22,7 @@ import { Message } from '../src/message';
 import { Token } from '../src/token';
 import { Type } from '../src/type/type';
 import { assertNever } from '../src/utils';
-import { addPositions } from '../src/compiler/tokenize/tokenize-code';
+import { addPositions } from '../src/position';
 
 
 export interface ValueExpressionExpectation {

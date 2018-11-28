@@ -6,11 +6,11 @@ import { Scope } from './scope';
 import { standardLibrary } from './standard-library/standard-library';
 import { Token } from './token';
 import { Expression } from './expression';
-import { tokenizeCode } from './compiler/tokenize/tokenize-code';
 import { interpretSyntaxTree } from './compiler/interpret-expression';
 import { typeExpression } from './compiler/type-expression';
 import { evaluateSyntaxTree } from './compiler/evaluate-expression';
 import { monotizeBaseExpression } from './compiler/monotize-expression';
+import { tokenize } from './compiler/tokenizer/tokenize';
 
 
 export interface CompilationResult {
@@ -41,17 +41,12 @@ function extractMessages(expressions: MessageContainer[]): Message[] {
 
 export function compile(code: string, scope?: Scope): CompilationResult {
   // Parse Tokens
-  const tokenList = tokenizeCode(code);
-  const { tokens, failed } = tokenList;
-  let { messages } = tokenList;
-  if (failed) {
-    return { tokens, messages, compiled: false };
-  }
+  const tokens = tokenize(code);
 
   // Interpret expression
   const expressions = interpretSyntaxTree(tokens);
   const [expression] = expressions;
-  messages = [...messages, ...extractMessages(expressions)];
+  let messages = extractMessages(expressions);
   if (!expression) {
     return { tokens, messages, compiled: false };
   }
