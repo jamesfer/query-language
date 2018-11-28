@@ -1,7 +1,7 @@
 import { evaluates } from '../runner';
 import {
   arrayExpression,
-  closeBracketToken, commaToken, commentToken, integerExpression, integerToken,
+  closeBracketToken, commaToken, integerExpression, integerToken,
   openBracketToken,
 } from '../utils';
 import { integerType } from '../../src/type/constructors';

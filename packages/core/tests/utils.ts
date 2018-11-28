@@ -1,4 +1,4 @@
-import { Token, TokenKind, Position } from '../src/token';
+import { Token, TokenKind} from '../src/token';
 import { Function2, partial } from 'lodash';
 import {
   ArrayExpressionExpectation, ExpressionExpectation,
@@ -8,7 +8,7 @@ import {
 import {
   Type,
   } from '../src/type/type';
-import { addPositions } from '../src/compiler/tokenize/tokenize-code';
+import { addPositions, Position } from '../src/position';
 import {
   booleanType, floatType, integerType, makeArrayType,
   stringType,

@@ -76,6 +76,11 @@
   version "2.2.48"
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.48.tgz#3523b126a0b049482e1c3c11877460f76622ffab"
 
+"@types/moo@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@types/moo/-/moo-0.4.2.tgz#6935086673b7e37db69c7aa4f68699f1677c0aa7"
+  integrity sha512-0hhe/9LwlSXdO3FV+eUQcwwS2Qn8xGNfy2jBF4ZE4XFXNAxvSI7y+zVXWyTB4+pKbgHRKt0YA6oFwYI9AAXjBA==
+
 "@types/node@*":
   version "9.6.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.0.tgz#d3480ee666df9784b1001a1872a2f6ccefb6c2d7"
@@ -3244,6 +3249,11 @@ mocha@^3.5.0:
     lodash.create "3.1.1"
     mkdirp "0.5.1"
     supports-color "3.1.2"
+
+moo@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/moo/-/moo-0.5.0.tgz#72f949e6735aeb27d07eb7c087ea5a70143c56e5"
+  integrity sha512-AMv6iqhTEd5vT/cQlH6cammKS5ekyHhyqTRKi5zKMWl1RTyFnQ3ohPSBNSm8ySe2wlxSKwDonr9D5ZT44mdO3g==
 
 ms@2.0.0:
   version "2.0.0"
