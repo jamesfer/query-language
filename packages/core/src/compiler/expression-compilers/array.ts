@@ -1,9 +1,10 @@
 import { ArrayExpression, Expression } from '../../expression';
 import { makeMessage, Message } from '../../message';
-import { assignTypeVariableInScope, Scope } from '../../scope';
-import { Token, TokenKind } from '../../token';
+import { Scope } from '../../scope';
+import { TokenKind } from '../../token';
 import { Type } from '../../type/type';
 import { UntypedArrayExpression } from '../../untyped-expression';
+import { ExpressionInterpreter } from '../interpret-expression';
 import { ExpressionTyper, typeExpression } from '../type-expression';
 import { buildListInterpreter } from '../compiler-utils/interpret-list';
 import { ArrayValue, LazyValue, makeLazyArrayValue, Value } from '../../value';
@@ -12,14 +13,14 @@ import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/filter';
 import { evaluateExpression } from '../evaluate-expression';
 import { isTypeOf } from '../../type/is-type-of';
-import { makeArrayType, makeTypeVariable, noneType } from '../../type/constructors';
+import { makeArrayType, makeTypeVariable } from '../../type/constructors';
 import { normalizeMessageResult } from '../compiler-utils/message-store';
 
 
 const buildArrayList
   = buildListInterpreter(TokenKind.OpenBracket, TokenKind.CloseBracket, TokenKind.Comma);
 
-export function interpretArray(tokens: Token[]): UntypedArrayExpression | undefined {
+export const interpretArray: ExpressionInterpreter = (tokens) => {
   const result = buildArrayList(tokens);
   if (result) {
     const [list, messages] = result;
@@ -30,7 +31,8 @@ export function interpretArray(tokens: Token[]): UntypedArrayExpression | undefi
       messages: normalizeMessageResult(messages),
     };
   }
-}
+  return undefined;
+};
 
 export const typeArray: ExpressionTyper<UntypedArrayExpression> = (scope, typeVariables, expression) => {
   const messages: Message[] = [];

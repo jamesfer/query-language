@@ -1,16 +1,12 @@
-import { makeUntypedUnrecognizedExpression, UntypedExpression } from '../../untyped-expression';
+import { makeUntypedUnrecognizedExpression } from '../../untyped-expression';
 import { makeMessage } from '../../message';
-import { Token, TokenKind } from '../../token';
+import { TokenKind } from '../../token';
 import { tokenArrayMatches } from '../../utils';
-import { interpretExpression } from '../interpret-expression';
+import { ExpressionInterpreter, interpretExpression } from '../interpret-expression';
 import { last } from 'lodash';
 
-export function interpretParenthesis(
-  incomingTokens: Token[],
-  prevExpression: UntypedExpression | null,
-  operatorPrecedence: number,
-): UntypedExpression | undefined {
-  if (tokenArrayMatches(incomingTokens, TokenKind.OpenParen) && prevExpression === null) {
+export const interpretParenthesis: ExpressionInterpreter = (incomingTokens) => {
+  if (tokenArrayMatches(incomingTokens, TokenKind.OpenParen)) {
     const openParen = incomingTokens[0];
     let tokens = incomingTokens.slice(1);
 
@@ -36,4 +32,5 @@ export function interpretParenthesis(
       );
     }
   }
-}
+  return undefined;
+};

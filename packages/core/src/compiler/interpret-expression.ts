@@ -6,74 +6,75 @@ import {
   interpretFunctionCall,
 } from './expression-compilers/function-call/interpret-function-call';
 import { interpretIdentifier } from './expression-compilers/identifier';
-import { buildOperatorExpression } from './expression-compilers/operators/operator';
+import { interpretOperatorExpression } from './expression-compilers/operators/operator';
 import { interpretParenthesis } from './expression-compilers/parenthesis';
 import { interpretString } from './expression-compilers/string';
 import { interpretNumber } from './expression-compilers/number';
 import { interpretArray } from './expression-compilers/array';
 import { interpretBoolean } from './expression-compilers/boolean';
 
-
-function buildLiteralExpression(
+export type ExpressionInterpreter = (
   tokens: Token[],
-  prevExpression: UntypedExpression | null,
-  operatorPrecedence: number,
-): UntypedExpression | undefined {
-  if (prevExpression === null) {
+  previous: UntypedExpression | null,
+  precedence: number,
+) => UntypedExpression | undefined;
+
+const interpretLiteral: ExpressionInterpreter = (tokens, previous, precedence) => {
+  if (previous === null) {
     return firstResult(
       [
+        interpretParenthesis,
         interpretString,
         interpretNumber,
         interpretArray,
         interpretBoolean,
+        interpretFunction,
+        interpretIdentifier,
       ],
       tokens,
+      previous,
+      precedence,
     );
   }
-}
+  return undefined;
+};
 
-function runExpressionBuilders(
-  tokens: Token[],
-  prevExpression: UntypedExpression | null = null,
-  operatorPrecedence: number = 0,
-): UntypedExpression | undefined {
+const runInterpreters: ExpressionInterpreter = (tokens, previous, precedence) => {
   if (tokens.length) {
     return firstResult(
       [
-        interpretParenthesis,
-        buildLiteralExpression,
-        interpretFunction,
-        interpretIdentifier,
+        interpretLiteral,
         interpretFunctionCall,
-        buildOperatorExpression,
+        interpretOperatorExpression,
       ],
       tokens,
-      prevExpression,
-      operatorPrecedence,
+      previous,
+      precedence,
     );
   }
-}
+  return undefined;
+};
 
 export function interpretExpression(
   tokens: Token[],
-  prevExpression: UntypedExpression | null = null,
-  operatorPrecedence: number = 0,
-): UntypedExpression | null {
+  previous: UntypedExpression | null = null,
+  precedence: number = 0,
+): UntypedExpression | undefined {
   let result: UntypedExpression | undefined;
-  let expressionPart = runExpressionBuilders(tokens, prevExpression, operatorPrecedence);
+  let expressionPart = runInterpreters(tokens, previous, precedence);
   while (expressionPart) {
     const unusedTokens = tokens.slice(expressionPart.tokens.length);
     result = expressionPart;
-    expressionPart = runExpressionBuilders(unusedTokens, expressionPart, operatorPrecedence);
+    expressionPart = runInterpreters(unusedTokens, expressionPart, precedence);
   }
-  return result || null;
+  return result;
 }
 
 export function interpretSyntaxTree(tokens: Token[]): UntypedExpression[] {
   const expressions: UntypedExpression[] = [];
   let remainingTokens = tokens;
   while (remainingTokens.length) {
-    const result = interpretExpression(remainingTokens)
+    const result = interpretExpression(remainingTokens, null, 0)
       || makeUntypedUnrecognizedExpression(remainingTokens);
     expressions.push(result);
 

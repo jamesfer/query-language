@@ -1,20 +1,15 @@
-import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
-import { Token, TokenKind } from '../../../token';
+import { TokenKind } from '../../../token';
 import { tokenArrayMatches } from '../../../utils';
-import { interpretExpression } from '../../interpret-expression';
+import { ExpressionInterpreter, interpretExpression } from '../../interpret-expression';
 import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
 import { makeIdentifierExpression } from '../identifier';
 import { hasHigherPrecedence, precedences } from './precedences';
 
 
-export function interpretUnaryMinusOperator(
-  tokens: Token[],
-  leftExpression: UntypedExpression | null,
-  operatorPrecedence: number,
-): UntypedFunctionCallExpression | undefined {
+export const interpretUnaryMinusOperator: ExpressionInterpreter = (tokens, left, precedence) => {
   if (tokenArrayMatches(tokens, TokenKind.SubtractOperator)
-    && leftExpression === null
-    && hasHigherPrecedence(precedences.unaryMinus, operatorPrecedence)
+    && left === null
+    && hasHigherPrecedence(precedences.unaryMinus, precedence)
   ) {
     const rightExpression = interpretExpression(
       tokens.slice(1),
@@ -37,4 +32,5 @@ export function interpretUnaryMinusOperator(
       ]);
     }
   }
-}
+  return undefined;
+};

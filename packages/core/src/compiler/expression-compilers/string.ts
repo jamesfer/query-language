@@ -1,13 +1,14 @@
 import { head, last } from 'lodash';
 import { addType, StringExpression } from '../../expression';
 import { makeMessage, Message } from '../../message';
-import { Scope, TypeScope } from '../../scope';
+import { Scope } from '../../scope';
 import { Token, TokenKind } from '../../token';
 import { stringType } from '../../type/constructors';
-import { UntypedExpression, UntypedStringExpression } from '../../untyped-expression';
+import { UntypedStringExpression } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { LazyValue, makeStringValue, StringValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
+import { ExpressionInterpreter } from '../interpret-expression';
 import { ExpressionTyper } from '../type-expression';
 
 
@@ -24,7 +25,7 @@ function makeStringExpression(token: Token, messages: Message[] = []): UntypedSt
   };
 }
 
-export function interpretString(tokens: Token[]): UntypedExpression | undefined {
+export const interpretString: ExpressionInterpreter = (tokens) => {
   if (tokenArrayMatches(tokens, TokenKind.StringLiteral)) {
     const messages: Message[] = [];
     const strToken = tokens[0];
@@ -33,7 +34,8 @@ export function interpretString(tokens: Token[]): UntypedExpression | undefined 
     }
     return makeStringExpression(strToken, messages);
   }
-}
+  return undefined;
+};
 
 export const typeString: ExpressionTyper<UntypedStringExpression> = (scope, typeVariables, expression) => {
   return [typeVariables, addType(expression, stringType)];

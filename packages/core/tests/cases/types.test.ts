@@ -56,8 +56,6 @@ describe('type checking', () => {
     )
   });
 
-  describe('emit type error', () => {
-
   evaluates('emits type error', '1 + "1"', {
     compiled: false,
     evaluated: false,
@@ -74,6 +72,5 @@ describe('type checking', () => {
     messages: [
       makeMessage('Error', 'Argument has an incorrect type.', [0, 4], [0, 7]),
     ],
-  });
   });
 });

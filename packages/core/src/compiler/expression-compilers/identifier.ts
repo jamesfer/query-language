@@ -1,12 +1,12 @@
 import { IdentifierExpression } from '../../expression';
 import { makeMessage, Message } from '../../message';
-import { findScopeVariableEntry, findScopeVariableType, findTypeInScope, Scope } from '../../scope';
+import { findScopeVariableEntry, findTypeInScope, Scope } from '../../scope';
 import { Token, TokenKind } from '../../token';
-import { noneType } from '../../type/constructors';
 import { UntypedIdentifierExpression } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { lazyNoneValue, LazyValue } from '../../value';
 import { evaluateExpression } from '../evaluate-expression';
+import { ExpressionInterpreter } from '../interpret-expression';
 import { ExpressionTyper } from '../type-expression';
 
 
@@ -27,11 +27,12 @@ export function makeCustomIdentifierExpression(
   };
 }
 
-export function interpretIdentifier(tokens: Token[]): UntypedIdentifierExpression | undefined {
+export const interpretIdentifier: ExpressionInterpreter = (tokens) => {
   if (tokenArrayMatches(tokens, TokenKind.Identifier)) {
     return makeIdentifierExpression(tokens[0]);
   }
-}
+  return undefined;
+};
 
 export const typeIdentifier: ExpressionTyper<UntypedIdentifierExpression> = (scope, typeVariables, expression) => {
   const { value, tokens } = expression;

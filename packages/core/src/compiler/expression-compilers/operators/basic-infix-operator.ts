@@ -1,20 +1,14 @@
-import { Token } from '../../../token';
-import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
-import { interpretExpression } from '../../interpret-expression';
+import { ExpressionInterpreter, interpretExpression } from '../../interpret-expression';
 import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
 import { makeIdentifierExpression } from '../identifier';
 import { hasHigherPrecedence, precedences } from './precedences';
 
 
-export function interpretInfixOperator(
-  tokens: Token[],
-  leftExpression: UntypedExpression | null,
-  prevPrecedence: number,
-): UntypedFunctionCallExpression | undefined {
+export const interpretInfixOperator: ExpressionInterpreter = (tokens, left, precedence) => {
   const opToken = tokens[0];
   const matchingOp = precedences[opToken.kind];
 
-  if (matchingOp && hasHigherPrecedence(matchingOp, prevPrecedence)) {
+  if (matchingOp && hasHigherPrecedence(matchingOp, precedence)) {
     const identifierExpression = makeIdentifierExpression(opToken);
     const rightExpression = interpretExpression(
       tokens.slice(1),
@@ -23,8 +17,9 @@ export function interpretInfixOperator(
     );
 
     return makeFunctionCallExpression(identifierExpression, [
-      leftExpression,
+      left,
       rightExpression,
     ]);
   }
-}
+  return undefined;
+};

@@ -13,6 +13,7 @@ import {
   makeLazyIntegerValue,
 } from '../../value';
 import { toNumber, isNaN } from 'lodash';
+import { ExpressionInterpreter } from '../interpret-expression';
 import { ExpressionTyper } from '../type-expression';
 
 
@@ -36,8 +37,7 @@ export function makeIntegerExpression(value: number, token: Token, messages: Mes
   };
 }
 
-export function interpretNumber(tokens: Token[])
-: UntypedFloatExpression | UntypedIntegerExpression | undefined {
+export const interpretNumber: ExpressionInterpreter = (tokens) => {
   if (tokenArrayMatches(tokens, TokenKind.FloatLiteral)
     || tokenArrayMatches(tokens, TokenKind.IntegerLiteral)) {
     const token = tokens[0];
@@ -56,7 +56,8 @@ export function interpretNumber(tokens: Token[])
     }
     return makeFloatExpression(value, token, messages);
   }
-}
+  return undefined;
+};
 
 export const typeNumber: ExpressionTyper<UntypedFloatExpression | UntypedIntegerExpression> = (
   scope,

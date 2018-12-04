@@ -4,6 +4,7 @@ import { Message } from '../../../message';
 import { Token, TokenKind } from '../../../token';
 import { buildListInterpreter } from '../../compiler-utils/interpret-list';
 import { normalizeMessageResult } from '../../compiler-utils/message-store';
+import { ExpressionInterpreter } from '../../interpret-expression';
 
 export const functionCallPrecedence = 100;
 
@@ -30,21 +31,18 @@ export function makeFunctionCallExpression(
 const buildArguments
   = buildListInterpreter(TokenKind.OpenParen, TokenKind.CloseParen, TokenKind.Comma);
 
-export function interpretFunctionCall(
-  tokens: Token[],
-  prevExpression: UntypedExpression | null,
-  operatorPrecedence: number,
-): UntypedFunctionCallExpression | undefined {
-  if (operatorPrecedence < functionCallPrecedence && prevExpression !== null) {
+export const interpretFunctionCall: ExpressionInterpreter = (tokens, left, precedence) => {
+  if (precedence < functionCallPrecedence && left !== null) {
     const result = buildArguments(tokens);
     if (result) {
       const [args, messages] = result;
       return makeFunctionCallExpression(
-        prevExpression,
+        left,
         args.expressions,
         normalizeMessageResult(messages),
         args.tokens,
       );
     }
   }
-}
+  return undefined;
+};

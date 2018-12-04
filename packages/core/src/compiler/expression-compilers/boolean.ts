@@ -1,15 +1,16 @@
 import { addType, BooleanExpression } from '../../expression';
 import { Scope } from '../../scope';
-import { Token, TokenKind } from '../../token';
+import { TokenKind } from '../../token';
 import { booleanType } from '../../type/constructors';
 import { UntypedBooleanExpression } from '../../untyped-expression';
 import { BooleanValue, LazyValue, makeBooleanValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
 import { tokenArrayMatches } from '../../utils';
+import { ExpressionInterpreter } from '../interpret-expression';
 import { ExpressionTyper } from '../type-expression';
 
 
-export function interpretBoolean(tokens: Token[]): UntypedBooleanExpression | undefined {
+export const interpretBoolean: ExpressionInterpreter = (tokens) => {
   if (tokenArrayMatches(tokens, TokenKind.BooleanLiteral)) {
     const booleanToken = tokens[0];
     return {
@@ -19,7 +20,8 @@ export function interpretBoolean(tokens: Token[]): UntypedBooleanExpression | un
       value: booleanToken.value === 'true',
     };
   }
-}
+  return undefined;
+};
 
 export const typeBoolean: ExpressionTyper<UntypedBooleanExpression> = (scope, typeVariables, expression) => {
   return [typeVariables, addType(expression, booleanType)];

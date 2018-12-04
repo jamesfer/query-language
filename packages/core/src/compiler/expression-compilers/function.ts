@@ -4,29 +4,23 @@ import { Expression, FunctionExpression } from '../../expression';
 import { makeFunctionType, noneType, TokenKind } from '../../qlang';
 import {
   expandTypeScope,
-  findTypeVariableInScope, inferTypeScope,
+  findTypeVariableInScope,
   Scope,
 } from '../../scope';
-import { Token } from '../../token';
 import { makeTypeVariable } from '../../type/constructors';
 import { VariableType } from '../../type/type';
 import {
   makeUntypedUnrecognizedExpression,
-  UntypedExpression,
   UntypedFunctionExpression,
 } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { FunctionValue, lazyNoneValue, LazyValue, PlainFunctionValue } from '../../value';
 import { evaluateExpression } from '../evaluate-expression';
-import { interpretExpression } from '../interpret-expression';
+import { ExpressionInterpreter, interpretExpression } from '../interpret-expression';
 import { ExpressionTyper, makeUnrecognizedExpression, typeExpression } from '../type-expression';
 
 
-export function interpretFunction(
-  incomingTokens: Token[],
-  prevExpression: UntypedExpression | null,
-  operatorPrecedence: number,
-): UntypedFunctionExpression | undefined {
+export const interpretFunction: ExpressionInterpreter = (incomingTokens) => {
   if (tokenArrayMatches(incomingTokens, TokenKind.Identifier)) {
     // TODO support multiple arguments
     const argToken = incomingTokens[0];
@@ -45,7 +39,8 @@ export function interpretFunction(
       };
     }
   }
-}
+  return undefined;
+};
 
 
 export const typeFunction: ExpressionTyper<UntypedFunctionExpression> = (scope, typeVariables, expression) => {

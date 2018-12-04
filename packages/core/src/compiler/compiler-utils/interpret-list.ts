@@ -9,7 +9,7 @@ import { MessageResult, MessageStore } from './message-store';
 function consumeElementAndSep(
   sepToken: TokenKind,
   incomingTokens: Token[],
-): { expression: UntypedExpression | null, sep: Token | null } {
+): { expression: UntypedExpression | undefined, sep: Token | null } {
   let tokens = incomingTokens;
   const expression = interpretExpression(tokens);
   if (expression) {

@@ -1,7 +1,7 @@
 import { every, first, last } from 'lodash';
-import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
 import { makeMessage } from '../../../message';
-import { Token, TokenKind } from '../../../token';
+import { TokenKind } from '../../../token';
+import { ExpressionInterpreter } from '../../interpret-expression';
 import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
 import { buildListInterpreter } from '../../compiler-utils/interpret-list';
@@ -11,19 +11,19 @@ import { normalizeMessageResult } from '../../compiler-utils/message-store';
 const buildArrayAccessList
   = buildListInterpreter(TokenKind.OpenBrace, TokenKind.CloseBrace, TokenKind.Comma, 3);
 
-export function interpretArraySliceOperator(
-  tokens: Token[],
-  leftExpression: UntypedExpression | null,
-  prevPrecedence: number,
-): UntypedFunctionCallExpression | undefined {
-  const hasPrecedence = hasHigherPrecedence(precedences.slice, prevPrecedence);
-  if (leftExpression && hasPrecedence) {
+export const interpretArraySliceOperator: ExpressionInterpreter = (tokens, left, precedence) => {
+  const hasPrecedence = hasHigherPrecedence(precedences.slice, precedence);
+  if (left && hasPrecedence) {
     const result = buildArrayAccessList(tokens);
     if (result) {
       const [list, messages] = result;
       const identifier = makeCustomIdentifierExpression('[]', []);
-      const expression = makeFunctionCallExpression(identifier, list.expressions,
-                                                    normalizeMessageResult(messages), list.tokens);
+      const expression = makeFunctionCallExpression(
+        identifier,
+        list.expressions,
+        normalizeMessageResult(messages),
+        list.tokens,
+      );
 
       // Check if any indexes were given
       if (every(list.expressions, arg => arg.kind === 'None')) {
@@ -40,4 +40,5 @@ export function interpretArraySliceOperator(
       return expression;
     }
   }
-}
+  return undefined;
+};
