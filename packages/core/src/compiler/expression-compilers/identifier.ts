@@ -1,11 +1,13 @@
 import { IdentifierExpression } from '../../expression';
 import { makeMessage, Message } from '../../message';
-import { findScopeVariableEntry, findScopeVariableType, Scope } from '../../scope';
+import { findScopeVariableEntry, findScopeVariableType, findTypeInScope, Scope } from '../../scope';
 import { Token, TokenKind } from '../../token';
+import { noneType } from '../../type/constructors';
 import { UntypedIdentifierExpression } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { lazyNoneValue, LazyValue } from '../../value';
 import { evaluateExpression } from '../evaluate-expression';
+import { ExpressionTyper } from '../type-expression';
 
 
 export function makeIdentifierExpression(token: Token): UntypedIdentifierExpression {
@@ -31,27 +33,28 @@ export function interpretIdentifier(tokens: Token[]): UntypedIdentifierExpressio
   }
 }
 
-export function typeIdentifier(scope: Scope, expression: UntypedIdentifierExpression)
-: IdentifierExpression {
+export const typeIdentifier: ExpressionTyper<UntypedIdentifierExpression> = (scope, typeVariables, expression) => {
   const { value, tokens } = expression;
-  const resultType = findScopeVariableType(scope, value);
+  const resultType = findTypeInScope(scope, value);
   const messages: Message[] = resultType ? [] : [
     makeMessage('Error', `Unrecognized identifier ${value}`, tokens[0]),
   ];
 
-  return {
+  // TODO maybe duplicate the identifier's type variable if it points to one
+
+  return [typeVariables, {
     resultType,
     value,
     tokens,
     kind: 'Identifier',
-    expression: findScopeVariableEntry(scope, value),
     messages: [...messages, ...expression.messages],
-  };
-}
+  }];
+};
 
 export function evaluateIdentifier(scope: Scope, expression: IdentifierExpression): LazyValue {
-  if (!expression.expression) {
+  const actualExpression = findScopeVariableEntry(scope, expression.value);
+  if (!actualExpression) {
     throw new Error('Can not evaluate an unrecognized identifier');
   }
-  return evaluateExpression(scope, expression.expression) || lazyNoneValue;
+  return evaluateExpression(scope, actualExpression) || lazyNoneValue;
 }

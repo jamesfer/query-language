@@ -2,7 +2,7 @@ import { Token, TokenKind} from '../src/token';
 import { Function2, partial } from 'lodash';
 import {
   ArrayExpressionExpectation, ExpressionExpectation,
-  FunctionExpressionExpectation,
+  FunctionCallExpressionExpectation,
   ValueExpressionExpectation,
 } from './runner';
 import {
@@ -73,13 +73,15 @@ export const inToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.InOperator, 'in');
 export const rangeToken: (begin?: Position | number) => Token
   = partial(makeToken, TokenKind.RangeOperator, '..');
+export const fatArrowToken: (begin?: Position | number) => Token
+  = partial(makeToken, TokenKind.FatArrow, '=>');
 
 
 export function functionCallExpression(
   resultType: Type | null,
   functionExpression: ExpressionExpectation,
   args: (ExpressionExpectation | null)[],
-): FunctionExpressionExpectation {
+): FunctionCallExpressionExpectation {
   return {
     kind: 'FunctionCall',
     resultType,
@@ -89,7 +91,7 @@ export function functionCallExpression(
 }
 
 export function arrayExpression(
-  elementType: Type | null, elements: ExpressionExpectation[],
+  elementType: Type, elements: ExpressionExpectation[],
 ): ArrayExpressionExpectation {
   return {
     kind: 'Array',

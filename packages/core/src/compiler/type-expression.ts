@@ -1,48 +1,53 @@
-import { Scope } from '../scope';
+import { Scope, TypeScope, TypeVariableScope } from '../scope';
 import { UntypedExpression, UntypedNoneExpression } from '../untyped-expression';
 import { addType, Expression, NoneExpression } from '../expression';
 import { assertNever } from '../utils';
 import { typeArray } from './expression-compilers/array';
-import { typeFunctionCall } from './expression-compilers/function/type-function-call';
+import { typeFunction } from './expression-compilers/function';
+import { typeFunctionCall } from './expression-compilers/function-call/type-function-call';
 import { typeIdentifier } from './expression-compilers/identifier';
 import { typeNumber } from './expression-compilers/number';
 import { typeString } from './expression-compilers/string';
 import { noneType } from '../type/constructors';
 import { typeBoolean } from './expression-compilers/boolean';
 
+export type ExpressionTyper<E extends UntypedExpression = UntypedExpression> = (
+  scope: TypeScope,
+  typeVariables: TypeVariableScope,
+  expression: E,
+) => [TypeVariableScope, Expression];
 
-export function typeExpression(scope: Scope, expression: UntypedExpression): Expression {
+export const typeExpression: ExpressionTyper = (scope, typeVariables, expression) => {
   switch (expression.kind) {
     case 'String':
-      return typeString(scope, expression);
+      return typeString(scope, typeVariables, expression);
     case 'Integer':
     case 'Float':
-      return typeNumber(scope, expression);
+      return typeNumber(scope, typeVariables, expression);
     case 'Boolean':
-      return typeBoolean(scope, expression);
+      return typeBoolean(scope, typeVariables, expression);
     case 'Array':
-      return typeArray(scope, expression);
+      return typeArray(scope, typeVariables, expression);
     case 'Identifier':
-      return typeIdentifier(scope, expression);
+      return typeIdentifier(scope, typeVariables, expression);
     case 'FunctionCall':
-      return typeFunctionCall(scope, expression);
-    case 'None':
-      return makeNoneExpression(scope, expression);
-    case 'Unrecognized':
+      return typeFunctionCall(scope, typeVariables, expression);
     case 'Function':
-      return makeUnrecognizedExpression(scope, expression);
+      return typeFunction(scope, typeVariables, expression);
+    case 'None':
+      return [typeVariables, makeNoneExpression(expression)];
+    case 'Unrecognized':
+      return [typeVariables, makeUnrecognizedExpression(expression)];
     default:
       return assertNever(expression);
   }
-}
+};
 
-export function makeNoneExpression(scope: Scope, expression: UntypedNoneExpression)
-: NoneExpression {
+export function makeNoneExpression(expression: UntypedNoneExpression): NoneExpression {
   return addType(expression, noneType);
 }
 
-export function makeUnrecognizedExpression(scope: Scope, expression: UntypedExpression)
-: Expression {
+export function makeUnrecognizedExpression(expression: UntypedExpression): Expression {
   return addType(expression, null);
 }
 

@@ -40,6 +40,5 @@ export function convertToScope(library: Library): Scope {
       resultType: entry.type,
       argumentNames: [],
     })),
-    values: {},
   };
 }

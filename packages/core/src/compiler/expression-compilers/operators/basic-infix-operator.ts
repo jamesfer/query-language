@@ -1,7 +1,7 @@
 import { Token } from '../../../token';
 import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
 import { interpretExpression } from '../../interpret-expression';
-import { makeFunctionCallExpression } from '../function/interpret-function-call';
+import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
 import { makeIdentifierExpression } from '../identifier';
 import { hasHigherPrecedence, precedences } from './precedences';
 

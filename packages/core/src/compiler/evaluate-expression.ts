@@ -10,7 +10,7 @@ import { Scope } from '../scope';
 import { assertNever } from '../utils';
 import { lazyNoneValue, LazyValue, Value } from '../value';
 import { evaluateArray } from './expression-compilers/array';
-import { evaluateFunctionCall } from './expression-compilers/function/evaluate-function-call';
+import { evaluateFunctionCall } from './expression-compilers/function-call/evaluate-function-call';
 import { evaluateBoolean } from './expression-compilers/boolean';
 import { evaluateFloat, evaluateInteger } from './expression-compilers/number';
 import { evaluateIdentifier } from './expression-compilers/identifier';

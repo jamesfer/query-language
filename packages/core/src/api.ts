@@ -1,4 +1,4 @@
-import { isEqual, reduce, uniqWith } from 'lodash';
+import { isEqual, reduce, uniqWith, Dictionary } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { Message } from './message';
 import { convertToScope } from './standard-library/library';
@@ -11,6 +11,7 @@ import { typeExpression } from './compiler/type-expression';
 import { evaluateSyntaxTree } from './compiler/evaluate-expression';
 import { monotizeBaseExpression } from './compiler/monotize-expression';
 import { tokenize } from './compiler/tokenizer/tokenize';
+import { Type } from './type/type';
 
 
 export interface CompilationResult {
@@ -53,7 +54,19 @@ export function compile(code: string, scope?: Scope): CompilationResult {
 
   // Type expression
   const typingScope = scope || convertToScope(standardLibrary);
-  const typedExpression = typeExpression(typingScope, expression);
+  // TODO don't manually construct scopes
+  const typeScope: Dictionary<Type> = {};
+  for (const key in typingScope.variables) {
+    const type = typingScope.variables[key].resultType;
+    if (type) {
+      typeScope[key] = type;
+    }
+  }
+  const [, typedExpression] = typeExpression(
+    { parent: null, types: typeScope },
+    { variables: {} },
+    expression,
+  );
   messages = [...messages, ...typedExpression.messages];
 
   // Monotize expression (convert poly-types to mono-types)

@@ -1,27 +1,33 @@
-import { Dictionary, map, mapValues } from 'lodash';
-import { PlainFunctionValue } from '../value';
+import { map, Dictionary, mapValues } from 'lodash';
+import { MethodExpression } from '../expression';
 import {
   ArrayType,
   BooleanType,
   FloatType,
   FunctionType,
-  GenericType,
   IntegerType,
-  InterfaceType,
   NoneType,
-  RecordType,
   StringType,
   Type,
+  VariableType,
+  RecordType,
+  InterfaceType,
 } from './type';
-import { MethodExpression } from '../expression';
+import { PlainFunctionValue } from '../value';
 
 export type TypeShorthand = string | Type;
 
-function evaluateShorthand(type: TypeShorthand): Type {
-  if (typeof type === 'string') {
-    return makeGenericType(type);
-  }
-  return type;
+function evaluateShorthand() {
+  const variableMap = {};
+  return (type: TypeShorthand): Type => {
+    if (typeof type === 'string') {
+      if (variableMap[type]) {
+        return variableMap[type];
+      }
+      return makeTypeVariable(type);
+    }
+    return type;
+  };
 }
 
 export const integerType: IntegerType = {
@@ -40,39 +46,51 @@ export const noneType: NoneType = {
   kind: 'None',
 };
 
+let typeVariableIdentifier = 0;
+function nextIdentifier() {
+  typeVariableIdentifier += 1;
+  return typeVariableIdentifier;
+}
+
+export function makeTypeVariable(name: string, identifier = nextIdentifier()): VariableType {
+  return { name, identifier, kind: 'Variable' };
+}
+
 export function makeFunctionType(
   argTypes: TypeShorthand[],
   returnType: TypeShorthand,
 ): FunctionType {
+  const evaluator = evaluateShorthand();
   return {
     kind: 'Function',
-    argTypes: map(argTypes, evaluateShorthand),
-    returnType: evaluateShorthand(returnType),
+    argTypes: map(argTypes, evaluator),
+    returnType: evaluator(returnType),
   };
 }
 
-export function makeArrayType(elementType: TypeShorthand | null): ArrayType {
+export function makeArrayType(elementType: TypeShorthand): ArrayType {
   return {
     kind: 'Array',
-    elementType: elementType ? evaluateShorthand(elementType) : null,
+    elementType: evaluateShorthand()(elementType),
   };
 }
 
-export function makeGenericType(
-  name: string,
-  derives: TypeShorthand | null = null,
-): GenericType {
-  return {
-    name,
-    kind: 'Generic',
-    derives: derives ? evaluateShorthand(derives) : null,
-  };
-}
+// export function makeGenericType(
+//   name: string,
+//   derives: TypeShorthand | null = null,
+// ): GenericType {
+//   return {
+//     name,
+//     kind: 'Generic',
+//     derives: derives ? evaluateShorthand(derives) : null,
+//   };
+// }
 
 export function makeRecordType(fields: Record<string, TypeShorthand>): RecordType {
+  const evaluator = evaluateShorthand();
   return {
     kind: 'Record',
-    fields: mapValues(fields, evaluateShorthand),
+    fields: mapValues(fields, evaluator),
   };
 }
 
@@ -126,9 +144,10 @@ export interface InterfaceShorthand {
   parents?: InterfaceType[];
 }
 export function makeInterfaceType({ fields, methods, parents }: InterfaceShorthand): InterfaceType {
+  const evaluator = evaluateShorthand();
   return {
     kind: 'Interface',
-    fields: mapValues(fields, evaluateShorthand),
+    fields: mapValues(fields, evaluator),
     methods: methods || {},
     parents: parents || [],
   };

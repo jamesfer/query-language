@@ -2,7 +2,7 @@ import { every, first, last } from 'lodash';
 import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
 import { makeMessage } from '../../../message';
 import { Token, TokenKind } from '../../../token';
-import { makeFunctionCallExpression } from '../function/interpret-function-call';
+import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
 import { buildListInterpreter } from '../../compiler-utils/interpret-list';
 import { hasHigherPrecedence, precedences } from './precedences';

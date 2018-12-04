@@ -13,6 +13,7 @@ import {
   makeLazyIntegerValue,
 } from '../../value';
 import { toNumber, isNaN } from 'lodash';
+import { ExpressionTyper } from '../type-expression';
 
 
 function makeFloatExpression(value: number, token: Token, messages: Message[] = [])
@@ -57,15 +58,18 @@ export function interpretNumber(tokens: Token[])
   }
 }
 
-export function typeNumber(
-  scope: Scope,
-  expression: UntypedFloatExpression | UntypedIntegerExpression,
-): IntegerExpression | FloatExpression {
-  if (expression.kind === 'Integer') {
-    return { ...expression, resultType: integerType };
-  }
-  return { ...expression, resultType: floatType };
-}
+export const typeNumber: ExpressionTyper<UntypedFloatExpression | UntypedIntegerExpression> = (
+  scope,
+  typeVariables,
+  expression,
+) => {
+  // The expression is written this way because typescript doesn't understand it if the ternary is
+  // inside the object literal.
+  const numberExpression = expression.kind === 'Integer'
+    ? { ...expression, resultType: integerType }
+    : { ...expression, resultType: floatType };
+  return [typeVariables, numberExpression];
+};
 
 export function evaluateInteger(scope: Scope, expression: IntegerExpression)
 : LazyValue<IntegerValue> {

@@ -1,7 +1,10 @@
 import { makeUntypedUnrecognizedExpression, UntypedExpression } from '../untyped-expression';
 import { Token } from '../token';
 import { firstResult } from '../utils';
-import { interpretFunctionCall } from './expression-compilers/function/interpret-function-call';
+import { interpretFunction } from './expression-compilers/function';
+import {
+  interpretFunctionCall,
+} from './expression-compilers/function-call/interpret-function-call';
 import { interpretIdentifier } from './expression-compilers/identifier';
 import { buildOperatorExpression } from './expression-compilers/operators/operator';
 import { interpretParenthesis } from './expression-compilers/parenthesis';
@@ -17,12 +20,15 @@ function buildLiteralExpression(
   operatorPrecedence: number,
 ): UntypedExpression | undefined {
   if (prevExpression === null) {
-    return firstResult([
-      interpretString,
-      interpretNumber,
-      interpretArray,
-      interpretBoolean,
-    ],                 tokens);
+    return firstResult(
+      [
+        interpretString,
+        interpretNumber,
+        interpretArray,
+        interpretBoolean,
+      ],
+      tokens,
+    );
   }
 }
 
@@ -32,13 +38,19 @@ function runExpressionBuilders(
   operatorPrecedence: number = 0,
 ): UntypedExpression | undefined {
   if (tokens.length) {
-    return firstResult([
-      interpretParenthesis,
-      buildLiteralExpression,
-      interpretIdentifier,
-      interpretFunctionCall,
-      buildOperatorExpression,
-    ],                 tokens, prevExpression, operatorPrecedence);
+    return firstResult(
+      [
+        interpretParenthesis,
+        buildLiteralExpression,
+        interpretFunction,
+        interpretIdentifier,
+        interpretFunctionCall,
+        buildOperatorExpression,
+      ],
+      tokens,
+      prevExpression,
+      operatorPrecedence,
+    );
   }
 }
 

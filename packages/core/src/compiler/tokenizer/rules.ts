@@ -16,6 +16,7 @@ export const mooRules: { [k in TokenKind]: RegExp | string | string[] | Rule | R
   Colon: ':',
 
   // Operators
+  FatArrow: '=>',
   ComposeOperator: '&',
   PowerOperator: '**',
   AddOperator: '+',
@@ -30,7 +31,6 @@ export const mooRules: { [k in TokenKind]: RegExp | string | string[] | Rule | R
   NotEqual: '!=',
   Equal: '=',
   RangeOperator: '..',
-  FatArrow: '=>',
   // TODO this will collide with keywords starting with "in"
   InOperator: 'in',
 

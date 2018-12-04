@@ -9,11 +9,9 @@ import {
 } from '../utils';
 import {
   booleanType, floatType,
-  integerType, makeArrayType, makeFunctionType, noneType,
+  integerType, makeArrayType, makeFunctionType,
 } from '../../src/type/constructors';
 import { makeMessage } from '../../';
-import { Position } from '../../src/position';
-import { MessageLevel } from '../../src/message';
 
 describe('functions', function() {
   let headIdentifier = identifierExpression(

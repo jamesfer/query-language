@@ -14,6 +14,6 @@ export { booleanType } from './type/constructors';
 export { noneType } from './type/constructors';
 export { makeFunctionType } from './type/constructors';
 export { makeArrayType } from './type/constructors';
-export { makeGenericType } from './type/constructors';
+export { makeTypeVariable } from './type/constructors';
 export { makeRecordType } from './type/constructors';
 export { Position } from './position';

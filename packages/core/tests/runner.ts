@@ -17,12 +17,14 @@ import {
   ArrayExpression,
   Expression,
   FunctionCallExpression,
+  FunctionExpression,
 } from '../src/expression';
 import { Message } from '../src/message';
 import { Token } from '../src/token';
 import { Type } from '../src/type/type';
 import { assertNever } from '../src/utils';
 import { addPositions } from '../src/position';
+import { FunctionValue } from '../src/value';
 
 
 export interface ValueExpressionExpectation {
@@ -31,11 +33,18 @@ export interface ValueExpressionExpectation {
   value: any,
 }
 
-export interface FunctionExpressionExpectation {
+export interface FunctionCallExpressionExpectation {
   kind: 'FunctionCall',
   resultType: Type | null,
   functionExpression: ExpressionExpectation,
   args: (ExpressionExpectation | null)[],
+}
+
+export interface FunctionExpressionExpectation {
+  kind: 'Function',
+  resultType: Type | null,
+  functionExpression: ExpressionExpectation,
+  args: string[],
 }
 
 export interface ArrayExpressionExpectation {
@@ -45,6 +54,7 @@ export interface ArrayExpressionExpectation {
 }
 
 export type ExpressionExpectation = ValueExpressionExpectation
+  | FunctionCallExpressionExpectation
   | FunctionExpressionExpectation
   | ArrayExpressionExpectation;
 
@@ -68,6 +78,54 @@ export type MinimalEvaluationExpectation
 
 
 
+function isFunctionValue(value: FunctionValue | Expression): value is FunctionValue {
+  return value.kind === 'Function' && isFunction(value.value);
+}
+
+function compareTypes(actual: Type | null, expected: Type | null) {
+  if (actual === null || expected === null) {
+    expect(actual).to.equal(expected);
+    return;
+  }
+
+  switch (actual.kind) {
+    case 'Integer':
+    case 'Float':
+    case 'Boolean':
+    case 'String':
+    case 'None':
+    case 'Interface':
+    case 'Record':
+      expect(actual).to.deep.equal(expected);
+      return;
+
+    case 'Array':
+      expect(expected.kind).to.equal('Array');
+      if (expected.kind === 'Array') {
+        compareTypes(actual.elementType, expected.elementType);
+      }
+      return;
+
+    case 'Variable':
+      expect(expected.kind).to.equal('Variable');
+      if (expected.kind === 'Variable') {
+        expect(expected.name).to.equal(actual.name);
+      }
+      return;
+
+    case 'Function':
+      expect(expected.kind).to.equal('Function');
+      if (expected.kind === 'Function') {
+        compareTypes(actual.returnType, expected.returnType);
+        expected.argTypes.forEach((arg, index) => compareTypes(arg, actual.argTypes[index]));
+      }
+      return;
+
+    default:
+      return assertNever(actual);
+  }
+}
+
 function compareExpressions(actual: Expression | null | undefined, expected: ExpressionExpectation | null | undefined) {
   if (!actual  || !expected) {
     expect(actual).to.equal(expected);
@@ -75,10 +133,11 @@ function compareExpressions(actual: Expression | null | undefined, expected: Exp
   }
 
   expect(actual.kind).to.equal(expected.kind);
-  expect(actual.resultType).to.deep.equal(expected.resultType);
+  // expect(actual.resultType).to.deep.equal(expected.resultType);
+  compareTypes(actual.resultType, expected.resultType);
 
   switch (expected.kind) {
-    case 'Array':
+    case 'Array': {
       let actualArray = actual as ArrayExpression;
 
       // Compare elements
@@ -87,14 +146,29 @@ function compareExpressions(actual: Expression | null | undefined, expected: Exp
         compareExpressions(expression, expected.elements[index]);
       });
       break;
+    }
 
-    case 'FunctionCall':
+    case 'Function': {
+      let actualFunction = actual as FunctionExpression;
+      if (!isFunctionValue(actualFunction.value)) {
+        compareExpressions(
+          actualFunction.value,
+          expected.functionExpression,
+        );
+      }
+
+      expect(actualFunction.argumentNames).to.deep.equal(expected.args);
+      break;
+    }
+
+
+    case 'FunctionCall': {
       let actualFunction = actual as FunctionCallExpression;
 
       // Compare function expression
       compareExpressions(
         actualFunction.functionExpression,
-        expected.functionExpression
+        expected.functionExpression,
       );
 
       // Compare arguments
@@ -103,15 +177,17 @@ function compareExpressions(actual: Expression | null | undefined, expected: Exp
         compareExpressions(arg, expected.args[index]);
       });
       break;
+    }
 
     case 'String':
     case 'Identifier':
     case 'Integer':
     case 'Boolean':
-    case 'Float':
-      const ignoreKeys = ['expression', 'messages', 'tokens'];
-      expect(omit(actual, ignoreKeys)).to.deep.equal(expected);
+    case 'Float': {
+      const ignoreKeys = ['expression', 'messages', 'tokens', 'resultType'];
+      expect(omit(actual, ignoreKeys)).to.deep.equal(omit(expected, ignoreKeys));
       break;
+    }
 
     default:
       return assertNever(expected);

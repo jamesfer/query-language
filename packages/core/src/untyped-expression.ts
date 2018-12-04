@@ -1,7 +1,5 @@
 import { Message } from './message';
 import { Token } from './token';
-import { FunctionValue } from './value';
-import { Expression } from './expression';
 
 export interface UntypedExpressionInterface<K> {
   kind: K;
@@ -39,7 +37,8 @@ export interface UntypedBooleanExpression extends UntypedExpressionInterface<'Bo
 }
 
 export interface UntypedFunctionExpression extends UntypedExpressionInterface<'Function'> {
-  value: FunctionValue | Expression;
+  value: UntypedExpression;
+  arguments: Token[];
 }
 
 export interface UntypedNoneExpression extends UntypedExpressionInterface<'None'> {}

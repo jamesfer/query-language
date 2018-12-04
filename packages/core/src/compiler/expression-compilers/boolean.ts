@@ -6,6 +6,7 @@ import { UntypedBooleanExpression } from '../../untyped-expression';
 import { BooleanValue, LazyValue, makeBooleanValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
 import { tokenArrayMatches } from '../../utils';
+import { ExpressionTyper } from '../type-expression';
 
 
 export function interpretBoolean(tokens: Token[]): UntypedBooleanExpression | undefined {
@@ -20,9 +21,9 @@ export function interpretBoolean(tokens: Token[]): UntypedBooleanExpression | un
   }
 }
 
-export function typeBoolean(scope: Scope, expression: UntypedBooleanExpression): BooleanExpression {
-  return addType(expression, booleanType);
-}
+export const typeBoolean: ExpressionTyper<UntypedBooleanExpression> = (scope, typeVariables, expression) => {
+  return [typeVariables, addType(expression, booleanType)];
+};
 
 export function evaluateBoolean(scope: Scope, expression: BooleanExpression)
 : LazyValue<BooleanValue> {

@@ -17,7 +17,7 @@ export function makeFunctionCallExpression(
     ...functionExpression.tokens,
     ...argTokens || flatMap(filter(args), 'tokens'),
   ];
-  const tokens: Token[] = sortBy(unsortedTokens, 'begin');
+  const tokens: Token[] = sortBy(unsortedTokens, 'begin[1]');
   return {
     functionExpression,
     args,

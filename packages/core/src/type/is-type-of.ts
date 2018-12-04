@@ -3,7 +3,7 @@ import { makeFunctionType } from './constructors';
 import { assertNever } from '../utils';
 import {
   applyGenericMap,
-  ArrayType, createGenericMap, FunctionType, GenericType, InterfaceType, RecordType,
+  ArrayType, createGenericMap, FunctionType, InterfaceType, RecordType,
   Type,
 } from './type';
 
@@ -31,8 +31,11 @@ export function isTypeOf(base: Type, subtype?: Type | null): boolean {
       return isSubtypeOfBoolean(subtype);
     case 'None':
       return isSubtypeOfNone(subtype);
-    case 'Generic':
-      return isSubtypeOfGeneric(concreteBase, subtype);
+    // case 'Generic':
+    //   return isSubtypeOfGeneric(concreteBase, subtype);
+    case 'Variable':
+      // TODO
+      return true;
     case 'Record':
       return isSubtypeOfRecord(concreteBase, subtype);
     case 'Interface':
@@ -59,6 +62,7 @@ function isSubtypeOfString(subtype: Type): boolean {
 }
 
 function isSubtypeOfBoolean(subtype: Type): boolean {
+  // TODO a number should not be a subtype of boolean
   return subtype.kind === 'Boolean' || isSubtypeOfFloat(subtype);
 }
 
@@ -102,14 +106,14 @@ function isSubtypeOfFunction(base: FunctionType, subtype: Type): boolean {
   return isTypeOf(base.returnType, subtype.returnType);
 }
 
-function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
-  if (base.derives) {
-    const type = subtype.kind === 'Generic' ? subtype.derives : subtype;
-    return isTypeOf(base.derives, type);
-  }
-  // TODO this should probably be false, changed it to true to make typing a little more forgiving.
-  return true;
-}
+// function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
+//   if (base.derives) {
+//     const type = subtype.kind === 'Generic' ? subtype.derives : subtype;
+//     return isTypeOf(base.derives, type);
+//   }
+//   // TODO this should probably be false, changed it to true to make typing a little more forgiving.
+//   return true;
+// }
 
 function isSubtypeOfRecord(base: RecordType | InterfaceType, subtype: Type) {
   if (subtype.kind === 'Record') {
@@ -136,7 +140,7 @@ export function instantiateMethodSignature(
   type: Type,
 ): FunctionType {
   const replaceSelf = (arg: Type) => {
-    return arg.kind === 'Generic' && arg.name === 'self' ? type : arg;
+    return arg.kind === 'Variable' && arg.name === 'self' ? type : arg;
   };
   return makeFunctionType(
     map(signature.argTypes, replaceSelf),

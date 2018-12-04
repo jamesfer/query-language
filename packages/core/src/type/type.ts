@@ -12,14 +12,11 @@ export type TypeKind = 'Integer'
   | 'None'
   | 'Array'
   | 'Function'
-  | 'Generic'
+  | 'Variable'
+  // | 'Generic'
   | 'Interface'
   // | 'Method'
   | 'Record';
-
-export interface TypeInterface<K extends TypeKind> {
-  kind: K;
-}
 
 export type Type = IntegerType
   | FloatType
@@ -28,10 +25,15 @@ export type Type = IntegerType
   | NoneType
   | ArrayType
   | FunctionType
-  | GenericType
+  // | GenericType
+  | VariableType
   | InterfaceType
   // | MethodType
   | RecordType;
+
+export interface TypeInterface<K extends TypeKind> {
+  kind: K;
+}
 
 // Basic types
 export interface IntegerType extends TypeInterface<'Integer'> {}
@@ -40,7 +42,7 @@ export interface StringType extends TypeInterface<'String'> {}
 export interface BooleanType extends TypeInterface<'Boolean'> {}
 export interface NoneType extends TypeInterface<'None'> {} // TODO change to placeholder
 export interface ArrayType extends TypeInterface<'Array'> {
-  elementType: Type | null;
+  elementType: Type;
 }
 export interface RecordType extends TypeInterface<'Record'> {
   fields: Record<string, Type>;
@@ -52,10 +54,15 @@ export interface FunctionType extends TypeInterface<'Function'> {
   returnType: Type;
 }
 
-export interface GenericType extends TypeInterface<'Generic'> {
+export interface VariableType extends TypeInterface<'Variable'> {
   name: string;
-  derives: Type | null;
+  identifier: number;
 }
+
+// export interface GenericType extends TypeInterface<'Generic'> {
+//   name: string;
+//   derives: Type | null;
+// }
 
 // export interface MethodType extends TypeInterface<'Method'> {
 //   signature: FunctionType,
@@ -74,12 +81,12 @@ export interface InterfaceType extends TypeInterface<'Interface'> {
 export function createGenericMap(generic: Type | null, concrete: Type | null): Dictionary<Type> {
   if (!generic
     || !concrete
-    || generic.kind !== 'Generic' && generic.kind !== concrete.kind) {
+    || generic.kind !== 'Variable' && generic.kind !== concrete.kind) {
     return {};
   }
 
   switch (generic.kind) {
-    case 'Generic':
+    case 'Variable':
       return {
         [generic.name]: concrete,
       };
@@ -128,7 +135,7 @@ export function createGenericMap(generic: Type | null, concrete: Type | null): D
 
 export function applyGenericMap(generic: Type, genericMap: Dictionary<Type>): Type {
   switch (generic.kind) {
-    case 'Generic':
+    case 'Variable':
       return get(genericMap, generic.name, generic);
 
     case 'Array':

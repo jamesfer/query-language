@@ -1,13 +1,13 @@
+import { filter, flatMap, isEqual, last, map, uniqBy } from 'lodash';
 import { UntypedFunctionCallExpression } from 'untyped-expression';
-import { filter, last, map, flatMap, uniqBy, isEqual } from 'lodash';
+import { Expression } from '../../../expression';
 import { makeMessage, Message } from '../../../message';
-import { Scope } from '../../../scope';
+import { TypeScope, TypeVariableScope } from '../../../scope';
+import { convergeTypes } from '../../../type/converge-types';
+import { makeFunctionType, noneType } from '../../../type/constructors';
 import { applyGenericMap, createGenericMap, Type } from '../../../type/type';
-import { Expression, FunctionCallExpression } from '../../../expression';
-import { typeExpression } from '../../type-expression';
-import { isTypeOf } from '../../../type/is-type-of';
-import { makeFunctionType } from '../../../type/constructors';
 import { MessageResult, MessageStore } from '../../compiler-utils/message-store';
+import { ExpressionTyper, typeExpression } from '../../type-expression';
 
 interface PartialApplication {
   expectedArgs: Type[];
@@ -44,9 +44,9 @@ function getNextArgType(partial: PartialApplication | null): Type | null {
   if (partial) {
     const nextArg = partial.expectedArgs[partial.suppliedArgs.length];
     if (nextArg) {
-      if (nextArg.kind === 'Generic') {
-        return partial.genericMap[nextArg.name];
-      }
+      // if (nextArg.kind === 'Generic') {
+      //   return partial.genericMap[nextArg.name];
+      // }
       return nextArg;
     }
   }
@@ -96,9 +96,9 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
   return null;
 }
 
-function typeFunctionCallee(scope: Scope, expression: UntypedFunctionCallExpression)
-: MessageResult<Expression> {
-  const funcExp = typeExpression(scope, expression.functionExpression);
+function typeFunctionCallee(scope: TypeScope, typeVariables: TypeVariableScope, expression: UntypedFunctionCallExpression)
+: MessageResult<[TypeVariableScope, Expression]> {
+  const [nextTypeVariables, funcExp] = typeExpression(scope, typeVariables, expression.functionExpression);
   const funcType = funcExp.resultType;
   const messages: Message[] = [...funcExp.messages];
 
@@ -110,46 +110,61 @@ function typeFunctionCallee(scope: Scope, expression: UntypedFunctionCallExpress
     ));
   }
 
-  return [funcExp, messages];
+  return [[nextTypeVariables, funcExp], messages];
 }
 
 function typeFunctionCallArgs(
   expression: UntypedFunctionCallExpression,
-  scope: Scope,
+  scope: TypeScope,
+  typeVariables: TypeVariableScope,
   funcType: Type | null,
 ) {
   let partial = makeInitialPartial(funcType);
+  let nextTypeVariables = typeVariables;
   const typedArgs: (Expression | null)[] = [];
+
   for (let index = 0; index < expression.args.length; index += 1) {
-    const arg = expression.args[ index ];
-    if (arg) {
-      // The expected type of the argument
-      // let expectedType = getNextArgType(partial);
+    const arg = expression.args[index];
 
-      const typedArg = typeExpression(scope, arg);
-      const expectedType = getNextArgType(partial);
-
-      // Check if the expected type matches the actual type
-      if (expectedType && typedArg.resultType
-        && !isTypeOf(expectedType, typedArg.resultType)) {
-        typedArg.messages.push(makeMessage(
-          'Error',
-          'Argument has an incorrect type.',
-          typedArg.tokens[ 0 ],
-          last(typedArg.tokens),
-        ));
-      }
-
-      // Apply argument to the function
-      partial = applyArg(partial, typedArg.resultType);
-      typedArgs.push(typedArg);
-    } else {
+    // If the argument is a placeholder, skip it.
+    if (!arg) {
       partial = applyArg(partial, null);
+      continue;
     }
+
+    // Determine the argument's general type
+    const expectedType = getNextArgType(partial);
+    const [expressionVariables, typedArg] = typeExpression(scope, nextTypeVariables, arg);
+    nextTypeVariables = expressionVariables;
+
+    // Run type inference to narrow generic types
+    let convergedType: Type | null = null;
+    if (expectedType && typedArg.resultType) {
+      const [convergedTypeVariables, actualConvergedType] = convergeTypes(expectedType, typedArg.resultType, nextTypeVariables);
+      convergedType = actualConvergedType;
+      nextTypeVariables = convergedTypeVariables;
+    }
+
+    // Check if the expected type matches the actual type
+    // TODO check that these messages are still correctly being printed
+    if (!convergedType) {
+      typedArg.messages.push(makeMessage(
+        'Error',
+        'Argument has an incorrect type.',
+        typedArg.tokens[0],
+        last(typedArg.tokens),
+      ));
+    }
+
+    // Apply argument to the function
+    partial = applyArg(partial, convergedType || noneType);
+    typedArgs.push(typedArg);
   }
+
   return {
     args: typedArgs,
     resultType: inlineFunctionApplication(partial),
+    scope: nextTypeVariables,
   };
 }
 
@@ -169,16 +184,26 @@ function checkArgumentCount(
   }
 }
 
-export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallExpression)
-: FunctionCallExpression {
+export const typeFunctionCall: ExpressionTyper<UntypedFunctionCallExpression> = (
+  scope,
+  typeVariables,
+  expression,
+) => {
   const messageStore = new MessageStore();
+  let nextTypeVariables = typeVariables;
 
   // Type the function callee
-  const result = typeFunctionCallee(scope, expression);
-  const funcExp = messageStore.store(result);
+  const [inferredVariables, funcExp] = messageStore.store(typeFunctionCallee(scope, nextTypeVariables, expression));
+  nextTypeVariables = inferredVariables;
 
   // Type each of the function args
-  const { resultType, args } = typeFunctionCallArgs(expression, scope, funcExp.resultType);
+  const { resultType, args, scope: argsScope } = typeFunctionCallArgs(
+    expression,
+    scope,
+    nextTypeVariables,
+    funcExp.resultType,
+  );
+  nextTypeVariables = argsScope;
 
   // Check if the number of arguments are correct.
   messageStore.add(checkArgumentCount(funcExp.resultType, args, expression));
@@ -190,12 +215,13 @@ export function typeFunctionCall(scope: Scope, expression: UntypedFunctionCallEx
     ...flatMap(args, 'messages'),
   ];
 
-  return {
+  return [nextTypeVariables, {
     resultType,
     args,
     kind: 'FunctionCall',
     functionExpression: funcExp,
     tokens: expression.tokens,
+    // TODO shouldn't need to unique messages
     messages: uniqBy(messages, isEqual),
-  };
-}
+  }];
+};

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { range } from 'lodash';
 import { testExecute } from '../../test-utils';
 
-describe('buildRange', function() {
+describe('range', function() {
   it('should build a bounded range', function() {
     return testExecute('3..5', values => {
       expect(values.length).to.equal(2);

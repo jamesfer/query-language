@@ -2,7 +2,7 @@ import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyp
 import { Token, TokenKind } from '../../../token';
 import { tokenArrayMatches } from '../../../utils';
 import { interpretExpression } from '../../interpret-expression';
-import { makeFunctionCallExpression } from '../function/interpret-function-call';
+import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
 import { makeIdentifierExpression } from '../identifier';
 import { hasHigherPrecedence, precedences } from './precedences';
 
