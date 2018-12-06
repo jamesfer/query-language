@@ -1,12 +1,13 @@
 import { filter, flatMap, isEqual, last, map, uniqBy } from 'lodash';
 import { UntypedFunctionCallExpression } from 'untyped-expression';
-import { Expression } from '../../../expression';
+import { Expression, FunctionCallExpression } from '../../../expression';
 import { makeMessage, Message } from '../../../message';
 import { TypeScope, TypeVariableScope } from '../../../scope';
-import { convergeTypes } from '../../../type/converge-types';
 import { makeFunctionType, noneType } from '../../../type/constructors';
+import { convergeTypes } from '../../../type/converge-types';
 import { applyGenericMap, createGenericMap, Type } from '../../../type/type';
-import { MessageResult, MessageStore } from '../../compiler-utils/message-store';
+import { Log, LogValue } from '../../compiler-utils/monoids/log';
+import { LogTypeScope, LogTypeScopeValue } from '../../compiler-utils/monoids/log-type-scope';
 import { ExpressionTyper, typeExpression } from '../../type-expression';
 
 interface PartialApplication {
@@ -96,21 +97,27 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
   return null;
 }
 
-function typeFunctionCallee(scope: TypeScope, typeVariables: TypeVariableScope, expression: UntypedFunctionCallExpression)
-: MessageResult<[TypeVariableScope, Expression]> {
-  const [nextTypeVariables, funcExp] = typeExpression(scope, typeVariables, expression.functionExpression);
+function typeFunctionCallee(
+  scope: TypeScope,
+  typeVariables: TypeVariableScope,
+  expression: UntypedFunctionCallExpression,
+): LogTypeScopeValue<Expression> {
+  const logScope = LogTypeScope.fromVariables(typeVariables);
+
+  // Determine the type of the callee
+  const callee = expression.functionExpression;
+  const funcExp = logScope.combine(typeExpression(scope, typeVariables, callee));
   const funcType = funcExp.resultType;
-  const messages: Message[] = [...funcExp.messages];
 
   if (funcType && funcType.kind !== 'Function') {
-    messages.push(makeMessage(
+    logScope.push(makeMessage(
       'Error',
       'Cannot call an expression that is not a function.',
       funcExp.tokens[0],
     ));
   }
 
-  return [[nextTypeVariables, funcExp], messages];
+  return logScope.wrap(funcExp);
 }
 
 function typeFunctionCallArgs(
@@ -119,8 +126,8 @@ function typeFunctionCallArgs(
   typeVariables: TypeVariableScope,
   funcType: Type | null,
 ) {
+  const logScope = LogTypeScope.fromVariables(typeVariables);
   let partial = makeInitialPartial(funcType);
-  let nextTypeVariables = typeVariables;
   const typedArgs: (Expression | null)[] = [];
 
   for (let index = 0; index < expression.args.length; index += 1) {
@@ -134,21 +141,20 @@ function typeFunctionCallArgs(
 
     // Determine the argument's general type
     const expectedType = getNextArgType(partial);
-    const [expressionVariables, typedArg] = typeExpression(scope, nextTypeVariables, arg);
-    nextTypeVariables = expressionVariables;
+    const typedArg = logScope.combine(typeExpression(scope, logScope.getScope(), arg));
 
     // Run type inference to narrow generic types
     let convergedType: Type | null = null;
     if (expectedType && typedArg.resultType) {
-      const [convergedTypeVariables, actualConvergedType] = convergeTypes(expectedType, typedArg.resultType, nextTypeVariables);
-      convergedType = actualConvergedType;
-      nextTypeVariables = convergedTypeVariables;
+      convergedType = logScope.combine(
+        convergeTypes(expectedType, typedArg.resultType, logScope.getScope())
+      );
     }
 
     // Check if the expected type matches the actual type
     // TODO check that these messages are still correctly being printed
     if (!convergedType) {
-      typedArg.messages.push(makeMessage(
+      logScope.push(makeMessage(
         'Error',
         'Argument has an incorrect type.',
         typedArg.tokens[0],
@@ -161,27 +167,31 @@ function typeFunctionCallArgs(
     typedArgs.push(typedArg);
   }
 
-  return {
+  return logScope.wrap({
     args: typedArgs,
     resultType: inlineFunctionApplication(partial),
-    scope: nextTypeVariables,
-  };
+  });
 }
 
 function checkArgumentCount(
   funcType: Type | null,
   typedArgs: (Expression | any)[],
   expression: UntypedFunctionCallExpression,
-): Message | undefined {
-  if (funcType && funcType.kind === 'Function'
-    && typedArgs.length > funcType.argTypes.length) {
-    return makeMessage(
+): LogTypeScopeValue<void> {
+  const logScope = LogTypeScope.empty();
+  if (
+    funcType
+    && funcType.kind === 'Function'
+    && typedArgs.length > funcType.argTypes.length
+  ) {
+    logScope.push(makeMessage(
       'Error',
       'Too many arguments supplied to function call.',
       expression.tokens[ 0 ],
       last(expression.tokens),
-    );
+    ));
   }
+  return logScope.wrap(undefined);
 }
 
 export const typeFunctionCall: ExpressionTyper<UntypedFunctionCallExpression> = (
@@ -189,39 +199,28 @@ export const typeFunctionCall: ExpressionTyper<UntypedFunctionCallExpression> = 
   typeVariables,
   expression,
 ) => {
-  const messageStore = new MessageStore();
-  let nextTypeVariables = typeVariables;
+  const logScope = LogTypeScope.fromVariables(typeVariables);
 
   // Type the function callee
-  const [inferredVariables, funcExp] = messageStore.store(typeFunctionCallee(scope, nextTypeVariables, expression));
-  nextTypeVariables = inferredVariables;
+  const funcExp = logScope.combine(typeFunctionCallee(scope, logScope.getScope(), expression));
 
   // Type each of the function args
-  const { resultType, args, scope: argsScope } = typeFunctionCallArgs(
+  const { resultType, args } = logScope.combine(typeFunctionCallArgs(
     expression,
     scope,
-    nextTypeVariables,
+    logScope.getScope(),
     funcExp.resultType,
-  );
-  nextTypeVariables = argsScope;
+  ));
 
   // Check if the number of arguments are correct.
-  messageStore.add(checkArgumentCount(funcExp.resultType, args, expression));
+  logScope.combine(checkArgumentCount(funcExp.resultType, args, expression));
 
-  // Add all argument messages to the messageStore
-  const messages: Message[] = [
-    ...expression.messages,
-    ...messageStore.messages,
-    ...flatMap(args, 'messages'),
-  ];
-
-  return [nextTypeVariables, {
+  // TODO check if messages are being duplicated as previously they were
+  return logScope.wrap<FunctionCallExpression>({
     resultType,
     args,
     kind: 'FunctionCall',
     functionExpression: funcExp,
     tokens: expression.tokens,
-    // TODO shouldn't need to unique messages
-    messages: uniqBy(messages, isEqual),
-  }];
+  });
 };

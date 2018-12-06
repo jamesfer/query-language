@@ -4,14 +4,15 @@ import { Token, TokenKind } from '../../token';
 import { tokenArrayMatches } from '../../utils';
 import { interpretExpression } from '../interpret-expression';
 import { first, last } from 'lodash';
-import { MessageResult, MessageStore } from './message-store';
+import { LogValue, Log } from './monoids/log';
 
 function consumeElementAndSep(
   sepToken: TokenKind,
   incomingTokens: Token[],
-): { expression: UntypedExpression | undefined, sep: Token | null } {
+): LogValue<{ expression: UntypedExpression | undefined, sep: Token | null }> {
   let tokens = incomingTokens;
-  const expression = interpretExpression(tokens);
+  const log = Log.empty();
+  const expression = log.combine(interpretExpression(tokens));
   if (expression) {
     tokens = tokens.slice(expression.tokens.length);
   }
@@ -21,22 +22,21 @@ function consumeElementAndSep(
     sep = tokens[0];
   }
 
-  return { expression, sep };
+  return log.wrap({ expression, sep });
 }
 
 function consumeList(
   closeToken: TokenKind,
   sepToken: TokenKind,
   incomingTokens: Token[],
-): MessageResult<{ expressions: UntypedExpression[], tokens: Token[] }> {
+): LogValue<{ expressions: UntypedExpression[], tokens: Token[] }> {
   let tokens = incomingTokens;
-  const messageStore = new MessageStore();
+  const log = Log.empty();
   const expressions: UntypedExpression[] = [];
   let usedTokens: Token[] = [];
 
   while (tokens.length && !tokenArrayMatches(tokens, closeToken)) {
-    const { expression, sep } = consumeElementAndSep(sepToken, tokens);
-
+    const { expression, sep } = log.combine(consumeElementAndSep(sepToken, tokens));
     if (expression) {
       expressions.push(expression);
       tokens = tokens.slice(expression.tokens.length);
@@ -45,7 +45,7 @@ function consumeList(
       if (!sep && !tokenArrayMatches(tokens, closeToken) && tokens.length) {
         const lastToken = last(usedTokens);
         const nextToken = tokens[0];
-        messageStore.add(makeMessage(
+        log.push(makeMessage(
           'Error',
           'Missing separator between items',
           lastToken ? lastToken.end : nextToken.begin,
@@ -58,7 +58,7 @@ function consumeList(
       tokens = tokens.slice(1);
 
       if (!expression) {
-        messageStore.add(makeMessage(
+        log.push(makeMessage(
           'Error',
           'Unneeded separator between items',
           sep,
@@ -73,14 +73,12 @@ function consumeList(
     }
   }
 
-  return messageStore.makeResult({
-    expressions,
-    tokens: usedTokens,
-  });
+  return log.wrap({ expressions, tokens: usedTokens });
 }
 
-export type ListInterpreter = (tokens: Token[]) =>
-  MessageResult<{ expressions: UntypedExpression[], tokens: Token[] }> | undefined;
+export type ListInterpreter = (tokens: Token[])
+  => LogValue<{ expressions: UntypedExpression[], tokens: Token[] } | undefined>;
+
 export function buildListInterpreter(
   openToken: TokenKind,
   closeToken: TokenKind,
@@ -90,11 +88,11 @@ export function buildListInterpreter(
   return (incomingTokens) => {
     let tokens = incomingTokens;
     if (tokenArrayMatches(tokens, openToken)) {
-      const messageStore = new MessageStore();
+      const log = Log.empty();
       const openingToken = tokens[0];
       tokens = tokens.slice(1);
 
-      const list = messageStore.store(consumeList(closeToken, sepToken, tokens));
+      const list = log.combine(consumeList(closeToken, sepToken, tokens));
       tokens = tokens.slice(list.tokens.length);
       list.tokens = [openingToken, ...list.tokens];
 
@@ -102,13 +100,13 @@ export function buildListInterpreter(
         list.tokens.push(tokens[0]);
       } else {
         const lastToken = last(list.tokens) || openingToken;
-        messageStore.add(makeMessage('Error', 'Missing closing token', lastToken));
+        log.push(makeMessage('Error', 'Missing closing token', lastToken));
       }
 
       if (maxItems !== -1 && list.expressions.length > maxItems) {
         const firstExcessiveToken = first(list.expressions[maxItems].tokens);
         const lastToken = last(list.tokens) || openingToken;
-        messageStore.add(makeMessage(
+        log.push(makeMessage(
           'Error',
           'Too many elements',
           firstExcessiveToken || openingToken,
@@ -116,7 +114,8 @@ export function buildListInterpreter(
         ));
       }
 
-      return messageStore.makeResult(list);
+      return log.wrap(list);
     }
+    return Log.of(undefined);
   };
 }

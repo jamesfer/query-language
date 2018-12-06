@@ -22,7 +22,6 @@ import { FunctionValue } from './value';
 export interface ExpressionInterface<K extends string, T extends (Type | null) = Type | null> {
   kind: K;
   resultType: T;
-  messages: Message[];
   tokens: Token[];
 }
 
@@ -84,15 +83,13 @@ export type Expression = FunctionCallExpression
   | MethodExpression
   | FunctionExpression;
 
-
 /* tslint:disable:max-line-length */
-export function addType(expression: UntypedStringExpression, resultType: StringType, messages?: Message[]): StringExpression;
-export function addType(expression: UntypedBooleanExpression, resultType: BooleanType, messages?: Message[]): BooleanExpression;
-export function addType(expression: UntypedIdentifierExpression, resultType: Type | null, messages?: Message[]): IdentifierExpression;
-export function addType(expression: UntypedNoneExpression, resultType: NoneType, messages?: Message[]): NoneExpression;
-export function addType(expression: UntypedExpression, resultType: null, messages?: Message[]): UnrecognizedExpression;
-export function addType(expression: UntypedExpression, resultType: Type | null, messages: Message[] = []): Expression {
-  expression.messages = expression.messages.concat(messages);
+export function addType(expression: UntypedStringExpression, resultType: StringType): StringExpression;
+export function addType(expression: UntypedBooleanExpression, resultType: BooleanType): BooleanExpression;
+export function addType(expression: UntypedIdentifierExpression, resultType: Type | null): IdentifierExpression;
+export function addType(expression: UntypedNoneExpression, resultType: NoneType): NoneExpression;
+export function addType(expression: UntypedExpression, resultType: null): UnrecognizedExpression;
+export function addType(expression: UntypedExpression, resultType: Type | null): Expression {
   return assign(expression, { resultType }) as Expression;
 }
 /* tslint:enable:max-line-length */

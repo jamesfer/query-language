@@ -1,10 +1,8 @@
-import { Message } from './message';
 import { Token } from './token';
 
 export interface UntypedExpressionInterface<K> {
   kind: K;
   tokens: Token[];
-  messages: Message[];
 }
 
 export interface UntypedFunctionCallExpression extends UntypedExpressionInterface<'FunctionCall'> {
@@ -60,15 +58,13 @@ export function makeUntypedNoneExpression(): UntypedNoneExpression {
   return {
     kind: 'None',
     tokens: [],
-    messages: [],
   };
 }
 
-export function makeUntypedUnrecognizedExpression(tokens: Token[], messages: Message[] = [])
+export function makeUntypedUnrecognizedExpression(tokens: Token[])
 : UntypedUnrecognizedExpression {
   return {
     tokens,
-    messages,
     kind: 'Unrecognized',
   };
 }

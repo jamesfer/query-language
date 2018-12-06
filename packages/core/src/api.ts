@@ -1,5 +1,6 @@
 import { isEqual, reduce, uniqWith, Dictionary } from 'lodash';
 import { Observable } from 'rxjs/Observable';
+import { LogTypeScope } from './compiler/compiler-utils/monoids/log-type-scope';
 import { Message } from './message';
 import { convertToScope } from './standard-library/library';
 import { Scope } from './scope';
@@ -12,6 +13,7 @@ import { evaluateSyntaxTree } from './compiler/evaluate-expression';
 import { monotizeBaseExpression } from './compiler/monotize-expression';
 import { tokenize } from './compiler/tokenizer/tokenize';
 import { Type } from './type/type';
+import { Log } from './compiler/compiler-utils/monoids/log';
 
 
 export interface CompilationResult {
@@ -41,15 +43,16 @@ function extractMessages(expressions: MessageContainer[]): Message[] {
 }
 
 export function compile(code: string, scope?: Scope): CompilationResult {
+  const log = Log.empty();
+
   // Parse Tokens
   const tokens = tokenize(code);
 
   // Interpret expression
-  const expressions = interpretSyntaxTree(tokens);
+  const expressions = log.combine(interpretSyntaxTree(tokens));
   const [expression] = expressions;
-  let messages = extractMessages(expressions);
   if (!expression) {
-    return { tokens, messages, compiled: false };
+    return { tokens, messages: log.getState(), compiled: false };
   }
 
   // Type expression
@@ -62,24 +65,23 @@ export function compile(code: string, scope?: Scope): CompilationResult {
       typeScope[key] = type;
     }
   }
-  const [, typedExpression] = typeExpression(
+
+  const logScope = LogTypeScope.empty();
+  const typedExpression = logScope.combine(typeExpression(
     { parent: null, types: typeScope },
     { variables: {} },
     expression,
-  );
-  messages = [...messages, ...typedExpression.messages];
+  ));
+  log.append(logScope.getLog());
 
   // Monotize expression (convert poly-types to mono-types)
   const monotypeExpression = monotizeBaseExpression(typedExpression);
-  messages = [...messages, ...monotypeExpression.messages];
-  // TODO we should not have to unique the arrays before returning them
-  // TODO need a better protocol when generating messages in each step
-  messages = uniqWith(messages, isEqual);
-  const result = { tokens, messages, expression: monotypeExpression };
-  if (monotypeExpression.kind === 'Unrecognized' || messages.length > 0) {
-    return { ...result, compiled: false };
-  }
-  return { ...result, compiled: true };
+
+  const result = { tokens, messages: log.getState(), expression: monotypeExpression };
+  return {
+    ...result,
+    compiled: monotypeExpression.kind !== 'Unrecognized' && log.getState().length === 0,
+  };
 }
 
 export function evaluate(expression: Expression, scope?: Scope): EvaluationResult {

@@ -1,9 +1,8 @@
-import { flatMap, sortBy, filter } from 'lodash';
-import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
-import { Message } from '../../../message';
+import { filter, flatMap, sortBy } from 'lodash';
 import { Token, TokenKind } from '../../../token';
+import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
 import { buildListInterpreter } from '../../compiler-utils/interpret-list';
-import { normalizeMessageResult } from '../../compiler-utils/message-store';
+import { Log } from '../../compiler-utils/monoids/log';
 import { ExpressionInterpreter } from '../../interpret-expression';
 
 export const functionCallPrecedence = 100;
@@ -11,7 +10,6 @@ export const functionCallPrecedence = 100;
 export function makeFunctionCallExpression(
   functionExpression: UntypedExpression,
   args: (UntypedExpression | any)[],
-  messages: Message[] = [],
   argTokens?: Token[],
 ): UntypedFunctionCallExpression {
   const unsortedTokens = [
@@ -23,7 +21,6 @@ export function makeFunctionCallExpression(
     functionExpression,
     args,
     tokens,
-    messages,
     kind: 'FunctionCall',
   };
 }
@@ -33,16 +30,15 @@ const buildArguments
 
 export const interpretFunctionCall: ExpressionInterpreter = (tokens, left, precedence) => {
   if (precedence < functionCallPrecedence && left !== null) {
-    const result = buildArguments(tokens);
+    const log = Log.empty();
+    const result = log.combine(buildArguments(tokens));
     if (result) {
-      const [args, messages] = result;
-      return makeFunctionCallExpression(
+      return log.wrap(makeFunctionCallExpression(
         left,
-        args.expressions,
-        normalizeMessageResult(messages),
-        args.tokens,
-      );
+        result.expressions,
+        result.tokens,
+      ));
     }
   }
-  return undefined;
+  return Log.of(undefined);
 };

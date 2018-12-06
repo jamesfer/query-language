@@ -6,25 +6,26 @@ import { UntypedBooleanExpression } from '../../untyped-expression';
 import { BooleanValue, LazyValue, makeBooleanValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
 import { tokenArrayMatches } from '../../utils';
+import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
 import { ExpressionInterpreter } from '../interpret-expression';
 import { ExpressionTyper } from '../type-expression';
+import { Log } from '../compiler-utils/monoids/log';
 
 
 export const interpretBoolean: ExpressionInterpreter = (tokens) => {
   if (tokenArrayMatches(tokens, TokenKind.BooleanLiteral)) {
     const booleanToken = tokens[0];
-    return {
+    return Log.of<UntypedBooleanExpression>({
       kind: 'Boolean',
       tokens: [booleanToken],
-      messages: [],
       value: booleanToken.value === 'true',
-    };
+    });
   }
-  return undefined;
+  return Log.of(undefined);
 };
 
 export const typeBoolean: ExpressionTyper<UntypedBooleanExpression> = (scope, typeVariables, expression) => {
-  return [typeVariables, addType(expression, booleanType)];
+  return LogTypeScope.wrapWithVariables(typeVariables, addType(expression, booleanType));
 };
 
 export function evaluateBoolean(scope: Scope, expression: BooleanExpression)

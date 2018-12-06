@@ -4,6 +4,7 @@ import { ExpressionInterpreter, interpretExpression } from '../../interpret-expr
 import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
 import { makeIdentifierExpression } from '../identifier';
 import { hasHigherPrecedence, precedences } from './precedences';
+import { Log } from '../../compiler-utils/monoids/log';
 
 
 export const interpretUnaryMinusOperator: ExpressionInterpreter = (tokens, left, precedence) => {
@@ -11,11 +12,12 @@ export const interpretUnaryMinusOperator: ExpressionInterpreter = (tokens, left,
     && left === null
     && hasHigherPrecedence(precedences.unaryMinus, precedence)
   ) {
-    const rightExpression = interpretExpression(
+    const log = Log.empty();
+    const rightExpression = log.combine(interpretExpression(
       tokens.slice(1),
       null,
       precedences.unaryMinus.precedence,
-    );
+    ));
 
     if (rightExpression) {
       const identifierExpression = makeIdentifierExpression(tokens[0]);
@@ -23,14 +25,13 @@ export const interpretUnaryMinusOperator: ExpressionInterpreter = (tokens, left,
         kind: 'Integer',
         value: 0,
         tokens: [],
-        messages: [],
       };
 
-      return makeFunctionCallExpression(identifierExpression, [
+      return log.wrap(makeFunctionCallExpression(identifierExpression, [
         integerExpression,
         rightExpression,
-      ]);
+      ]));
     }
   }
-  return undefined;
+  return Log.of(undefined);
 };

@@ -1,5 +1,4 @@
-import { firstResult } from '../../../utils';
-import { ExpressionInterpreter } from '../../interpret-expression';
+import { coalesceLogs, ExpressionInterpreter } from '../../interpret-expression';
 import { interpretArraySliceOperator } from './array-slice-operator';
 import { interpretInfixOperator } from './basic-infix-operator';
 import { interpretRangeOperator } from './range-operator';
@@ -13,5 +12,5 @@ export const interpretOperatorExpression: ExpressionInterpreter = (tokens, left,
     interpretArraySliceOperator,
     interpretRangeOperator,
   ];
-  return firstResult(interpreters, tokens, left, precedences);
+  return coalesceLogs(interpreters, tokens, left, precedences);
 };

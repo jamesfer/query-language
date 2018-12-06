@@ -27,7 +27,7 @@ export function findTypeInScope(scope: TypeScope, identifier: string): Type | nu
  * Creates a new scope with the given scope as it's parent. Effectively expands the current scope
  * with new variables.
  */
-export function expandTypeScope(scope: TypeScope, types: { [k: string]: Type }) {
+export function expandTypeScope(scope: TypeScope, types: { [k: string]: Type }): TypeScope {
   return { types, parent: scope };
 }
 

@@ -95,7 +95,6 @@ export function monotizeExpression(expression: Expression, expectedType: Type): 
         return {
           kind: 'Function',
           tokens: expression.tokens,
-          messages: expression.messages,
           resultType: expectedType,
           value: implementationValue.value,
           argumentNames: implementationValue.argumentNames,

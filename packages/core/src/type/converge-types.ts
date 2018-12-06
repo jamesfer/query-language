@@ -1,3 +1,4 @@
+import { LogTypeScope, LogTypeScopeValue } from '../compiler/compiler-utils/monoids/log-type-scope';
 import {
   assignTypeVariableInScope,
   findTypeVariableInScope,
@@ -11,95 +12,98 @@ export function convergeTypes(
   a: Type,
   b: Type,
   typeVariables: TypeVariableScope,
-): [TypeVariableScope, Type | null] {
+): LogTypeScopeValue<Type | null> {
   // Having the first argument as variable is easier to deal with. So swap them if b is varialbe and
   // a is not
   if (b.kind === 'Variable' && a.kind !== 'Variable') {
     return convergeTypes(b, a, typeVariables);
   }
 
+  const logScope = LogTypeScope.fromVariables(typeVariables);
   switch (a.kind) {
     case 'None':
     case 'String':
-      return [typeVariables, b.kind === a.kind ? a : null];
+      return logScope.wrap(b.kind === a.kind ? a : null);
 
     case 'Boolean': {
       // TODO a number should not be a subtype of boolean
       const isBoolean = b.kind === 'Boolean' || b.kind === 'Integer' || b.kind === 'Float';
-      return [typeVariables, isBoolean ? a : null];
+      return logScope.wrap(isBoolean ? a : null);
     }
 
     case 'Integer':
     case 'Float':
       // TODO temporarily, all floats are considered integers until the float only functions are
       // TODO converted to interfaces
-      return [typeVariables, b.kind === 'Float' || b.kind === 'Integer' ? a : null];
+      return logScope.wrap(b.kind === 'Float' || b.kind === 'Integer' ? a : null);
 
     case 'Array':
       if (b.kind === 'Array') {
-        const [scope, elementType] = convergeTypes(a.elementType, b.elementType, typeVariables);
+        const elementType = logScope.combine(
+          convergeTypes(a.elementType, b.elementType, logScope.getScope()),
+        );
         if (elementType) {
-          return [scope, makeArrayType(elementType)];
+          return logScope.wrap(makeArrayType(elementType));
         }
       }
-      return [typeVariables, null];
+      return logScope.wrap(null);
 
     case 'Function':
       if (b.kind === 'Function' && b.argTypes.length === a.argTypes.length) {
         // Find the common types of all arguments
-        let nextTypeVariableScope = typeVariables;
         let failedToConvergeArgs = false;
         const commonArgTypes = a.argTypes.map((argOfA, index) => {
-          const [convergedScope, commonType] = convergeTypes(
+          const commonType = logScope.combine(convergeTypes(
             argOfA,
             b.argTypes[index],
-            nextTypeVariableScope,
-          );
-          nextTypeVariableScope = convergedScope;
+            logScope.getScope(),
+          ));
           failedToConvergeArgs = failedToConvergeArgs || commonType === null;
           return commonType;
         });
+
         // Return null if any of the arguments failed to converge
         if (failedToConvergeArgs) {
-          return [nextTypeVariableScope, null];
+          return logScope.wrap(null);
         }
 
-        const [bodyTypeVariableScope, commonBodyType] = convergeTypes(
+        const commonBodyType = logScope.combine(convergeTypes(
           a.returnType,
           b.returnType,
-          nextTypeVariableScope,
-        );
+          logScope.getScope(),
+        ));
         if (!commonBodyType) {
-          return [bodyTypeVariableScope, null];
+          return logScope.wrap(null);
         }
 
         // While we performed a check above to ensure that none of the arguments were null,
         // Typescript still thinks that some arg types may be null. Hence the need for a typecast.
-        return [bodyTypeVariableScope, makeFunctionType(commonArgTypes as Type[], commonBodyType)];
+        return logScope.wrap(makeFunctionType(commonArgTypes as Type[], commonBodyType));
       }
-      return [typeVariables, null];
+      return logScope.wrap(null);
 
     case 'Variable': {
-      const realAType = findTypeVariableInScope(typeVariables, a.identifier);
+      const realAType = findTypeVariableInScope(logScope.getScope(), a.identifier);
       // if (b.kind !== 'Variable') {
         if (!realAType) {
           // If b is not a variable and a doesn't exist in the scope, then it should just be
           // assigned to b
-          return [assignTypeVariableInScope(typeVariables, a.identifier, b), b];
+          logScope.appendScope(assignTypeVariableInScope(logScope.getScope(), a.identifier, b));
+          return logScope.wrap(b);
         }
 
         // If a does exist in the scope, then it needs to be converged with b
-        const [newVariableScope, convergedType] = convergeTypes(realAType, b, typeVariables);
+        const convergedType = logScope.combine(convergeTypes(realAType, b, logScope.getScope()));
         if (convergedType) {
           // If a and b successfully converge, then assign a to the converged type.
-          return [
-            assignTypeVariableInScope(newVariableScope, a.identifier, convergedType),
-            convergedType,
-          ];
+          logScope.appendScope(
+            assignTypeVariableInScope(logScope.getScope(), a.identifier, convergedType)
+          );
+          return logScope.wrap(convergedType);
         }
 
         // If a and b don't successfully converge, just return null
-        return [typeVariables, null];
+        return logScope.wrap(null);
       // }
       // TODO may need to put extra logic in here for the cases where a and b are variables
     }
@@ -107,7 +111,7 @@ export function convergeTypes(
     // TODO
     case 'Interface':
     case 'Record':
-      return [typeVariables, null];
+      return logScope.wrap(null);
 
     default:
       return assertNever(a);

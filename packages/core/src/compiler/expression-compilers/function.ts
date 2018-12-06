@@ -18,10 +18,13 @@ import { FunctionValue, lazyNoneValue, LazyValue, PlainFunctionValue } from '../
 import { evaluateExpression } from '../evaluate-expression';
 import { ExpressionInterpreter, interpretExpression } from '../interpret-expression';
 import { ExpressionTyper, makeUnrecognizedExpression, typeExpression } from '../type-expression';
+import { Log } from '../compiler-utils/monoids/log';
+import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
 
 
 export const interpretFunction: ExpressionInterpreter = (incomingTokens) => {
   if (tokenArrayMatches(incomingTokens, TokenKind.Identifier)) {
+    const log = Log.empty();
     // TODO support multiple arguments
     const argToken = incomingTokens[0];
     let tokens = incomingTokens.slice(1);
@@ -29,21 +32,23 @@ export const interpretFunction: ExpressionInterpreter = (incomingTokens) => {
       const arrowToken = tokens[0];
       tokens = tokens.slice(1);
 
-      const bodyExpression = interpretExpression(tokens) || makeUntypedUnrecognizedExpression([]);
-      return {
+      const bodyExpression = log.combine(interpretExpression(tokens))
+        || makeUntypedUnrecognizedExpression([]);
+      return log.wrap<UntypedFunctionExpression>({
         kind: 'Function',
         arguments: [argToken],
         tokens: [argToken, arrowToken, ...bodyExpression.tokens],
-        messages: [],
         value: bodyExpression,
-      };
+      });
     }
   }
-  return undefined;
+  return Log.of(undefined);
 };
 
 
 export const typeFunction: ExpressionTyper<UntypedFunctionExpression> = (scope, typeVariables, expression) => {
+  const logScope = LogTypeScope.fromVariables(typeVariables);
+
   // Create inner function scope
   const argumentTypes: Dictionary<VariableType> = {};
   expression.arguments.forEach((argument) => {
@@ -52,25 +57,26 @@ export const typeFunction: ExpressionTyper<UntypedFunctionExpression> = (scope, 
   const functionScope = expandTypeScope(scope, argumentTypes);
 
   // Determine the type of the function body
-  const [inferredVariables, maybeBodyExpression] = typeExpression(functionScope, typeVariables, expression.value);
+  const typeExpressionResult = typeExpression(functionScope, typeVariables, expression.value);
+  const maybeBodyExpression = logScope.combine(typeExpressionResult);
   const bodyExpression = maybeBodyExpression || makeUnrecognizedExpression(expression.value);
+
+  // TODO add messages if any typing failed
 
   // Create the inferred function type
   const inferredArgumentTypes = Object.values(argumentTypes).map(argumentType => (
-    findTypeVariableInScope(inferredVariables, argumentType.identifier) || noneType
+    findTypeVariableInScope(logScope.getScope(), argumentType.identifier) || noneType
   ));
   const bodyType = bodyExpression.resultType || noneType;
   const inferredFunctionType = makeFunctionType(inferredArgumentTypes, bodyType);
 
-  return [inferredVariables, {
+  return logScope.wrap<FunctionExpression>({
     kind: 'Function',
     resultType: inferredFunctionType,
     value: bodyExpression,
     argumentNames: expression.arguments.map(arg => arg.value),
     tokens: expression.tokens,
-    // TODO add messages if any typing failed
-    messages: [],
-  }];
+  });
 };
 
 function isFunctionValue(value: FunctionValue | Expression): value is FunctionValue {

@@ -2,6 +2,7 @@ import { Scope, TypeScope, TypeVariableScope } from '../scope';
 import { UntypedExpression, UntypedNoneExpression } from '../untyped-expression';
 import { addType, Expression, NoneExpression } from '../expression';
 import { assertNever } from '../utils';
+import { LogTypeScope, LogTypeScopeState, LogTypeScopeValue } from './compiler-utils/monoids/log-type-scope';
 import { typeArray } from './expression-compilers/array';
 import { typeFunction } from './expression-compilers/function';
 import { typeFunctionCall } from './expression-compilers/function-call/type-function-call';
@@ -10,12 +11,13 @@ import { typeNumber } from './expression-compilers/number';
 import { typeString } from './expression-compilers/string';
 import { noneType } from '../type/constructors';
 import { typeBoolean } from './expression-compilers/boolean';
+import { TypeVariables } from './compiler-utils/monoids/type-variables';
 
 export type ExpressionTyper<E extends UntypedExpression = UntypedExpression> = (
   scope: TypeScope,
   typeVariables: TypeVariableScope,
   expression: E,
-) => [TypeVariableScope, Expression];
+) => LogTypeScopeValue<Expression>;
 
 export const typeExpression: ExpressionTyper = (scope, typeVariables, expression) => {
   switch (expression.kind) {
@@ -35,9 +37,9 @@ export const typeExpression: ExpressionTyper = (scope, typeVariables, expression
     case 'Function':
       return typeFunction(scope, typeVariables, expression);
     case 'None':
-      return [typeVariables, makeNoneExpression(expression)];
+      return LogTypeScope.fromVariables(typeVariables).wrap(makeNoneExpression(expression));
     case 'Unrecognized':
-      return [typeVariables, makeUnrecognizedExpression(expression)];
+      return LogTypeScope.fromVariables(typeVariables).wrap(makeUnrecognizedExpression(expression));
     default:
       return assertNever(expression);
   }

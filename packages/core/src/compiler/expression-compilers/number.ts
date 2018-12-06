@@ -15,23 +15,21 @@ import {
 import { toNumber, isNaN } from 'lodash';
 import { ExpressionInterpreter } from '../interpret-expression';
 import { ExpressionTyper } from '../type-expression';
+import { Log } from '../compiler-utils/monoids/log';
+import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
 
 
-function makeFloatExpression(value: number, token: Token, messages: Message[] = [])
-: UntypedFloatExpression {
+function makeFloatExpression(value: number, token: Token): UntypedFloatExpression {
   return {
     value,
-    messages,
     kind: 'Float',
     tokens: [token],
   };
 }
 
-export function makeIntegerExpression(value: number, token: Token, messages: Message[] = [])
-: UntypedIntegerExpression {
+export function makeIntegerExpression(value: number, token: Token): UntypedIntegerExpression {
   return {
     value,
-    messages,
     kind: 'Integer',
     tokens: [token],
   };
@@ -40,23 +38,23 @@ export function makeIntegerExpression(value: number, token: Token, messages: Mes
 export const interpretNumber: ExpressionInterpreter = (tokens) => {
   if (tokenArrayMatches(tokens, TokenKind.FloatLiteral)
     || tokenArrayMatches(tokens, TokenKind.IntegerLiteral)) {
+    const log = Log.empty();
     const token = tokens[0];
     const value = +token.value;
 
-    const messages: Message[] = [];
     if (isNaN(value)) {
-      messages.push(makeMessage('Error', 'Not a valid number.', token));
+      log.push(makeMessage('Error', 'Not a valid number.', token));
     } else if (value === Infinity || value === -Infinity) {
       const message = 'Value cannot be represented as a number.';
-      messages.push(makeMessage('Error', message, token));
+      log.push(makeMessage('Error', message, token));
     }
 
     if (token.kind === TokenKind.IntegerLiteral) {
-      return makeIntegerExpression(value, token, messages);
+      return log.wrap(makeIntegerExpression(value, token));
     }
-    return makeFloatExpression(value, token, messages);
+    return log.wrap(makeFloatExpression(value, token));
   }
-  return undefined;
+  return Log.of(undefined);
 };
 
 export const typeNumber: ExpressionTyper<UntypedFloatExpression | UntypedIntegerExpression> = (
@@ -67,9 +65,9 @@ export const typeNumber: ExpressionTyper<UntypedFloatExpression | UntypedInteger
   // The expression is written this way because typescript doesn't understand it if the ternary is
   // inside the object literal.
   const numberExpression = expression.kind === 'Integer'
-    ? { ...expression, resultType: integerType }
-    : { ...expression, resultType: floatType };
-  return [typeVariables, numberExpression];
+    ? { ...expression, messages: [], resultType: integerType }
+    : { ...expression, messages: [], resultType: floatType };
+  return LogTypeScope.wrapWithVariables(typeVariables, numberExpression);
 };
 
 export function evaluateInteger(scope: Scope, expression: IntegerExpression)
