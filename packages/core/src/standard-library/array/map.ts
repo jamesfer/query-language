@@ -1,18 +1,23 @@
 import { of } from 'rxjs/observable/of';
 import { makeArrayType, makeFunctionType } from '../../type/constructors';
 import { makeLazyArrayValue, PlainFunctionValue, Value } from '../../value';
-import { LibraryFunction } from '../library';
+import { NativeFunction } from '../../library';
 import { evalArgs } from '../library-utils';
 import { Observable } from 'rxjs/Observable';
 
 function mapFunc(func: PlainFunctionValue, list: Observable<Value>) {
-  return makeLazyArrayValue(list.switchMap(value => func(of(value))));
+  // TODO work out how to pass interfaces to lower functions
+  return makeLazyArrayValue(list.switchMap(value => func()(of(value))));
 }
 
-export const map: LibraryFunction = {
-  type: makeFunctionType([
-    makeFunctionType(['T'], 'R'),
+export const map: NativeFunction = {
+  type: makeFunctionType(
+    [],
+    [
+      makeFunctionType([], ['T'], 'R'),
+      makeArrayType('T'),
+    ],
     makeArrayType('T'),
-  ],                     makeArrayType('T')),
-  impl: evalArgs(mapFunc),
+  ),
+  implementation: evalArgs(mapFunc),
 };

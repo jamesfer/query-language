@@ -4,10 +4,10 @@ import { head } from './head';
 import { take } from './take';
 import { inFunc } from './in';
 import { range } from './range';
-import { Library } from 'standard-library/library';
+import { Library } from 'library';
 
 export const array: Library = {
-  functions: {
+  nativeFunctions: {
     sum,
     map,
     head,

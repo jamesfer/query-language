@@ -2,6 +2,7 @@ import { Dictionary } from 'lodash';
 import 'rxjs/add/observable/of';
 import { Observable } from 'rxjs/Observable';
 import { Expression } from './expression';
+import { Implementation } from './scope';
 
 export type ValueKind = 'String'
   | 'Integer'
@@ -13,7 +14,9 @@ export type ValueKind = 'String'
   | 'Method'
   | 'Record';
 
-export type PlainFunctionValue<R extends Value = Value> = (...args: LazyValue[]) => LazyValue<R>;
+export type PlainFunctionValue<R extends Value = Value> = (
+  (...implementations: Implementation[]) => (...args: LazyValue[]) => LazyValue<R>
+);
 export type PlainValue = string
   | number
   | boolean

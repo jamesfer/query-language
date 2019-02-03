@@ -1,4 +1,4 @@
-import { isFunction, merge, zipObject, Dictionary } from 'lodash';
+import { Dictionary, isFunction, merge, zipObject, map } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { Expression, FunctionExpression } from '../../expression';
 import { makeFunctionType, noneType, TokenKind } from '../../qlang';
@@ -6,6 +6,8 @@ import {
   expandTypeScope,
   findTypeVariableInScope,
   Scope,
+  clearInterfacesFromTypeScope,
+  expandScope,
 } from '../../scope';
 import { makeTypeVariable } from '../../type/constructors';
 import { VariableType } from '../../type/type';
@@ -15,11 +17,11 @@ import {
 } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { FunctionValue, lazyNoneValue, LazyValue, PlainFunctionValue } from '../../value';
+import { Log } from '../compiler-utils/monoids/log';
+import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
 import { evaluateExpression } from '../evaluate-expression';
 import { ExpressionInterpreter, interpretExpression } from '../interpret-expression';
 import { ExpressionTyper, makeUnrecognizedExpression, typeExpression } from '../type-expression';
-import { Log } from '../compiler-utils/monoids/log';
-import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
 
 
 export const interpretFunction: ExpressionInterpreter = (incomingTokens) => {
@@ -58,19 +60,31 @@ export const typeFunction: ExpressionTyper<UntypedFunctionExpression> = (scope, 
 
   // Determine the type of the function body
   const typeExpressionResult = typeExpression(functionScope, typeVariables, expression.value);
-  const maybeBodyExpression = logScope.combine(typeExpressionResult);
-  const bodyExpression = maybeBodyExpression || makeUnrecognizedExpression(expression.value);
+  const bodyExpression = logScope.combine(typeExpressionResult)
+    || makeUnrecognizedExpression(expression.value);
 
   // TODO add messages if any typing failed
+
+  // Collect the implementations from the type scope
+  const restrictions = map(logScope.getScope().interfaces, (restriction, name) => ({ restriction, name }));
+  const implementations = map(restrictions, 'restriction');
+  const implementationNames = map(restrictions, 'name');
 
   // Create the inferred function type
   const inferredArgumentTypes = Object.values(argumentTypes).map(argumentType => (
     findTypeVariableInScope(logScope.getScope(), argumentType.identifier) || noneType
   ));
   const bodyType = bodyExpression.resultType || noneType;
-  const inferredFunctionType = makeFunctionType(inferredArgumentTypes, bodyType);
+  const inferredFunctionType = makeFunctionType(
+    implementations,
+    inferredArgumentTypes,
+    bodyType,
+  );
 
-  return logScope.wrap<FunctionExpression>({
+  const newTypeVariables = clearInterfacesFromTypeScope(logScope.getScope());
+
+  return LogTypeScope.fromVariables(newTypeVariables).wrap<FunctionExpression>({
+    implementationNames,
     kind: 'Function',
     resultType: inferredFunctionType,
     value: bodyExpression,
@@ -97,11 +111,16 @@ export function evaluateFunction(scope: Scope, expression: FunctionExpression)
   // }
 
   // Convert an expression into a function
-  const expressionFunction: PlainFunctionValue = (...args) => {
-    const argumentValues = zipObject(expression.argumentNames, args);
-    const functionScope = merge({}, scope, { variables: argumentValues });
-    return Observable.of(evaluateExpression(functionScope, funcValue))
-      .switchMap(value => value === undefined ? lazyNoneValue : value);
+  const expressionFunction: PlainFunctionValue = (...implementations) => {
+    const implementationValues = zipObject(expression.implementationNames, implementations);
+    const implementationScope = expandScope(scope, { implementations: implementationValues });
+    return (...args) => {
+      const argumentValues = zipObject(expression.argumentNames, args);
+      // TODO
+      const functionScope = expandScope(implementationScope, { variables: argumentValues });
+      return Observable.of(evaluateExpression(functionScope, funcValue))
+        .switchMap(value => value === undefined ? lazyNoneValue : value);
+    };
   };
   const functionValue: FunctionValue = {
     kind: 'Function',

@@ -17,3 +17,4 @@ export { makeArrayType } from './type/constructors';
 export { makeTypeVariable } from './type/constructors';
 export { makeRecordType } from './type/constructors';
 export { Position } from './position';
+export { InterfaceType } from './interface';

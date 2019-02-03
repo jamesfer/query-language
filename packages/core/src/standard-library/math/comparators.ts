@@ -1,94 +1,87 @@
-import { InterfaceType } from '../../type/type';
-import { Library, LibraryFunction } from '../library';
+import { makeImplementation, makeInterface } from '../../interface';
+import { InterfaceType } from '../../interface';
+import { convertNativeToExpression, Library, NativeFunction } from '../../library';
 import {
   booleanType,
   floatType,
   makeFunctionType,
-  makeInterfaceType,
-  stringType,
+  makeTypeVariable,
 } from '../../type/constructors';
 import { bindBooleanFunction } from '../library-utils';
-import { makeFunctionValue } from '../../value';
+import { Implementation } from '../../scope';
+import { integerType } from '../../qlang';
 
-// const Equateable: InterfaceType = makeInterfaceType(null, {
-//   '=': {
-//     signature: makeFunctionType([ 'self', 'self' ], booleanType),
-//     implementations: {
-//       'float': {
-//         type: floatType,
-//         func: equalsFunction,
+const equatableType = makeTypeVariable('E');
+const Equatable: InterfaceType = makeInterface({
+  parameters: [equatableType],
+  methods: {
+    '=': makeFunctionType(
+      [{ interfaceName: 'Equatable', args: [equatableType] }],
+      [equatableType, equatableType],
+      booleanType,
+    ),
+  },
+});
+
+// const equalsFunction = makeFunctionValue(bindBooleanFunction((a, b) => a === b));
+// const equateable: InterfaceType = makeImplementation({
+//   methods: {
+//     '=': {
+//       kind: 'Method',
+//       resultType: makeFunctionType(['self', 'self'], booleanType),
+//       messages: [],
+//       tokens: [],
+//       implementations: {
+//         float: {
+//           instance: floatType,
+//           value: equalsFunction,
+//           argumentNames: [],
+//         },
+//         string: {
+//           instance: stringType,
+//           value: equalsFunction,
+//           argumentNames: [],
+//         },
 //       },
-//       'string': {
-//         type: stringType,
-//         func: equalsFunction,
-//       },
-//       'boolean': {
-//         type: booleanType,
-//         func: equalsFunction,
+//     },
+//   },
+// });
+//
+// const lessThanFunction = makeFunctionValue(bindBooleanFunction((a, b) => a < b));
+// const orderable: InterfaceType = makeImplementation({
+//   parents: [equateable],
+//   methods: {
+//     '<': {
+//       kind: 'Method',
+//       resultType: makeFunctionType(['self', 'self'], booleanType),
+//       messages: [],
+//       tokens: [],
+//       implementations: {
+//         float: {
+//           instance: floatType,
+//           value: lessThanFunction,
+//           argumentNames: [],
+//         },
+//         string: {
+//           instance: stringType,
+//           value: lessThanFunction,
+//           argumentNames: [],
+//         },
 //       },
 //     },
 //   },
 // });
 
-const equalsFunction = makeFunctionValue(bindBooleanFunction((a, b) => a === b));
-const equateable: InterfaceType = makeInterfaceType({
-  methods: {
-    '=': {
-      kind: 'Method',
-      resultType: makeFunctionType(['self', 'self'], booleanType),
-      messages: [],
-      tokens: [],
-      implementations: {
-        float: {
-          instance: floatType,
-          value: equalsFunction,
-          argumentNames: [],
-        },
-        string: {
-          instance: stringType,
-          value: equalsFunction,
-          argumentNames: [],
-        },
-      },
-    },
-  },
-});
-
-const lessThanFunction = makeFunctionValue(bindBooleanFunction((a, b) => a < b));
-const orderable: InterfaceType = makeInterfaceType({
-  parents: [equateable],
-  methods: {
-    '<': {
-      kind: 'Method',
-      resultType: makeFunctionType(['self', 'self'], booleanType),
-      messages: [],
-      tokens: [],
-      implementations: {
-        float: {
-          instance: floatType,
-          value: lessThanFunction,
-          argumentNames: [],
-        },
-        string: {
-          instance: stringType,
-          value: lessThanFunction,
-          argumentNames: [],
-        },
-      },
-    },
-  },
-});
 
 
-
-const greaterThan: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], booleanType),
-  impl: bindBooleanFunction((a, b) => a > b),
+const greaterThan: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], booleanType),
+  implementation: bindBooleanFunction((a, b) => a > b),
 };
 
-const greaterEqual: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], booleanType),
-  impl: bindBooleanFunction((a, b) => a >= b),
+const greaterEqual: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], booleanType),
+  implementation: bindBooleanFunction((a, b) => a >= b),
 };
 
 // const lessThan: LibraryFunction = {
@@ -96,26 +89,43 @@ const greaterEqual: LibraryFunction = {
 //   impl: bindBooleanFunction((a, b) => a < b),
 // };
 
-const lessEqual: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], booleanType),
-  impl: bindBooleanFunction((a, b) => a <= b),
+const lessEqual: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], booleanType),
+  implementation: bindBooleanFunction((a, b) => a <= b),
 };
 
-const equal: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], booleanType),
-  impl: bindBooleanFunction((a, b) => a === b),
+const equal: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], booleanType),
+  implementation: bindBooleanFunction((a, b) => a === b),
 };
 
-const notEqual: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], booleanType),
-  impl: bindBooleanFunction((a, b) => {
+const notEqual: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], booleanType),
+  implementation: bindBooleanFunction((a, b) => {
     return a !== b;
   }),
 };
 
+const equatableFloatInstance: Implementation = makeImplementation({
+  parameters: [floatType],
+  methods: {
+    '=': convertNativeToExpression(equal),
+  },
+});
+
+const equatableIntegerInstance: Implementation = makeImplementation({
+  parameters: [integerType],
+  methods: {
+    '=': convertNativeToExpression({
+      type: makeFunctionType([], [integerType, integerType], booleanType),
+      implementation: equal.implementation,
+    }),
+  },
+});
+
 
 export const comparators: Library = {
-  functions: {
+  nativeFunctions: {
     // '=': equal,
     '!=': notEqual,
     '>': greaterThan,
@@ -123,8 +133,14 @@ export const comparators: Library = {
     // '<': lessThan,
     '<=': lessEqual,
   },
-  types: {
-    Equateable: equateable,
-    Orderable: orderable,
+  interfaces: {
+    Equatable,
+    // Orderable: orderable,
+  },
+  implementations: {
+    'Equatable': [
+      equatableFloatInstance,
+      equatableIntegerInstance,
+    ],
   },
 };

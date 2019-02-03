@@ -1,14 +1,35 @@
 import { filter, flatMap, isEqual, last, map, uniqBy } from 'lodash';
 import { UntypedFunctionCallExpression } from 'untyped-expression';
-import { Expression, FunctionCallExpression } from '../../../expression';
+import {
+  Expression,
+  FunctionCallExpression,
+  FunctionExpression,
+  IdentifierExpression,
+} from '../../../expression';
 import { makeMessage, Message } from '../../../message';
-import { TypeScope, TypeVariableScope } from '../../../scope';
+import {
+  assignInterfaceInTypeVariableScope,
+  assignTypeVariableInScope,
+  findScopeImplementationMatching, findTypeVariableInScope,
+  TypeScope,
+  TypeVariableScope,
+} from '../../../scope';
 import { makeFunctionType, noneType } from '../../../type/constructors';
 import { convergeTypes } from '../../../type/converge-types';
-import { applyGenericMap, createGenericMap, Type } from '../../../type/type';
+import {
+  applyGenericMap,
+  createGenericMap,
+  FunctionType, InterfaceRestriction,
+  Type,
+  VariableType,
+} from '../../../type/type';
+import { uniqueIdentifier } from '../../../utils';
+import { FunctionValue } from '../../../value';
 import { Log, LogValue } from '../../compiler-utils/monoids/log';
 import { LogTypeScope, LogTypeScopeValue } from '../../compiler-utils/monoids/log-type-scope';
 import { ExpressionTyper, typeExpression } from '../../type-expression';
+import { isConcreteType } from '../../../type/is-concrete';
+import { makeCustomIdentifierExpression, makeIdentifierExpression } from '../identifier';
 
 interface PartialApplication {
   expectedArgs: Type[];
@@ -90,7 +111,7 @@ function inlineFunctionApplication(partial: PartialApplication | null): Type | n
     const returnType = applyGenericMap(partial.returnType, partial.genericMap);
 
     if (unsuppliedArgs.length) {
-      return makeFunctionType(unsuppliedArgs, returnType);
+      return makeFunctionType([], unsuppliedArgs, returnType);
     }
     return returnType;
   }
@@ -147,7 +168,7 @@ function typeFunctionCallArgs(
     let convergedType: Type | null = null;
     if (expectedType && typedArg.resultType) {
       convergedType = logScope.combine(
-        convergeTypes(expectedType, typedArg.resultType, logScope.getScope())
+        convergeTypes(expectedType, typedArg.resultType, logScope.getScope()),
       );
     }
 
@@ -194,6 +215,72 @@ function checkArgumentCount(
   return logScope.wrap(undefined);
 }
 
+export function extractInterfaces(
+  scope: TypeScope,
+  typeVariables: TypeVariableScope,
+  callee: Expression,
+  args: (Expression | null)[],
+): [TypeVariableScope, string[]] {
+  const discovered: {
+    restriction: InterfaceRestriction,
+    source: string,
+  }[] = [];
+  let implementationArgs: string[] = [];
+
+  if (callee.resultType && callee.resultType.kind === 'Function') {
+    // If the callee has any interface requirements
+    const requestedInterfaces = callee.resultType.interfaceRestrictions;
+    if (requestedInterfaces.length) {
+      // Gather a list of interfaces that will be passed to the callee as arguments
+      const suppliedInterfaces = requestedInterfaces.map((requestedInterface): string => {
+        const matchingInterface = discovered.find(({ restriction }) => isEqual(restriction, requestedInterface));
+        // The particular restriction was already found
+        if (matchingInterface) {
+          return matchingInterface.source;
+        }
+
+        const concreteArgs = requestedInterface.args.map(arg => (
+          findTypeVariableInScope(typeVariables, arg.identifier)
+        ));
+
+        // Manually look up how we are going to fulfill this restriction
+        if (concreteArgs.every(arg => !!arg && isConcreteType(typeVariables, arg))) {
+          // Find the interface in the scope
+          const matchingInScope = findScopeImplementationMatching(scope, requestedInterface.interfaceName, concreteArgs as Type[]);
+          if (!matchingInScope) {
+            // TODO Typing should prevent this from happening
+            throw new Error(`Failed to find interface ${requestedInterface.interfaceName} with args ${requestedInterface.args}`);
+          }
+          discovered.push({ restriction: requestedInterface, source: matchingInScope });
+          return matchingInScope;
+        }
+
+        // Add the interface as a required parameter to the typeVariables
+        const identifier = uniqueIdentifier(requestedInterface.interfaceName);
+        typeVariables = assignInterfaceInTypeVariableScope(typeVariables, identifier, requestedInterface);
+        discovered.push({ restriction: requestedInterface, source: identifier });
+        return identifier;
+      });
+
+      // Make a new expression to wrap the callee with interface args
+      // const newCallee: FunctionCallExpression = {
+      //   kind: 'FunctionCall',
+      //   functionExpression: callee.,
+      //   implementationArgs: suppliedInterfaces,
+      //   args: [],
+      //   resultType: makeFunctionType([], callee.resultType.argTypes, callee.resultType.returnType),
+      //   tokens: callee.tokens,
+      // };
+      // callee = newCallee;
+      implementationArgs = suppliedInterfaces;
+    }
+  }
+
+  // TODO repeat the above for arguments
+
+  return [typeVariables, implementationArgs];
+}
+
 export const typeFunctionCall: ExpressionTyper<UntypedFunctionCallExpression> = (
   scope,
   typeVariables,
@@ -215,8 +302,15 @@ export const typeFunctionCall: ExpressionTyper<UntypedFunctionCallExpression> = 
   // Check if the number of arguments are correct.
   logScope.combine(checkArgumentCount(funcExp.resultType, args, expression));
 
+  // Check if any interfaces can be determined
+  // TODO call the above function
+  // const requiredInterfaces = logScope.getScope().interfaces;
+
+  const [newTypeVariables, implementationArgs] = extractInterfaces(scope, logScope.getScope(), funcExp, args);
+
   // TODO check if messages are being duplicated as previously they were
-  return logScope.wrap<FunctionCallExpression>({
+  return LogTypeScope.fromVariables(newTypeVariables).wrap<FunctionCallExpression>({
+    implementationArgs,
     resultType,
     args,
     kind: 'FunctionCall',

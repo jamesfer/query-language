@@ -1,40 +1,40 @@
 import { floatType, makeFunctionType } from '../../type/constructors';
-import { Library, LibraryFunction } from '../library';
+import { Library, LibraryFunction, NativeFunction } from '../../library';
 import { bindFloatFunction } from '../library-utils';
 
-const add: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], floatType),
-  impl: bindFloatFunction((a, b) => a + b),
+const add: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], floatType),
+  implementation: bindFloatFunction((a, b) => a + b),
 };
 
-const subtract: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], floatType),
-  impl: bindFloatFunction((a, b) => a - b),
+const subtract: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], floatType),
+  implementation: bindFloatFunction((a, b) => a - b),
 };
 
-const multiply: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], floatType),
-  impl: bindFloatFunction((a, b) => a * b),
+const multiply: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], floatType),
+  implementation: bindFloatFunction((a, b) => a * b),
 };
 
-const divide: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], floatType),
-  impl: bindFloatFunction((a, b) => a / b),
+const divide: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], floatType),
+  implementation: bindFloatFunction((a, b) => a / b),
 };
 
-const modulo: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], floatType),
-  impl: bindFloatFunction((a, b) => a % b),
+const modulo: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], floatType),
+  implementation: bindFloatFunction((a, b) => a % b),
 };
 
-const power: LibraryFunction = {
-  type: makeFunctionType([floatType, floatType], floatType),
-  impl: bindFloatFunction((a, b) => a ** b),
+const power: NativeFunction = {
+  type: makeFunctionType([], [floatType, floatType], floatType),
+  implementation: bindFloatFunction((a, b) => a ** b),
 };
 
 
 export const operators: Library = {
-  functions: {
+  nativeFunctions: {
     '+': add,
     '*': multiply,
     '/': divide,

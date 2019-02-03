@@ -1,19 +1,18 @@
-import { map, Dictionary, mapValues } from 'lodash';
-import { MethodExpression } from '../expression';
+import { Dictionary, map, mapValues } from 'lodash';
+import { uniqueIdentifier } from '../utils';
 import {
   ArrayType,
   BooleanType,
   FloatType,
   FunctionType,
   IntegerType,
+  InterfaceRestriction,
   NoneType,
+  RecordType,
   StringType,
   Type,
   VariableType,
-  RecordType,
-  InterfaceType,
 } from './type';
-import { PlainFunctionValue } from '../value';
 
 export type TypeShorthand = string | Type;
 
@@ -46,22 +45,18 @@ export const noneType: NoneType = {
   kind: 'None',
 };
 
-let typeVariableIdentifier = 0;
-function nextIdentifier() {
-  typeVariableIdentifier += 1;
-  return typeVariableIdentifier;
-}
-
-export function makeTypeVariable(name: string, identifier = nextIdentifier()): VariableType {
+export function makeTypeVariable(name: string, identifier = uniqueIdentifier()): VariableType {
   return { name, identifier, kind: 'Variable' };
 }
 
 export function makeFunctionType(
+  interfaceRestrictions: InterfaceRestriction[],
   argTypes: TypeShorthand[],
   returnType: TypeShorthand,
 ): FunctionType {
   const evaluator = evaluateShorthand();
   return {
+    interfaceRestrictions,
     kind: 'Function',
     argTypes: map(argTypes, evaluator),
     returnType: evaluator(returnType),
@@ -74,17 +69,6 @@ export function makeArrayType(elementType: TypeShorthand): ArrayType {
     elementType: evaluateShorthand()(elementType),
   };
 }
-
-// export function makeGenericType(
-//   name: string,
-//   derives: TypeShorthand | null = null,
-// ): GenericType {
-//   return {
-//     name,
-//     kind: 'Generic',
-//     derives: derives ? evaluateShorthand(derives) : null,
-//   };
-// }
 
 export function makeRecordType(fields: Record<string, TypeShorthand>): RecordType {
   const evaluator = evaluateShorthand();
@@ -105,50 +89,3 @@ export function makeMethodType(
   };
 }
 
-// export function makeInterfaceType(
-//   fields?: Dictionary<TypeShorthand> | null,
-//   methods?: Dictionary<{
-//     type: MethodType,
-//     value: MethodValue
-//   }> | null,
-// ): InterfaceType {
-//   return {
-//     kind: 'Interface',
-//     fields: mapValues(fields, evaluateShorthand),
-//     methods: methods || {},
-//   };
-// }
-
-export interface MethodShorthand {
-  signature: FunctionType;
-  implementations: Dictionary<{ type: Type, func: PlainFunctionValue }>;
-}
-
-// export function makeInterfaceType(
-//   fields?: Dictionary<TypeShorthand> | null,
-//   methods?: Dictionary<MethodShorthand> | null,
-// ): InterfaceType {
-//   return {
-//     kind: 'Interface',
-//     fields: mapValues(fields, evaluateShorthand),
-//     methods: mapValues(methods, method => ({
-//       type: makeMethodType(method.signature, mapValues(method.implementations, 'type')),
-//       value: makeMethodValue(mapValues(method.implementations, 'func')),
-//     })),
-//   };
-// }
-
-export interface InterfaceShorthand {
-  fields?: Dictionary<TypeShorthand> | null;
-  methods?: Dictionary<MethodExpression> | null;
-  parents?: InterfaceType[];
-}
-export function makeInterfaceType({ fields, methods, parents }: InterfaceShorthand): InterfaceType {
-  const evaluator = evaluateShorthand();
-  return {
-    kind: 'Interface',
-    fields: mapValues(fields, evaluator),
-    methods: methods || {},
-    parents: parents || [],
-  };
-}

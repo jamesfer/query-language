@@ -78,7 +78,7 @@ export function convergeTypes(
 
         // While we performed a check above to ensure that none of the arguments were null,
         // Typescript still thinks that some arg types may be null. Hence the need for a typecast.
-        return logScope.wrap(makeFunctionType(commonArgTypes as Type[], commonBodyType));
+        return logScope.wrap(makeFunctionType([], commonArgTypes as Type[], commonBodyType));
       }
       return logScope.wrap(null);
 
@@ -109,7 +109,7 @@ export function convergeTypes(
     }
 
     // TODO
-    case 'Interface':
+    // case 'Interface':
     case 'Record':
       return logScope.wrap(null);
 
@@ -117,77 +117,3 @@ export function convergeTypes(
       return assertNever(a);
   }
 }
-//
-// export function broadestCommonType(
-//   a: Type | null,
-//   b: Type | null,
-//   genericScope: Dictionary<Type> = {},
-// ): Type | null {
-//   // Return null if either of the types are null
-//   if (a === null || b === null) {
-//     return null;
-//   }
-//
-//   // Having the first argument as generic is easier to deal with. So swap them if b is generic and a
-//   // isn't
-//   if (a.kind !== 'Generic' && b.kind === 'Generic') {
-//     return broadestCommonType(b, a);
-//   }
-//
-//   switch (a.kind) {
-//     case 'Array':
-//       if (b.kind === 'Array') {
-//         const elementType = broadestCommonType(a.elementType, b.elementType);
-//         if (elementType) {
-//           return makeArrayType(elementType);
-//         }
-//       }
-//       return null;
-//
-//     case 'Function':
-//       if (b.kind === 'Function' && b.argTypes.length === a.argTypes.length) {
-//         const commonArgTypes = a.argTypes.map((argOfA, index) => (
-//           broadestCommonType(argOfA, b.argTypes[index])
-//         ));
-//         if (commonArgTypes.some(arg => arg === null)) {
-//           return null;
-//         }
-//
-//         const commonBodyType = broadestCommonType(a.returnType, b.returnType);
-//         if (!commonBodyType) {
-//           return null;
-//         }
-//
-//         // While we performed a check above to ensure that none of the arguments were null,
-//         // Typescript still thinks that some arg types may be null. Hence the need for a typecast.
-//         return makeFunctionType(commonArgTypes as Type[], commonBodyType);
-//       }
-//       return null;
-//
-//     case 'Generic':
-//       if (b.kind !== 'Generic') {
-//         // Doesn't work if a already inherits from something
-//         return makeGenericType(a.name, b);
-//       }
-//
-//
-//
-//     case 'None':
-//     case 'String':
-//     case 'Boolean':
-//     case 'Integer':
-//       return b.kind === a.kind ? a : null;
-//
-//     case 'Float':
-//       // TODO eventually, an integer shouldn't be a subtype of float
-//       return b.kind === a.kind || b.kind === 'Integer' ? a : null;
-//
-//     // TODO
-//     case 'Interface':
-//     case 'Record':
-//       return null;
-//
-//     default:
-//       return assertNever(a);
-//   }
-// }

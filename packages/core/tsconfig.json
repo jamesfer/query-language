@@ -1,29 +1,24 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "dist",
-    "baseUrl": "src",
-    "sourceMap": true,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "target": "es5",
-    "module": "CommonJS",
     "alwaysStrict": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
+    "baseUrl": "src",
     "importHelpers": true,
     "lib": [
-      "es2017"
-    ]
+      "es2018",
+      "esnext.asynciterable"
+    ],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "target": "es6"
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "tests",
-    "**/*.spec.ts",
-    "**/*.test.ts"
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts"
   ]
 }

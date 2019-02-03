@@ -1,4 +1,4 @@
-import { Library, mergeLibraries } from './library';
+import { Library, mergeLibraries } from '../library';
 import { ifFunc } from './branching/if';
 import { math } from './math/math';
 import { otherOperators } from './other-operators';

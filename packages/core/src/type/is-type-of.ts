@@ -1,9 +1,10 @@
 import { every, isEmpty, map } from 'lodash';
+import { InterfaceType } from '../interface';
 import { makeFunctionType } from './constructors';
 import { assertNever } from '../utils';
 import {
   applyGenericMap,
-  ArrayType, createGenericMap, FunctionType, InterfaceType, RecordType,
+  ArrayType, createGenericMap, FunctionType, RecordType,
   Type,
 } from './type';
 
@@ -38,8 +39,8 @@ export function isTypeOf(base: Type, subtype?: Type | null): boolean {
       return true;
     case 'Record':
       return isSubtypeOfRecord(concreteBase, subtype);
-    case 'Interface':
-      return isSubtypeOfInterface(concreteBase, subtype);
+    // case 'Interface':
+    //   return isSubtypeOfInterface(concreteBase, subtype);
     // case 'Method':
     //   return isSubtypeOfMethod(concreteBase, subtype);
     default:
@@ -75,11 +76,6 @@ function isSubtypeOfArray(base: ArrayType, subtype: Type): boolean {
     return false;
   }
 
-  // An empty array base type can only be satisfied by another empty array type
-  if (base.elementType === null) {
-    return subtype.elementType === null;
-  }
-
   // If the subtype has no element type, it could be any type of array.
   // If it does have an element type, it must be a subtype of the array's subtype.
   return subtype.elementType
@@ -96,24 +92,12 @@ function isSubtypeOfFunction(base: FunctionType, subtype: Type): boolean {
     return false;
   }
 
-  if (!every(
-      subtype.argTypes,
-      (type, index) => isTypeOf(type, base.argTypes[ index ]),
-    )) {
+  if (!every(subtype.argTypes, (type, index) => isTypeOf(type, base.argTypes[index]))) {
     return false;
   }
 
   return isTypeOf(base.returnType, subtype.returnType);
 }
-
-// function isSubtypeOfGeneric(base: GenericType, subtype: Type): boolean {
-//   if (base.derives) {
-//     const type = subtype.kind === 'Generic' ? subtype.derives : subtype;
-//     return isTypeOf(base.derives, type);
-//   }
-//   // TODO this should probably be false, changed it to true to make typing a little more forgiving.
-//   return true;
-// }
 
 function isSubtypeOfRecord(base: RecordType | InterfaceType, subtype: Type) {
   if (subtype.kind === 'Record') {
@@ -125,16 +109,6 @@ function isSubtypeOfRecord(base: RecordType | InterfaceType, subtype: Type) {
   return false;
 }
 
-// function isSubtypeOfMethod(base: MethodType, subtype: Type) {
-//   if (subtype.kind === 'Function') {
-//     return isSubtypeOfFunction(base.signature, subtype);
-//   }
-  // if (subtype.kind === 'Method') {
-  //   return isSubtypeOfFunction(base.signature, subtype.signature);
-  // }
-  // return false;
-// }
-
 export function instantiateMethodSignature(
   signature: FunctionType,
   type: Type,
@@ -143,36 +117,37 @@ export function instantiateMethodSignature(
     return arg.kind === 'Variable' && arg.name === 'self' ? type : arg;
   };
   return makeFunctionType(
+    [],
     map(signature.argTypes, replaceSelf),
     replaceSelf(signature.returnType),
   );
 }
-
-function isSubtypeOfInterface(base: InterfaceType, subtype: Type) {
-  // Check fields match
-  if (!isEmpty(base.fields)) {
-    if (!isSubtypeOfRecord(base, subtype)) {
-      return false;
-    }
-  }
-
-  // Check parents match
-  if (!every(base.parents, parent => isSubtypeOfInterface(parent, subtype))) {
-    return false;
-  }
-
-  return true;
-
-  // Check methods match
-  // return every(base.methods, method => {
-  //   const signature = method.type;
-  //   // Replace all 'self's in the signature with the subtype
-  //   const subtypeSignature = instantiateMethodSignature(signature, subtype);
-  //   method.value.
-  //   return some(method.type.implementations, instanceType => {
-  //     // Replace all 'self's in the signature with the instance type
-  //     const instanceSignature = instantiateMethodSignature(signature, instanceType);
-  //     return isSubtypeOfFunction(instanceSignature, subtypeSignature);
-  //   });
-  // });
-}
+//
+// function isSubtypeOfInterface(base: InterfaceType, subtype: Type) {
+//   // Check fields match
+//   if (!isEmpty(base.fields)) {
+//     if (!isSubtypeOfRecord(base, subtype)) {
+//       return false;
+//     }
+//   }
+//
+//   // Check parents match
+//   if (!every(base.parents, parent => isSubtypeOfInterface(parent, subtype))) {
+//     return false;
+//   }
+//
+//   return true;
+//
+//   // Check methods match
+//   // return every(base.methods, method => {
+//   //   const signature = method.type;
+//   //   // Replace all 'self's in the signature with the subtype
+//   //   const subtypeSignature = instantiateMethodSignature(signature, subtype);
+//   //   method.value.
+//   //   return some(method.type.implementations, instanceType => {
+//   //     // Replace all 'self's in the signature with the instance type
+//   //     const instanceSignature = instantiateMethodSignature(signature, instanceType);
+//   //     return isSubtypeOfFunction(instanceSignature, subtypeSignature);
+//   //   });
+//   // });
+// }

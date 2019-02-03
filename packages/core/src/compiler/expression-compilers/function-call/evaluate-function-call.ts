@@ -2,7 +2,7 @@ import { filter, map, partial } from 'lodash';
 import 'rxjs/add/operator/switchMap';
 import { Observable } from 'rxjs/Observable';
 import { Expression, FunctionCallExpression } from '../../../expression';
-import { Scope } from '../../../scope';
+import { findImplementationInScope, Implementation, Scope } from '../../../scope';
 import { Type } from '../../../type/type';
 import { LazyValue, makeFunctionValue, PlainFunctionValue } from '../../../value';
 import { evaluateExpression, PartialPlaceholder } from '../../evaluate-expression';
@@ -55,6 +55,13 @@ export function evaluateFunctionCall(scope: Scope, expression: FunctionCallExpre
 
   const lazyFuncs = evaluateFunctionExpression(scope, expression.functionExpression);
   const args = evaluateArguments(scope, expression.args);
+  const implementations = expression.implementationArgs.map(name => (
+    findImplementationInScope(scope, name)
+  ));
+
+  if (implementations.some(implementation => implementation === null)) {
+    throw new Error('Could not find one of the required implementations');
+  }
 
   if (argCount > arity) {
     // TODO remove synchronous throw
@@ -63,7 +70,8 @@ export function evaluateFunctionCall(scope: Scope, expression: FunctionCallExpre
 
   return lazyFuncs.switchMap((funcs) => {
     if (argCount === arity) {
-      return funcs(...args as LazyValue[]);
+      // Null values in the implementation array are already checked above.
+      return funcs(...implementations as Implementation[])(...args as LazyValue[]);
     }
     const partialFunc = partial(funcs, ...args) as PlainFunctionValue;
     return Observable.of(makeFunctionValue(partialFunc));

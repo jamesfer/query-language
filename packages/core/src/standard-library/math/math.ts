@@ -1,4 +1,4 @@
-import { Library, mergeLibraries } from '../library';
+import { Library, mergeLibraries } from '../../library';
 import { operators } from './operators';
 import { trigonometry } from './trigonometry';
 import { comparators } from './comparators';

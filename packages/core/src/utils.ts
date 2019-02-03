@@ -1,7 +1,9 @@
 import { Token, TokenKind } from './token';
 import { every } from 'lodash';
 
-export function assertNever(x: never): never { return x; }
+export function assertNever(x: never): never {
+  throw new Error('Assert never was actually called');
+}
 
 /* tslint:disable:max-line-length */
 export function firstResult<R>(functions: (() => R | undefined)[]): R | undefined;
@@ -29,3 +31,9 @@ export function tokenArrayMatches(tokens: Token[], ...types: TokenKind[]): boole
   return every(types, (type, index) => type === tokens[index].kind);
 }
 
+
+let typeVariableIdentifier = 0;
+export function uniqueIdentifier(prefix: string = ''): string {
+  typeVariableIdentifier += 1;
+  return `${prefix}${typeVariableIdentifier}`;
+}

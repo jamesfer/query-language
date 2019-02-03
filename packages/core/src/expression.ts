@@ -52,19 +52,19 @@ export interface ArrayExpression extends ExpressionInterface<'Array', ArrayType>
 export interface FunctionCallExpression extends ExpressionInterface<'FunctionCall'> {
   functionExpression: Expression;
   args: (Expression | null)[];
+  implementationArgs: string[];
 }
 
 export interface FunctionExpression extends ExpressionInterface<'Function'> {
   value: FunctionValue | Expression;
   argumentNames: string[];
+  implementationNames: string[];
 }
 
 export interface MethodExpression extends ExpressionInterface<'Method'> {
-  implementations: Dictionary<{
-    instance: Type,
-    value: FunctionValue | Expression,
-    argumentNames: string[],
-  }>;
+  methodName: string;
+  argumentNames: string[];
+  implementationNames: string[];
 }
 
 export interface UnrecognizedExpression extends ExpressionInterface<'Unrecognized', null> {}
@@ -80,8 +80,8 @@ export type Expression = FunctionCallExpression
   | IntegerExpression
   | ArrayExpression
   | UnrecognizedExpression
-  | MethodExpression
-  | FunctionExpression;
+  | FunctionExpression
+  | MethodExpression;
 
 /* tslint:disable:max-line-length */
 export function addType(expression: UntypedStringExpression, resultType: StringType): StringExpression;

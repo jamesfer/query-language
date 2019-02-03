@@ -1,4 +1,4 @@
-import { Library, LibraryFunction } from '../library';
+import { Library, LibraryFunction } from '../../library';
 import { bindFloatFunction } from '../library-utils';
 import { floatType, makeFunctionType } from '../../type/constructors';
 

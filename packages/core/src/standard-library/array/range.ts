@@ -1,11 +1,10 @@
 import 'rxjs/add/observable/range';
 import { Observable } from 'rxjs/Observable';
 import { ArrayValue, LazyValue, makeArrayValue, makeIntegerValue } from '../../value';
-import { LibraryFunction } from '../library';
+import { NativeFunction } from '../../library';
 import { evalArgs } from '../library-utils';
 import { integerType, makeArrayType, makeFunctionType } from '../../type/constructors';
 import 'rxjs/add/operator/map';
-
 
 export function rangeFunc(start: number, end: number): LazyValue<ArrayValue> {
   const sign = start < end ? 1 : -1;
@@ -16,10 +15,11 @@ export function rangeFunc(start: number, end: number): LazyValue<ArrayValue> {
   return Observable.of(makeArrayValue(arr));
 }
 
-
-
-export const range: LibraryFunction = {
-  type: makeFunctionType([integerType, integerType],
-                         makeArrayType(integerType)),
-  impl: evalArgs(rangeFunc),
+export const range: NativeFunction = {
+  type: makeFunctionType(
+    [],
+    [integerType, integerType],
+    makeArrayType(integerType),
+  ),
+  implementation: evalArgs(rangeFunc),
 };

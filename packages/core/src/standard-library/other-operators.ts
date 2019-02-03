@@ -1,6 +1,6 @@
 import { makeFunctionType } from '../type/constructors';
 import { makeLazyFunctionValue, PlainFunctionValue } from '../value';
-import { Library, LibraryFunction } from './library';
+import { Library, LibraryFunction } from '../library';
 import { evalArgs } from './library-utils';
 
 const compose: LibraryFunction = {

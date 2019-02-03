@@ -1,8 +1,6 @@
 import { assign, Dictionary, get, map } from 'lodash';
 import { assertNever } from '../utils';
 import { makeArrayType, makeFunctionType } from './constructors';
-import { MethodExpression } from '../expression';
-
 
 // TODO turn into an enum
 export type TypeKind = 'Integer'
@@ -13,9 +11,7 @@ export type TypeKind = 'Integer'
   | 'Array'
   | 'Function'
   | 'Variable'
-  // | 'Generic'
   | 'Interface'
-  // | 'Method'
   | 'Record';
 
 export type Type = IntegerType
@@ -25,10 +21,8 @@ export type Type = IntegerType
   | NoneType
   | ArrayType
   | FunctionType
-  // | GenericType
   | VariableType
-  | InterfaceType
-  // | MethodType
+  // | InterfaceType
   | RecordType;
 
 export interface TypeInterface<K extends TypeKind> {
@@ -44,39 +38,32 @@ export interface NoneType extends TypeInterface<'None'> {} // TODO change to pla
 export interface ArrayType extends TypeInterface<'Array'> {
   elementType: Type;
 }
-export interface RecordType extends TypeInterface<'Record'> {
-  fields: Record<string, Type>;
-}
 
 // Advanced types
+export interface InterfaceRestriction {
+  interfaceName: string;
+  args: VariableType[];
+}
+
 export interface FunctionType extends TypeInterface<'Function'> {
+  interfaceRestrictions: InterfaceRestriction[];
   argTypes: Type[];
   returnType: Type;
 }
 
 export interface VariableType extends TypeInterface<'Variable'> {
   name: string;
-  identifier: number;
+  identifier: string;
 }
 
-// export interface GenericType extends TypeInterface<'Generic'> {
-//   name: string;
-//   derives: Type | null;
-// }
-
-// export interface MethodType extends TypeInterface<'Method'> {
-//   signature: FunctionType,
-//   implementations: Dictionary<Type>,
-// }
-
-export interface InterfaceType extends TypeInterface<'Interface'> {
+// TODO maybe remove these for now
+// TODO record type could be removed as it is equivalent to an interface with no methods
+export interface RecordType extends TypeInterface<'Record'> {
   fields: Dictionary<Type>;
-  methods: Dictionary<MethodExpression>;
-  parents: InterfaceType[];
 }
+
 
 // Utility Functions
-
 
 export function createGenericMap(generic: Type | null, concrete: Type | null): Dictionary<Type> {
   if (!generic
@@ -116,7 +103,6 @@ export function createGenericMap(generic: Type | null, concrete: Type | null): D
       );
       return genericMap;
 
-    case 'Interface':
     case 'Record':
       // TODO
       return {};
@@ -148,9 +134,8 @@ export function applyGenericMap(generic: Type, genericMap: Dictionary<Type>): Ty
     case 'Function':
       const returnType = applyGenericMap(generic.returnType, genericMap);
       const argTypes = map(generic.argTypes, arg => applyGenericMap(arg, genericMap));
-      return makeFunctionType(argTypes, returnType);
+      return makeFunctionType(generic.interfaceRestrictions, argTypes, returnType);
 
-    case 'Interface':
     case 'Record':
       // TODO
       return generic;

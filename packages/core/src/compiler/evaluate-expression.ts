@@ -6,7 +6,7 @@ import 'rxjs/add/operator/toArray';
 import 'rxjs/add/observable/combineLatest';
 import { Observable } from 'rxjs/Observable';
 import { Expression } from '../expression';
-import { Scope } from '../scope';
+import { Scope, Implementation } from '../scope';
 import { assertNever } from '../utils';
 import { lazyNoneValue, LazyValue, Value } from '../value';
 import { evaluateArray } from './expression-compilers/array';
@@ -16,6 +16,7 @@ import { evaluateFloat, evaluateInteger } from './expression-compilers/number';
 import { evaluateIdentifier } from './expression-compilers/identifier';
 import { evaluateString } from './expression-compilers/string';
 import { evaluateFunction } from './expression-compilers/function';
+import { evaluateMethod } from './expression-compilers/method';
 
 export type PartialPlaceholder = {};
 
@@ -34,7 +35,7 @@ export function evaluateExpression(scope: Scope, expression: Expression): LazyVa
     case 'Function':
       return evaluateFunction(scope, expression);
     case 'Method':
-      throw new Error('Cannot evaluate a method');
+      return evaluateMethod(scope, expression);
     case 'FunctionCall':
       return evaluateFunctionCall(scope, expression);
     case 'Identifier':
