@@ -1,5 +1,5 @@
 import { Message } from '../../../message';
-import { TypeVariableScope } from '../../../scope';
+import { InferredTypesScope } from '../../../type6Lazy/scope';
 import { Monoid, MonoidValue } from './monoid';
 import { TypeVariables } from './type-variables';
 import { Log } from './log';
@@ -32,11 +32,11 @@ export class LogTypeScope extends Monoid<LogTypeScopeState> {
     return new LogTypeScope({ scope, log: Log.empty() });
   }
 
-  static fromVariables(variables: TypeVariableScope) {
+  static fromVariables(variables: InferredTypesScope) {
     return this.fromScope(TypeVariables.from(variables));
   }
 
-  static wrapWithVariables<T>(variables: TypeVariableScope, value: T) {
+  static wrapWithVariables<T>(variables: InferredTypesScope, value: T) {
     return this.fromVariables(variables).wrap(value);
   }
 
@@ -48,7 +48,7 @@ export class LogTypeScope extends Monoid<LogTypeScopeState> {
     return this.state;
   }
 
-  getScope(): TypeVariableScope {
+  getScope(): InferredTypesScope {
     return this.state.scope.getState();
   }
 
@@ -61,7 +61,7 @@ export class LogTypeScope extends Monoid<LogTypeScopeState> {
     this.state.scope.append(state.scope.getState());
   }
 
-  appendScope(variables: TypeVariableScope): void {
+  appendScope(variables: InferredTypesScope): void {
     this.append(LogTypeScope.fromVariables(variables).getState());
   }
 

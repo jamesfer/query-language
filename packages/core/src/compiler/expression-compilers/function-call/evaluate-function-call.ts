@@ -64,7 +64,7 @@ export function evaluateFunctionCall(scope: Scope, expression: FunctionCallExpre
   }
 
   if (argCount > arity) {
-    // TODO remove synchronous throw
+    // TODO handle errors better
     throw new Error('Too many arguments');
   }
 

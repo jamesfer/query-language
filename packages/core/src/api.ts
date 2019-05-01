@@ -1,19 +1,15 @@
-import { isEqual, reduce, uniqWith, Dictionary } from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { LogTypeScope } from './compiler/compiler-utils/monoids/log-type-scope';
 import { Message } from './message';
-import { convertToScope } from './library';
-import { constructTypeScope, emptyTypeVariableScope, Scope } from './scope';
 import { standardLibrary } from './standard-library/standard-library';
 import { Token } from './token';
-import { Expression } from './expression';
 import { interpretSyntaxTree } from './compiler/interpret-expression';
 import { typeExpression } from './compiler/type-expression';
 import { evaluateSyntaxTree } from './compiler/evaluate-expression';
-import { monotizeBaseExpression } from './compiler/monotize-expression';
 import { tokenize } from './compiler/tokenizer/tokenize';
-import { Type } from './type/type';
 import { Log } from './compiler/compiler-utils/monoids/log';
+import { Expression } from './type6Lazy/expression';
+import { Scope } from './type6Lazy/scope';
 
 
 export interface CompilationResult {
@@ -31,17 +27,6 @@ export interface EvaluationResult {
 
 export interface ExecutionResult extends CompilationResult, EvaluationResult {}
 
-
-type MessageContainer = { messages: Message[] };
-
-function extractMessages(expressions: MessageContainer[]): Message[] {
-  return reduce<MessageContainer, Message[]>(
-    expressions,
-    (list, exp) => list.concat(exp.messages),
-    [],
-  );
-}
-
 export function compile(code: string): CompilationResult {
   const log = Log.empty();
 
@@ -56,11 +41,11 @@ export function compile(code: string): CompilationResult {
   }
 
   // Type expression
-  const scope = convertToScope(standardLibrary);
-  const typeScope = constructTypeScope(scope);
+  // TODO standard library is not in the right format
+  const scope: Scope = standardLibrary as any;
   const logScope = LogTypeScope.empty();
   const typedExpression = logScope.combine(typeExpression(
-    typeScope,
+    scope,
     logScope.getScope(),
     expression,
   ));
@@ -69,15 +54,16 @@ export function compile(code: string): CompilationResult {
   const result = { tokens, messages: log.getState(), expression: typedExpression };
   return {
     ...result,
-    compiled: typedExpression.kind !== 'Unrecognized' && log.getState().length === 0,
+    compiled: log.getState().length === 0,
   };
 }
 
 export function evaluate(expression: Expression): EvaluationResult {
-  const evalScope = convertToScope(standardLibrary);
+  // TODO calling evaluate should use the compiled scope to prevent mismatches in the scope between type checking and evaluation
   return {
     messages: [],
-    result: evaluateSyntaxTree(evalScope, expression),
+    // TODO the standard library is in the wrong format
+    result: evaluateSyntaxTree(standardLibrary, expression),
     evaluated: true,
   };
 }

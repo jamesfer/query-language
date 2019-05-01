@@ -1,9 +1,9 @@
 import { head, last } from 'lodash';
-import { addType, StringExpression } from '../../expression';
-import { makeMessage, Message } from '../../message';
+import { makeMessage } from '../../message';
 import { Scope } from '../../scope';
 import { Token, TokenKind } from '../../token';
-import { stringType } from '../../type/constructors';
+import { ExpressionKind, StringExpression } from '../../type6Lazy/expression';
+import { stringType } from '../../type6Lazy/value-constructors';
 import { UntypedStringExpression } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import { LazyValue, makeStringValue, StringValue } from '../../value';
@@ -38,8 +38,12 @@ export const interpretString: ExpressionInterpreter = (tokens) => {
   return Log.of(undefined);
 };
 
-export const typeString: ExpressionTyper<UntypedStringExpression> = (scope, typeVariables, expression) => {
-  return LogTypeScope.wrapWithVariables(typeVariables, addType(expression, stringType));
+export const typeString: ExpressionTyper<UntypedStringExpression> = (scope, inferredTypes, expression) => {
+  return LogTypeScope.wrapWithVariables<StringExpression>(inferredTypes, {
+    ...expression,
+    kind: ExpressionKind.String,
+    resultType: stringType,
+  });
 };
 
 export function evaluateString(scope: Scope, expression: StringExpression): LazyValue<StringValue> {

@@ -1,21 +1,17 @@
-import 'rxjs/add/observable/from';
-import 'rxjs/add/operator/filter';
-import { Observable } from 'rxjs/Observable';
-import { ArrayExpression, Expression } from '../../expression';
-import { makeMessage, Message } from '../../message';
+import { makeMessage } from '../../message';
 import { Scope } from '../../scope';
 import { TokenKind } from '../../token';
-import { makeArrayType, makeTypeVariable } from '../../type/constructors';
-import { isTypeOf } from '../../type/is-type-of';
-import { Type } from '../../type/type';
+import { ExpressionKind, ListExpression } from '../../type6Lazy/expression';
+import { isSubtype, makeType, mapIterator, Type } from '../../type6Lazy/type';
+import { LazyValue, List, ValueKind } from '../../type6Lazy/value';
+import { listType, unboundVariable } from '../../type6Lazy/value-constructors';
 import { UntypedArrayExpression } from '../../untyped-expression';
-import { ArrayValue, LazyValue, makeLazyArrayValue, Value } from '../../value';
 import { buildListInterpreter } from '../compiler-utils/interpret-list';
 import { Log } from '../compiler-utils/monoids/log';
+import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
 import { evaluateExpression } from '../evaluate-expression';
 import { ExpressionInterpreter } from '../interpret-expression';
 import { ExpressionTyper, typeExpression } from '../type-expression';
-import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
 
 
 const buildArrayList
@@ -34,19 +30,19 @@ export const interpretArray: ExpressionInterpreter = (tokens) => {
   return Log.of(undefined);
 };
 
-export const typeArray: ExpressionTyper<UntypedArrayExpression> = (scope, typeVariables, expression) => {
-  const logScope = LogTypeScope.fromVariables(typeVariables);
+export const typeArray: ExpressionTyper<UntypedArrayExpression> = (scope, inferredTypes, expression) => {
+  const logScope = LogTypeScope.fromVariables(inferredTypes);
   let elementType: Type | null = null;
 
   // Process each element expression
   const elements = expression.elements.map((element) => {
-    const typedExpression = logScope.combine(typeExpression(scope, typeVariables, element));
+    const typedExpression = logScope.combine(typeExpression(scope, inferredTypes, element));
 
     // Check the type with the existing element type
     if (typedExpression.resultType) {
       if (!elementType) {
         elementType = typedExpression.resultType;
-      } else if (!isTypeOf(elementType, typedExpression.resultType)) {
+      } else if (!isSubtype(scope, elementType, typedExpression.resultType)) {
         logScope.push(makeMessage(
           'Error',
           'Element type does not fit into array',
@@ -59,17 +55,23 @@ export const typeArray: ExpressionTyper<UntypedArrayExpression> = (scope, typeVa
     return typedExpression;
   });
 
-  return logScope.wrap<ArrayExpression>({
+  const resultType = makeType(
+    async () => (elementType ? listType(await elementType.value()) : unboundVariable('T')),
+    // TODO why do I have to use as any here
+    elementType ? (elementType as any).constraints : [],
+  );
+
+  return logScope.wrap<ListExpression>({
     elements,
-    kind: expression.kind,
+    resultType,
+    kind: ExpressionKind.List,
     tokens: expression.tokens,
-    resultType: makeArrayType(elementType || makeTypeVariable('T')),
   });
 };
 
-export function evaluateArray(scope: Scope, expression: ArrayExpression): LazyValue<ArrayValue> {
-  const elements = Observable.from(expression.elements)
-    .map(element => evaluateExpression(scope, element))
-    .filter(element => !!element) as Observable<Observable<Value>>;
-  return makeLazyArrayValue(elements.mergeAll());
+export function evaluateArray(scope: Scope, expression: ListExpression): LazyValue<List> {
+  return async () => ({
+    kind: ValueKind.List,
+    values: mapIterator(expression.elements, value => evaluateExpression(scope, value)),
+  });
 }

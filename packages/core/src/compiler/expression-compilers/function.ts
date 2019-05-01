@@ -1,27 +1,26 @@
-import { Dictionary, isFunction, merge, zipObject, map } from 'lodash';
+import { Dictionary, map, zipObject } from 'lodash';
 import { Observable } from 'rxjs/Observable';
-import { Expression, FunctionExpression } from '../../expression';
-import { makeFunctionType, noneType, TokenKind } from '../../qlang';
+import { TokenKind } from '../../qlang';
+import { ExpressionKind, LambdaExpression } from '../../type6Lazy/expression';
 import {
-  expandTypeScope,
-  findTypeVariableInScope,
-  Scope,
-  clearInterfacesFromTypeScope,
+  clearImplicitInterfaces,
   expandScope,
-} from '../../scope';
-import { makeTypeVariable } from '../../type/constructors';
-import { VariableType } from '../../type/type';
+  createChildScope,
+  findInferredVariableType,
+  Scope,
+} from '../../type6Lazy/scope';
+import { makeType } from '../../type6Lazy/type';
+import { Lambda, LazyValue, NativeLambda, UnboundVariable } from '../../type6Lazy/value';
+import { functionType, nothing, unboundVariable } from '../../type6Lazy/value-constructors';
 import {
   makeUntypedUnrecognizedExpression,
   UntypedFunctionExpression,
 } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
-import { FunctionValue, lazyNoneValue, LazyValue, PlainFunctionValue } from '../../value';
 import { Log } from '../compiler-utils/monoids/log';
 import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
-import { evaluateExpression } from '../evaluate-expression';
 import { ExpressionInterpreter, interpretExpression } from '../interpret-expression';
-import { ExpressionTyper, makeUnrecognizedExpression, typeExpression } from '../type-expression';
+import { ExpressionTyper, typeExpression } from '../type-expression';
 
 
 export const interpretFunction: ExpressionInterpreter = (incomingTokens) => {
@@ -48,77 +47,75 @@ export const interpretFunction: ExpressionInterpreter = (incomingTokens) => {
 };
 
 
-export const typeFunction: ExpressionTyper<UntypedFunctionExpression> = (scope, typeVariables, expression) => {
-  const logScope = LogTypeScope.fromVariables(typeVariables);
+export const typeFunction: ExpressionTyper<UntypedFunctionExpression> = (scope, inferredTypes, expression) => {
+  const logScope = LogTypeScope.fromVariables(inferredTypes);
 
   // Create inner function scope
-  const argumentTypes: Dictionary<VariableType> = {};
+  const argumentTypes: Dictionary<UnboundVariable> = {};
   expression.arguments.forEach((argument) => {
-    argumentTypes[argument.value] = makeTypeVariable(`${argument.value}T`);
+    argumentTypes[argument.value] = unboundVariable(`${argument.value}T`);
   });
-  const functionScope = expandTypeScope(scope, argumentTypes);
+  const functionScope = createChildScope(scope, argumentTypes);
 
   // Determine the type of the function body
-  const typeExpressionResult = typeExpression(functionScope, typeVariables, expression.value);
-  const bodyExpression = logScope.combine(typeExpressionResult)
-    || makeUnrecognizedExpression(expression.value);
+  const typeExpressionResult = typeExpression(functionScope, inferredTypes, expression.value);
+  const bodyExpression = logScope.combine(typeExpressionResult);
+    // || makeUnrecognizedExpression(expression.value);
+  if (!bodyExpression) {
+    // TODO handle errors better
+    throw new Error('Failed to add type to function body');
+  }
 
   // TODO add messages if any typing failed
 
   // Collect the implementations from the type scope
-  const restrictions = map(logScope.getScope().interfaces, (restriction, name) => ({ restriction, name }));
+  const restrictions = map(logScope.getScope().implicitInterfaceParameters, (restriction, name) => ({ restriction, name }));
   const implementations = map(restrictions, 'restriction');
   const implementationNames = map(restrictions, 'name');
 
   // Create the inferred function type
   const inferredArgumentTypes = Object.values(argumentTypes).map(argumentType => (
-    findTypeVariableInScope(logScope.getScope(), argumentType.identifier) || noneType
+    findInferredVariableType(logScope.getScope(), argumentType.uniqueIdentifier) || nothing
   ));
-  const bodyType = bodyExpression.resultType || noneType;
-  const inferredFunctionType = makeFunctionType(
-    implementations,
-    inferredArgumentTypes,
-    bodyType,
+  const bodyType = bodyExpression.resultType || makeType(async () => nothing);
+  const inferredFunctionType = makeType(
+    async () => functionType(...inferredArgumentTypes, await bodyType.value()),
+    [...implementations, ...bodyType.constraints],
   );
 
-  const newTypeVariables = clearInterfacesFromTypeScope(logScope.getScope());
+  const newTypeVariables = clearImplicitInterfaces(logScope.getScope());
 
-  return LogTypeScope.fromVariables(newTypeVariables).wrap<FunctionExpression>({
-    implementationNames,
-    kind: 'Function',
+  return LogTypeScope.fromVariables(newTypeVariables).wrap<LambdaExpression>({
+    // implementationNames, TODO
+    kind: ExpressionKind.Lambda,
     resultType: inferredFunctionType,
-    value: bodyExpression,
-    argumentNames: expression.arguments.map(arg => arg.value),
+    body: bodyExpression,
+    parameterNames: expression.arguments.map(arg => arg.value),
     tokens: expression.tokens,
   });
 };
 
-function isFunctionValue(value: FunctionValue | Expression): value is FunctionValue {
-  return value.kind === 'Function' && isFunction(value.value);
-}
+// function isFunctionValue(value: FunctionValue | Expression): value is FunctionValue {
+//   return value.kind === 'Function' && isFunction(value.value);
+// }
 
-export function evaluateFunction(scope: Scope, expression: FunctionExpression)
-: LazyValue<FunctionValue> {
-  // Check if the value is a native function
-  const funcValue = expression.value;
-  if (isFunctionValue(funcValue)) {
-    return Observable.of(funcValue);
-  }
-
+export function evaluateFunction(
+  scope: Scope,
+  expression: LambdaExpression,
+): LazyValue<Lambda> {
   // const funcType = expression.resultType;
   // if (!funcType || funcType.kind !== 'Function') {
   //   throw new Error('Tried to evaluate a function expression that was not a function');
   // }
 
   // Convert an expression into a function
-  const expressionFunction: PlainFunctionValue = (...implementations) => {
+  const expressionFunction: any = (...implementations) => {
     const implementationValues = zipObject(expression.implementationNames, implementations);
     const implementationScope = expandScope(scope, { implementations: implementationValues });
     return (...args) => {
       const argumentValues = zipObject(expression.argumentNames, args);
-      // TODO
       const functionScope = expandScope(implementationScope, { variables: argumentValues });
-      return Observable.of(evaluateExpression(functionScope, funcValue))
+      return evaluateExpression(functionScope, funcValue))
         .switchMap(value => value === undefined ? lazyNoneValue : value);
     };
   };

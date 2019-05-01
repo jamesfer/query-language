@@ -1,56 +1,55 @@
-import { Scope, TypeScope, TypeVariableScope } from '../scope';
+import { Expression, ExpressionKind, NothingExpression } from '../type6Lazy/expression';
+import { InferredTypesScope, TypeScope } from '../type6Lazy/scope';
+import { nothing } from '../type6Lazy/value-constructors';
 import { UntypedExpression, UntypedNoneExpression } from '../untyped-expression';
-import { addType, Expression, NoneExpression } from '../expression';
 import { assertNever } from '../utils';
-import { LogTypeScope, LogTypeScopeState, LogTypeScopeValue } from './compiler-utils/monoids/log-type-scope';
+import { LogTypeScope, LogTypeScopeValue } from './compiler-utils/monoids/log-type-scope';
 import { typeArray } from './expression-compilers/array';
 import { typeFunction } from './expression-compilers/function';
 import { typeFunctionCall } from './expression-compilers/function-call/type-function-call';
 import { typeIdentifier } from './expression-compilers/identifier';
 import { typeNumber } from './expression-compilers/number';
 import { typeString } from './expression-compilers/string';
-import { noneType } from '../type/constructors';
 import { typeBoolean } from './expression-compilers/boolean';
-import { TypeVariables } from './compiler-utils/monoids/type-variables';
 
+// TODO this should be asynchronous using lazy types
 export type ExpressionTyper<E extends UntypedExpression = UntypedExpression> = (
   scope: TypeScope,
-  typeVariables: TypeVariableScope,
+  inferredTypes: InferredTypesScope,
   expression: E,
 ) => LogTypeScopeValue<Expression>;
 
-export const typeExpression: ExpressionTyper = (scope, typeVariables, expression) => {
+export const typeExpression: ExpressionTyper = (scope, inferredTypes, expression) => {
   switch (expression.kind) {
     case 'String':
-      return typeString(scope, typeVariables, expression);
+      return typeString(scope, inferredTypes, expression);
     case 'Integer':
     case 'Float':
-      return typeNumber(scope, typeVariables, expression);
+      return typeNumber(scope, inferredTypes, expression);
     case 'Boolean':
-      return typeBoolean(scope, typeVariables, expression);
+      return typeBoolean(scope, inferredTypes, expression);
     case 'Array':
-      return typeArray(scope, typeVariables, expression);
+      return typeArray(scope, inferredTypes, expression);
     case 'Identifier':
-      return typeIdentifier(scope, typeVariables, expression);
+      return typeIdentifier(scope, inferredTypes, expression);
     case 'FunctionCall':
-      return typeFunctionCall(scope, typeVariables, expression);
+      return typeFunctionCall(scope, inferredTypes, expression);
     case 'Function':
-      return typeFunction(scope, typeVariables, expression);
+      return typeFunction(scope, inferredTypes, expression);
     case 'None':
-      return LogTypeScope.fromVariables(typeVariables).wrap(makeNoneExpression(expression));
+      return LogTypeScope.fromVariables(inferredTypes).wrap(makeNoneExpression(expression));
     case 'Unrecognized':
-      return LogTypeScope.fromVariables(typeVariables).wrap(makeUnrecognizedExpression(expression));
+      // TODO handle errors better
+      throw new Error('Tried to type an unrecognized expression');
     default:
       return assertNever(expression);
   }
 };
 
-export function makeNoneExpression(expression: UntypedNoneExpression): NoneExpression {
-  return addType(expression, noneType);
+export function makeNoneExpression(expression: UntypedNoneExpression): NothingExpression {
+  return {
+    kind: ExpressionKind.Nothing,
+    tokens: expression.tokens,
+    resultType: nothing,
+  };
 }
-
-export function makeUnrecognizedExpression(expression: UntypedExpression): Expression {
-  return addType(expression, null);
-}
-
-

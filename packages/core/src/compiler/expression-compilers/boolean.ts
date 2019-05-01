@@ -1,7 +1,8 @@
-import { addType, BooleanExpression } from '../../expression';
 import { Scope } from '../../scope';
 import { TokenKind } from '../../token';
-import { booleanType } from '../../type/constructors';
+import { BooleanExpression, ExpressionKind } from '../../type6Lazy/expression';
+import { makeType } from '../../type6Lazy/type';
+import { booleanType } from '../../type6Lazy/value-constructors';
 import { UntypedBooleanExpression } from '../../untyped-expression';
 import { BooleanValue, LazyValue, makeBooleanValue } from '../../value';
 import { Observable } from 'rxjs/Observable';
@@ -24,8 +25,12 @@ export const interpretBoolean: ExpressionInterpreter = (tokens) => {
   return Log.of(undefined);
 };
 
-export const typeBoolean: ExpressionTyper<UntypedBooleanExpression> = (scope, typeVariables, expression) => {
-  return LogTypeScope.wrapWithVariables(typeVariables, addType(expression, booleanType));
+export const typeBoolean: ExpressionTyper<UntypedBooleanExpression> = (scope, inferredTypes, expression) => {
+  return LogTypeScope.wrapWithVariables<BooleanExpression>(inferredTypes, {
+    ...expression,
+    kind: ExpressionKind.Boolean,
+    resultType: makeType(async () => booleanType),
+  });
 };
 
 export function evaluateBoolean(scope: Scope, expression: BooleanExpression)

@@ -1,8 +1,13 @@
-import { FloatExpression, IntegerExpression } from '../../expression';
-import { makeMessage, Message } from '../../message';
+import { makeMessage } from '../../message';
 import { Scope } from '../../scope';
 import { Token, TokenKind } from '../../token';
-import { floatType, integerType } from '../../type/constructors';
+import {
+  IntegerExpression,
+  FloatExpression,
+  Expression,
+  ExpressionKind,
+} from '../../type6Lazy/expression';
+import { floatType, integerType } from '../../type6Lazy/value-constructors';
 import { UntypedFloatExpression, UntypedIntegerExpression } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
 import {
@@ -59,15 +64,13 @@ export const interpretNumber: ExpressionInterpreter = (tokens) => {
 
 export const typeNumber: ExpressionTyper<UntypedFloatExpression | UntypedIntegerExpression> = (
   scope,
-  typeVariables,
+  inferredTypes,
   expression,
 ) => {
-  // The expression is written this way because typescript doesn't understand it if the ternary is
-  // inside the object literal.
-  const numberExpression = expression.kind === 'Integer'
-    ? { ...expression, messages: [], resultType: integerType }
-    : { ...expression, messages: [], resultType: floatType };
-  return LogTypeScope.wrapWithVariables(typeVariables, numberExpression);
+  const numberExpression: Expression = expression.kind === 'Integer'
+    ? { ...expression, kind: ExpressionKind.Integer, resultType: integerType }
+    : { ...expression, kind: ExpressionKind.Float, resultType: floatType };
+  return LogTypeScope.wrapWithVariables(inferredTypes, numberExpression);
 };
 
 export function evaluateInteger(scope: Scope, expression: IntegerExpression)

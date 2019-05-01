@@ -1,24 +1,24 @@
 import {
-  emptyTypeVariableScope,
-  overwriteTypeVariableScope,
-  TypeVariableScope,
-} from '../../../scope';
+  emptyInferredTypesScope,
+  InferredTypesScope,
+  expandInferredTypesScope,
+} from '../../../type6Lazy/scope';
 import { Monoid } from './monoid';
 
-export class TypeVariables extends Monoid<TypeVariableScope> {
+export class TypeVariables extends Monoid<InferredTypesScope> {
   static empty() {
-    return new TypeVariables(emptyTypeVariableScope());
+    return new TypeVariables(emptyInferredTypesScope());
   }
 
-  static from(variables: TypeVariableScope) {
+  static from(variables: InferredTypesScope) {
     return new TypeVariables(variables);
   }
 
   static of<T>(value: T) {
-    return { value, state: emptyTypeVariableScope() };
+    return { value, state: emptyInferredTypesScope() };
   }
 
-  protected constructor(protected scope: TypeVariableScope) {
+  protected constructor(protected scope: InferredTypesScope) {
     super();
   }
 
@@ -26,7 +26,7 @@ export class TypeVariables extends Monoid<TypeVariableScope> {
     return this.scope;
   }
 
-  append(other: TypeVariableScope): void {
-    overwriteTypeVariableScope(this.scope, other);
+  append(other: InferredTypesScope): void {
+    expandInferredTypesScope(this.scope, other);
   }
 }
