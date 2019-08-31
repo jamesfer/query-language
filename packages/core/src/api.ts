@@ -3,10 +3,10 @@ import { interpretSyntaxTree } from './compiler/interpret-expression';
 import { tokenize } from './compiler/tokenizer/tokenize';
 import { Message } from './message';
 import { Token } from './token';
-import { evaluateExpression } from './type7Lazy/evaluate-expression';
-import { Expression } from './type7Lazy/expression';
-import { typeExpression } from './type7Lazy/type/type-expression';
-import { Value } from './type7Lazy/value';
+import { evaluateExpression } from './compiler/evaluate-expression';
+import { Expression } from './compiler/expression';
+import { typeExpression } from './compiler/type/type-expression';
+import { Value } from './compiler/value';
 
 
 export interface CompilationResult {
