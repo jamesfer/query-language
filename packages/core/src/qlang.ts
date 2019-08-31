@@ -4,7 +4,7 @@ export * from './message';
 export * from './token';
 export * from './type/type';
 export * from './value';
-export { standardLibrary } from './standard-library/standard-library';
+// export { standardLibrary } from './standard-library/standard-library';
 export { isTypeOf } from './type/is-type-of';
 export { TypeShorthand } from './type/constructors';
 export { integerType } from './type/constructors';

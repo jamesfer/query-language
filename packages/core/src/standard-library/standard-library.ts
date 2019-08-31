@@ -9,7 +9,7 @@ export const standardLibrary: Library = mergeLibraries(
   math,
   otherOperators,
   array,
-  {
-    functions: { if: ifFunc },
-  },
+  // {
+  //   functions: { if: ifFunc },
+  // },
 );

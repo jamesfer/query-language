@@ -16,9 +16,5 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "target": "es6"
-  },
-  "include": [
-    "src/**/*.ts",
-    "tests/**/*.ts"
-  ]
+  }
 }

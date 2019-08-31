@@ -1,15 +1,12 @@
-import { Observable } from 'rxjs/Observable';
-import { LogTypeScope } from './compiler/compiler-utils/monoids/log-type-scope';
-import { Message } from './message';
-import { standardLibrary } from './standard-library/standard-library';
-import { Token } from './token';
-import { interpretSyntaxTree } from './compiler/interpret-expression';
-import { typeExpression } from './compiler/type-expression';
-import { evaluateSyntaxTree } from './compiler/evaluate-expression';
-import { tokenize } from './compiler/tokenizer/tokenize';
 import { Log } from './compiler/compiler-utils/monoids/log';
-import { Expression } from './type6Lazy/expression';
-import { Scope } from './type6Lazy/scope';
+import { interpretSyntaxTree } from './compiler/interpret-expression';
+import { tokenize } from './compiler/tokenizer/tokenize';
+import { Message } from './message';
+import { Token } from './token';
+import { evaluateExpression } from './type7Lazy/evaluate-expression';
+import { Expression } from './type7Lazy/expression';
+import { typeExpression } from './type7Lazy/type/type-expression';
+import { Value } from './type7Lazy/value';
 
 
 export interface CompilationResult {
@@ -21,13 +18,13 @@ export interface CompilationResult {
 
 export interface EvaluationResult {
   messages: Message[];
-  result?: Observable<any>;
+  result?: Value;
   evaluated: boolean;
 }
 
 export interface ExecutionResult extends CompilationResult, EvaluationResult {}
 
-export function compile(code: string): CompilationResult {
+export async function compile(code: string): Promise<CompilationResult> {
   const log = Log.empty();
 
   // Parse Tokens
@@ -42,44 +39,39 @@ export function compile(code: string): CompilationResult {
 
   // Type expression
   // TODO standard library is not in the right format
-  const scope: Scope = standardLibrary as any;
-  const logScope = LogTypeScope.empty();
-  const typedExpression = logScope.combine(typeExpression(
-    scope,
-    logScope.getScope(),
-    expression,
-  ));
-  log.append(logScope.getLog());
+  // const scope: Scope = standardLibrary as any;
+  const [state, , typedExpression] = await typeExpression({}, expression);
+  log.append(state.messages);
 
-  const result = { tokens, messages: log.getState(), expression: typedExpression };
   return {
-    ...result,
+    tokens,
+    messages: log.getState(),
+    expression: typedExpression,
     compiled: log.getState().length === 0,
   };
 }
 
-export function evaluate(expression: Expression): EvaluationResult {
+export async function evaluate(expression: Expression): Promise<EvaluationResult> {
   // TODO calling evaluate should use the compiled scope to prevent mismatches in the scope between type checking and evaluation
+  // TODO the standard library is in the wrong format
+  const [, , result] = await evaluateExpression({}, expression);
   return {
+    result: await result(),
     messages: [],
-    // TODO the standard library is in the wrong format
-    result: evaluateSyntaxTree(standardLibrary, expression),
     evaluated: true,
   };
 }
 
-export function execute(code: string): ExecutionResult {
-  const compRes = compile(code);
-  if (compRes.compiled && compRes.expression) {
-    const evalRes = evaluate(compRes.expression);
-    return {
-      ...compRes,
-      ...evalRes,
-      messages: compRes.messages.concat(evalRes.messages),
-    } as ExecutionResult;
+export async function execute(code: string): Promise<ExecutionResult> {
+  const compRes = await compile(code);
+  if (!compRes.compiled || !compRes.expression) {
+    return { evaluated: false, ...compRes };
   }
+
+  const evalRes = await evaluate(compRes.expression);
   return {
-    evaluated: false,
     ...compRes,
+    ...evalRes,
+    messages: [...compRes.messages, ...evalRes.messages],
   };
 }
