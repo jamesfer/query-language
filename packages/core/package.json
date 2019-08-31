@@ -22,11 +22,13 @@
     "watch": "webpack --progress --watch",
     "prod": "webpack --progress --env.production",
     "lint": "tslint -p tsconfig.json",
-    "test": "nyc --reporter=html --reporter=text-summary mocha src/**/*.spec.ts tests/**/*.test.ts",
-    "test:ci": "nyc --reporter=lcovonly --reporter=text-summary mocha src/**/*.spec.ts tests/**/*.test.ts",
-    "test:watch": "nodemon -e js,ts -w tests -w src --exec 'npm run test'",
+    "test": "jest",
+    "test:ci": "jest",
     "test:conformance": "mocha --require ts-node/register tests/**/*.test.ts",
     "test:library": "mocha --require ts-node/register src/**/*.spec.ts"
+  },
+  "jest": {
+    "preset": "ts-jest"
   },
   "nyc": {
     "all": true,
@@ -50,21 +52,20 @@
     ]
   },
   "dependencies": {
+    "jest": "^24.8.0",
     "lodash": "^4.17.4",
     "moo": "^0.5.0",
     "rxjs": "^5.5.0",
+    "ts-jest": "^24.0.2",
     "tslib": "^1.9.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.0.2",
+    "@types/jest": "^24.0.17",
     "@types/lodash": "^4.14.72",
-    "@types/mocha": "^2.2.41",
     "@types/moo": "^0.4.2",
     "@types/node": "^8.0.24",
-    "chai": "^4.1.1",
     "clean-webpack-plugin": "^0.1.17",
     "coveralls": "^3.0.0",
-    "mocha": "^3.5.0",
     "nodemon": "^1.14.3",
     "nyc": "^11.4.1",
     "source-map-support": "^0.5.0",
