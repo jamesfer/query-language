@@ -2,12 +2,11 @@ import { makeMessage } from '../../../message';
 import { Token, TokenKind } from '../../../token';
 import { tokenArrayMatches } from '../../../utils';
 import { ExpressionInterpreter, interpretExpression } from '../../interpret-expression';
-import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
+import { makeFunctionCallExpression } from '../function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
 import { makeIntegerExpression } from '../number';
 import { hasHigherPrecedence, precedences } from './precedences';
 import { Log } from '../../compiler-utils/monoids/log';
-
 
 export const interpretRangeOperator: ExpressionInterpreter = (incomingTokens, left, precedence) => {
   let tokens = incomingTokens;

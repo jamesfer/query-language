@@ -1,15 +1,15 @@
 import { Token } from '../token';
 import { makeUntypedUnrecognizedExpression, UntypedExpression } from '../untyped-expression';
 import { Log, LogValue } from './compiler-utils/monoids/log';
-import { interpretArray } from './expression-compilers/array';
-import { interpretBoolean } from './expression-compilers/boolean';
-import { interpretFunction } from './expression-compilers/function';
-import { interpretFunctionCall } from './expression-compilers/function-call/interpret-function-call';
-import { interpretIdentifier } from './expression-compilers/identifier';
-import { interpretNumber } from './expression-compilers/number';
-import { interpretOperatorExpression } from './expression-compilers/operators/operator';
-import { interpretParenthesis } from './expression-compilers/parenthesis';
-import { interpretString } from './expression-compilers/string';
+import { interpretArray } from './interpreters/array';
+import { interpretBoolean } from './interpreters/boolean';
+import { interpretFunction } from './interpreters/function';
+import { interpretFunctionCall } from './interpreters/function-call';
+import { interpretIdentifier } from './interpreters/identifier';
+import { interpretNumber } from './interpreters/number';
+import { interpretOperatorExpression } from './interpreters/operators/operator';
+import { interpretParenthesis } from './interpreters/parenthesis';
+import { interpretString } from './interpreters/string';
 
 export type ExpressionInterpreter = (
   tokens: Token[],

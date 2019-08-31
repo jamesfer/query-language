@@ -4,7 +4,6 @@ import { interpretInfixOperator } from './basic-infix-operator';
 import { interpretRangeOperator } from './range-operator';
 import { interpretUnaryMinusOperator } from './unary-minus-operator';
 
-
 export const interpretOperatorExpression: ExpressionInterpreter = (tokens, left, precedences) => {
   const interpreters = [
     interpretUnaryMinusOperator,

@@ -1,9 +1,9 @@
 import { filter, flatMap, sortBy } from 'lodash';
-import { Token, TokenKind } from '../../../token';
-import { UntypedExpression, UntypedFunctionCallExpression } from '../../../untyped-expression';
-import { buildListInterpreter } from '../../compiler-utils/interpret-list';
-import { Log } from '../../compiler-utils/monoids/log';
-import { ExpressionInterpreter } from '../../interpret-expression';
+import { Token, TokenKind } from '../../token';
+import { UntypedExpression, UntypedFunctionCallExpression } from '../../untyped-expression';
+import { buildListInterpreter } from '../compiler-utils/interpret-list';
+import { Log } from '../compiler-utils/monoids/log';
+import { ExpressionInterpreter } from '../interpret-expression';
 
 export const functionCallPrecedence = 100;
 

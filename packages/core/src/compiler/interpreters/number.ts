@@ -1,27 +1,10 @@
+import { isNaN } from 'lodash';
 import { makeMessage } from '../../message';
-import { Scope } from '../../scope';
 import { Token, TokenKind } from '../../token';
-import {
-  IntegerExpression,
-  FloatExpression,
-  Expression,
-  ExpressionKind,
-} from '../../type6Lazy/expression';
-import { floatType, integerType } from '../../type6Lazy/value-constructors';
 import { UntypedFloatExpression, UntypedIntegerExpression } from '../../untyped-expression';
 import { tokenArrayMatches } from '../../utils';
-import {
-  FloatValue,
-  IntegerValue,
-  LazyValue,
-  makeLazyFloatValue,
-  makeLazyIntegerValue,
-} from '../../value';
-import { toNumber, isNaN } from 'lodash';
-import { ExpressionInterpreter } from '../interpret-expression';
-import { ExpressionTyper } from '../type-expression';
 import { Log } from '../compiler-utils/monoids/log';
-import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
+import { ExpressionInterpreter } from '../interpret-expression';
 
 
 function makeFloatExpression(value: number, token: Token): UntypedFloatExpression {
@@ -61,24 +44,3 @@ export const interpretNumber: ExpressionInterpreter = (tokens) => {
   }
   return Log.of(undefined);
 };
-
-export const typeNumber: ExpressionTyper<UntypedFloatExpression | UntypedIntegerExpression> = (
-  scope,
-  inferredTypes,
-  expression,
-) => {
-  const numberExpression: Expression = expression.kind === 'Integer'
-    ? { ...expression, kind: ExpressionKind.Integer, resultType: integerType }
-    : { ...expression, kind: ExpressionKind.Float, resultType: floatType };
-  return LogTypeScope.wrapWithVariables(inferredTypes, numberExpression);
-};
-
-export function evaluateInteger(scope: Scope, expression: IntegerExpression)
-: LazyValue<IntegerValue> {
-  return makeLazyIntegerValue(toNumber(expression.value));
-}
-
-export function evaluateFloat(scope: Scope, expression: FloatExpression)
-: LazyValue<FloatValue> {
-  return makeLazyFloatValue(toNumber(expression.value));
-}

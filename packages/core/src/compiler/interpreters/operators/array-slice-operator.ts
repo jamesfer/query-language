@@ -4,7 +4,7 @@ import { TokenKind } from '../../../token';
 import { buildListInterpreter } from '../../compiler-utils/interpret-list';
 import { Log } from '../../compiler-utils/monoids/log';
 import { ExpressionInterpreter } from '../../interpret-expression';
-import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
+import { makeFunctionCallExpression } from '../function-call';
 import { makeCustomIdentifierExpression } from '../identifier';
 import { hasHigherPrecedence, precedences } from './precedences';
 

@@ -1,11 +1,10 @@
 import { TokenKind } from '../../../token';
 import { tokenArrayMatches } from '../../../utils';
 import { ExpressionInterpreter, interpretExpression } from '../../interpret-expression';
-import { makeFunctionCallExpression } from '../function-call/interpret-function-call';
+import { makeFunctionCallExpression } from '../function-call';
 import { makeIdentifierExpression } from '../identifier';
 import { hasHigherPrecedence, precedences } from './precedences';
 import { Log } from '../../compiler-utils/monoids/log';
-
 
 export const interpretUnaryMinusOperator: ExpressionInterpreter = (tokens, left, precedence) => {
   if (tokenArrayMatches(tokens, TokenKind.SubtractOperator)
