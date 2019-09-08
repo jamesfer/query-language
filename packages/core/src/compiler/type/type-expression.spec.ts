@@ -148,7 +148,7 @@ describe('typeExpression', () => {
       it('types the expression as an unbound type', async () => {
         const [, , { resultType }] = await typeExpression(emptyScope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
-          type(lazyValue(listType(lazyValue(unboundVariable('T0')))))
+          type(lazyValue(listType(lazyValue(unboundVariable('T')))))
         ));
       });
     });

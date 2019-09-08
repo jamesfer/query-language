@@ -3,7 +3,6 @@ export enum ValueKind {
   Anything = 'Anything',
   Nothing = 'Nothing',
   UserDefinedLiteral = 'UserDefinedLiteral',
-  TypeInterface = 'TypeInterface',
   UnboundVariable = 'UnboundVariable',
   BoundVariable = 'BoundVariable',
   Lambda = 'Lambda',
@@ -14,6 +13,7 @@ export enum ValueKind {
   String = 'String',
   Boolean = 'Boolean',
   List = 'List',
+  Record = 'Record',
 }
 
 export interface Anything {
@@ -47,6 +47,11 @@ export interface Boolean {
 export interface List {
   kind: ValueKind.List;
   values: LazyValueList;
+}
+
+export interface Record {
+  kind: ValueKind.Record;
+  values: { [k: string]: LazyValue };
 }
 
 export interface UserDefinedLiteral {

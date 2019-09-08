@@ -1,9 +1,9 @@
 import { intersectionBy, flatMap } from 'lodash';
 import { assertNever } from '../../utils';
 import { TypeScope } from '../scope';
-import { lazyList, reduceInto, zipIterators } from '../utils';
+import { lazyList, pMap, reduceInto, zipIterators } from '../utils';
 import { LazyValue, LazyValueList, ValueKind } from '../value';
-import { application, lazyValue, list, unboundVariable } from '../value-constructors';
+import { application, lazyValue, list, nothing, unboundVariable } from '../value-constructors';
 import { State, StateResult } from './state';
 import {
   extractUnboundVariables,
@@ -248,7 +248,6 @@ export async function convergeTypes(
 
 export type ConvergeManyTypesResult = [
   VariableSubstitution[],
-  VariableSubstitution[],
   VariableSubstitution[][],
   LazyValue | undefined
 ];
@@ -262,48 +261,35 @@ export async function convergeManyTypes(
   values: LazyValue[],
 ): Promise<StateResult<ConvergeManyTypesResult>> {
   const state = State.of(scope);
-  let combinedElementType: LazyValue = lazyValue(await freeVariable('T', values));
-  const inferredSubstitutions: VariableSubstitution[][] = [];
-  const combinedSubstitutions: VariableSubstitution[] = [];
-  const elementSubstitutions: VariableSubstitution[][] = [];
-  for (let i = 0; i < values.length; i++) {
-    // Converge the current value with the accumulation
-    const [substitutions, converged] = await state.runAsync(
-      convergeTypes,
-      combinedElementType,
-      values[i],
-    );
-    if (!converged) {
-      return state.wrap<ConvergeManyTypesResult>([[], [], [], undefined]);
-    }
-
-    inferredSubstitutions.push(substitutions.inferred);
-    combinedSubstitutions.push(...substitutions.left);
-
-    // Add the substitutions to every previous element in the list
-    elementSubstitutions.forEach((previousSubstitutions) => {
-      previousSubstitutions.push(...substitutions.left);
-    });
-
-    // Append this elements substitutions to the list
-    elementSubstitutions.push(substitutions.right);
-
-    combinedElementType = converged;
+  const [first, ...rest] = values;
+  if (!first) {
+    return state.wrap<ConvergeManyTypesResult>([[], [[]], lazyValue(unboundVariable('T'))]);
   }
 
-  // Apply the regular substitutions to the inferred values
-  const flatInferredSubstitutions = flatMap(inferredSubstitutions, (substitutions, index) => (
-    substitutions.map(({ from, to }) => ({
-      from,
-      to: applySubstitutions(elementSubstitutions[index], to),
-    }))
+  let inferredSubstitutions: VariableSubstitution[] = [];
+  let convergedValue: LazyValue | undefined = first;
+  const elementResults = [{ left: [], right: [] }, ...await pMap(rest, async element => {
+    if (!convergedValue) {
+      return { left: [], right: [] };
+    }
+
+    // Converge the current value with the accumulation
+    const [{ inferred, ...substitutions }, converged] = await state.runAsync(
+      convergeTypes,
+      convergedValue,
+      applyInferredSubstitutions(inferredSubstitutions, element),
+    );
+    convergedValue = converged;
+    inferredSubstitutions = inferred;
+    return substitutions;
+  })];
+
+  // Combine all replacements together for each element
+  const leftElementSubs = elementResults.map(({ left }) => left);
+  const eSubs = elementResults.map(({ right }, index) => (
+    right.concat(...leftElementSubs.slice(index))
   ));
 
-  return state.wrap<ConvergeManyTypesResult>([
-    flatInferredSubstitutions,
-    combinedSubstitutions,
-    elementSubstitutions,
-    combinedElementType,
-  ]);
+  return state.wrap<ConvergeManyTypesResult>([inferredSubstitutions, eSubs, convergedValue]);
 }
 

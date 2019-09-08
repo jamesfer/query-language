@@ -1,4 +1,4 @@
-import { zipObject } from 'lodash';
+import { zipObject, zip, spread } from 'lodash';
 import { makeMessage } from '../../message';
 import { UntypedExpression } from '../../untyped-expression';
 import { assertNever } from '../../utils';
@@ -106,13 +106,10 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       const elementTypes = typedElements.map(element => element.resultType.value);
 
       // Converge all of the types into one if possible
-      const [inferredSubstitutions, convergedSubstitutions, substitutionArray, converged] = await state.runAsync(
+      const [inferredSubstitutions, substitutions, converged] = await state.runAsync(
         convergeManyTypes,
         elementTypes,
       );
-
-      // TODO we might also need to apply these substitutions to each of the expressions too
-      state.setScope(applyInferredSubstitutionsToScope(state.scope(), inferredSubstitutions));
 
       if (!converged) {
         state.log(makeMessage(
@@ -123,14 +120,19 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
         ));
       }
 
-      return state.wrapWithSubstitutions<ListExpression>(convergedSubstitutions, {
+      // Check if we can imply any interfaces for each of the elements
+      const elementsWithImplicits = converged
+        ? await pMap(zip(typedElements, substitutions), spread(state.runAsyncP2(findImplicits)))
+        : typedElements;
+
+      // TODO we might also need to apply these substitutions to each of the expressions too
+      state.setScope(applyInferredSubstitutionsToScope(state.scope(), inferredSubstitutions));
+
+      return state.wrap<ListExpression>({
         tokens,
         kind: ExpressionKind.List,
         resultType: type(lazyValue(converged ? listType(converged) : nothing)),
-        // Check if we can imply any interfaces for each of the elements
-        elements: converged
-          ? await pMap(typedElements, state.runAsync1P1(findImplicits, substitutionArray[0]))
-          : typedElements,
+        elements: elementsWithImplicits,
         implicitParameters: [],
       });
     }

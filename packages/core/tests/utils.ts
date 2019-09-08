@@ -7,12 +7,12 @@ import {
 } from './runner';
 import {
   Type,
-  } from '../src/type/type';
+  } from '../src/compiler/type/type';
 import { addPositions, Position } from '../src/position';
 import {
-  booleanType, floatType, integerType, makeArrayType,
+  booleanType, floatType, integerType, lazyValue, listType,
   stringType,
-} from '../src/type/constructors';
+} from '../src/compiler/value-constructors';
 
 function makeToken(kind: TokenKind, value: string, begin: Position | number = [ 0, 0 ]): Token {
   if (typeof begin === 'number') {
@@ -94,9 +94,9 @@ export function arrayExpression(
   elementType: Type, elements: ExpressionExpectation[],
 ): ArrayExpressionExpectation {
   return {
-    kind: 'Array',
-    resultType: makeArrayType(elementType),
     elements,
+    kind: 'Array',
+    resultType: { ...elementType, value: lazyValue(listType(elementType.value)) },
   };
 }
 
