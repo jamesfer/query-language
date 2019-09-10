@@ -24,7 +24,7 @@ export interface BaseExpression<K extends ExpressionKind> {
   kind: K;
   resultType: Type;
   tokens: Token[];
-  implicitParameters: string[];
+  implicitParameters: (string | number)[];
 }
 
 export interface AnythingExpression extends BaseExpression<ExpressionKind.Anything> {}

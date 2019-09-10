@@ -4,9 +4,14 @@ import {
   UntypedFunctionCallExpression,
   UntypedFunctionExpression,
 } from '../../untyped-expression';
-import { ApplicationExpression, ExpressionKind, LambdaExpression } from '../expression';
+import {
+  ApplicationExpression,
+  ExpressionKind,
+  LambdaExpression,
+  ListExpression,
+} from '../expression';
 import { TypeScope } from '../scope';
-import { Value } from '../value';
+import { LazyValue, Value } from '../value';
 import {
   booleanType,
   floatType,
@@ -17,10 +22,10 @@ import {
   nothing,
   stringType,
   unboundVariable,
-  boundVariable,
+  boundVariable, userDefinedLiteral,
 } from '../value-constructors';
 import { serializeType } from './test-utils';
-import { type } from './type';
+import { type, TypeConstraint, TypeConstraints } from './type';
 import { typeExpression } from './type-expression';
 import { State } from './state';
 
@@ -78,7 +83,7 @@ describe('typeExpression', () => {
 
   describe('with an identifier expression', () => {
     it('looks up the type in the scope', async () => {
-      let valueType = lazyValue(integerType);
+      let valueType = type(lazyValue(integerType));
       const scopeWithIdentifier: TypeScope = {
         variables: {
           name: { valueType },
@@ -94,7 +99,7 @@ describe('typeExpression', () => {
       );
 
       expect(await serializeType(resultType)).toEqual(
-        await serializeType(type(valueType))
+        await serializeType(valueType)
       );
     });
   });
@@ -156,7 +161,7 @@ describe('typeExpression', () => {
     describe('where one element is an unbound variable', () => {
       const scope: TypeScope = {
         variables: {
-          T: { valueType: lazyValue(unboundVariable('T')) },
+          T: { valueType: type(lazyValue(unboundVariable('T'))) },
         },
       };
       const elements: UntypedExpression[] = [
@@ -190,16 +195,16 @@ describe('typeExpression', () => {
         const scope: TypeScope = {
           variables: {
             x: {
-              valueType: functionType(
+              valueType: type(functionType(
                 lazyValue(unboundVariable('a')),
                 lazyValue(unboundVariable('b')),
-              ),
+              )),
             },
             y: {
-              valueType: functionType(
+              valueType: type(functionType(
                 lazyValue(unboundVariable('b')),
                 lazyValue(unboundVariable('a')),
-              ),
+              )),
             }
           }
         };
@@ -228,7 +233,103 @@ describe('typeExpression', () => {
           ))))
         ));
       });
-    })
+    });
+
+    describe('when an element has constraints', () => {
+      it('fulfills constraints that can be resolved', async () => {
+        const constraint: TypeConstraint = {
+          kind: 'TypeConstraint',
+          parent: lazyValue(userDefinedLiteral('Monad')),
+          child: lazyValue(integerType),
+        };
+        const scope: TypeScope = {
+          variables: {
+            x: {
+              valueType: type(
+                functionType(
+                  lazyValue(integerType),
+                  lazyValue(unboundVariable('b')),
+                ),
+                [constraint],
+              ),
+            },
+          },
+          implementations: {
+            monadInteger: {
+              kind: 'TypeImplementation',
+              childType: lazyValue(integerType),
+              parentType: lazyValue(userDefinedLiteral('Monad')),
+              constraints: [],
+            },
+          },
+        };
+        const elements: UntypedExpression[] = [
+          {
+            kind: 'Identifier',
+            tokens: [],
+            value: 'x',
+          },
+        ];
+        const untypedExpression: UntypedExpression = {
+          elements,
+          kind: 'Array',
+          tokens: [],
+        };
+        const { resultType, elements: [{ implicitParameters }] } = State.unwrap(await typeExpression(scope, untypedExpression)) as ListExpression;
+        expect(await serializeType(resultType)).toEqual(await serializeType(
+          type(
+            lazyValue(listType(functionType(
+              lazyValue(integerType),
+              lazyValue(unboundVariable('b')),
+            ))),
+          )
+        ));
+        expect(implicitParameters).toEqual(['monadInteger']);
+      });
+
+      it('lifts constraints that cannot be resolved', async () => {
+        const constraint: TypeConstraint = {
+          kind: 'TypeConstraint',
+          parent: lazyValue(userDefinedLiteral('Monad')),
+          child: lazyValue(unboundVariable('a')),
+        };
+        const scope: TypeScope = {
+          variables: {
+            x: {
+              valueType: type(
+                functionType(
+                  lazyValue(unboundVariable('a')),
+                  lazyValue(unboundVariable('b')),
+                ),
+                [constraint],
+              ),
+            },
+          }
+        };
+        const elements: UntypedExpression[] = [
+          {
+            kind: 'Identifier',
+            tokens: [],
+            value: 'x',
+          },
+        ];
+        const untypedExpression: UntypedExpression = {
+          elements,
+          kind: 'Array',
+          tokens: [],
+        };
+        const { resultType } = State.unwrap(await typeExpression(scope, untypedExpression));
+        expect(await serializeType(resultType)).toEqual(await serializeType(
+          type(
+            lazyValue(listType(functionType(
+              lazyValue(unboundVariable('a')),
+              lazyValue(unboundVariable('b')),
+            ))),
+            [constraint],
+          )
+        ));
+      });
+    });
   });
 
   describe('with a function expression', () => {
@@ -428,11 +529,11 @@ describe('typeExpression', () => {
         const scope: TypeScope = {
           variables: {
             add: {
-              valueType: functionType(
+              valueType: type(functionType(
                 lazyValue(unboundVariable('a')),
                 lazyValue(unboundVariable('a')),
                 lazyValue(integerType),
-              ),
+              )),
             },
           },
         };
@@ -464,10 +565,10 @@ describe('typeExpression', () => {
         const scope: TypeScope = {
           variables: {
             increment: {
-              valueType: functionType(
+              valueType: type(functionType(
                 lazyValue(unboundVariable('a')),
                 lazyValue(unboundVariable('a')),
-              ),
+              )),
             },
           },
         };
@@ -495,7 +596,7 @@ describe('typeExpression', () => {
       it('uses a function call to infer bound variables', async () => {
         const scope: TypeScope = {
           variables: {
-            inc: { valueType: functionType(lazyValue(integerType), lazyValue(integerType)) }
+            inc: { valueType: type(functionType(lazyValue(integerType), lazyValue(integerType))) }
           },
         };
         const untypedExpression: UntypedFunctionExpression = {
@@ -529,11 +630,11 @@ describe('typeExpression', () => {
         const scope: TypeScope = {
           variables: {
             something: {
-              valueType: functionType(
+              valueType: type(functionType(
                 lazyValue(integerType),
                 lazyValue(unboundVariable('a')),
                 lazyValue(unboundVariable('a')),
-              ),
+              )),
             },
           },
         };

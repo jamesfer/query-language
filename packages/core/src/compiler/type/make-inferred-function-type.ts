@@ -17,11 +17,15 @@ export async function makeInferredFunctionType(
   const inferredParameterTypes = await pReduce(
     parameterNames,
     [] as LazyValue[],
-    async (otherParameters, parameter) => [
-      ...otherParameters,
-      findVariableTypeInScope(state.scope(), parameter)
-        || lazyValue(await freeVariable('p', [bodyType.value, ...otherParameters]))
-    ],
+    async (otherParameters, parameter) => {
+      const variable = findVariableTypeInScope(state.scope(), parameter);
+      return [
+        ...otherParameters,
+        variable
+          ? variable.value
+          : lazyValue(await freeVariable('p', [bodyType.value, ...otherParameters]))
+      ];
+    },
   );
 
   // TODO work out if we need to do this

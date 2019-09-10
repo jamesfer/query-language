@@ -107,7 +107,7 @@ export async function serializeType(type: Type): Promise<any> {
     constraints: pMap(type.constraints, async constraint => ({
       ...constraint,
       child: await serializeValueWithState(constraint.child, state),
-      parents: await serializeValueListWithState(constraint.parents, state),
+      parents: await serializeValueWithState(constraint.parent, state),
     })),
   };
 }

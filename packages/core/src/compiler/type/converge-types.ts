@@ -166,6 +166,7 @@ export async function convergeTypes(
         left.kind === right.kind && left.value === right.value ? lazyRight : undefined
       ]);
 
+      // TODO this doesn't support children of user defined types
     case ValueKind.UserDefinedLiteral:
       return state.wrap<ConvergeResult>([
         noSubstitutions,

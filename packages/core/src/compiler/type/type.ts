@@ -1,9 +1,9 @@
-import { LazyValue, LazyValueList, UnboundVariable } from '../value';
+import { LazyValue, UnboundVariable } from '../value';
 
 export interface TypeConstraint {
   kind: 'TypeConstraint';
   child: LazyValue;
-  parents: LazyValueList;
+  parent: LazyValue;
 }
 
 export type TypeConstraints = TypeConstraint[];

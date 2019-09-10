@@ -1,4 +1,4 @@
-import { zipObject, zip, spread } from 'lodash';
+import { zipObject, zip, spread, flatMap, compact } from 'lodash';
 import { makeMessage } from '../../message';
 import { UntypedExpression } from '../../untyped-expression';
 import { assertNever } from '../../utils';
@@ -36,9 +36,13 @@ import { convergeManyTypes, convergeTypes } from './converge-types';
 import { findImplicits } from './find-implicits';
 import { makeInferredFunctionType } from './make-inferred-function-type';
 import { State, StateResult } from './state';
-import { type } from './type';
+import { Type, type } from './type';
 import { freeBoundVariable, freeVariable } from './utils';
-import { applySubstitutions } from './variable-substitutions';
+import {
+  applySubstitutions,
+  VariableSubstitution,
+  VariableSubstitutions,
+} from './variable-substitutions';
 
 export async function typeExpression(scope: TypeScope, expression: UntypedExpression): Promise<StateResult<Expression>> {
   const state = State.of(scope);
@@ -91,7 +95,7 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       const variable = findVariableTypeInScope(state.scope(), expression.value);
       return state.wrap<IdentifierExpression>({
         kind: ExpressionKind.Identifier,
-        resultType: type(variable ? variable : lazyValue(nothing)),
+        resultType: variable || type(lazyValue(nothing)),
         tokens: expression.tokens,
         name: expression.value,
         implicitParameters: [],
@@ -121,18 +125,39 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       }
 
       // Check if we can imply any interfaces for each of the elements
-      const elementsWithImplicits = converged
-        ? await pMap(zip(typedElements, substitutions), spread(state.runAsyncP2(findImplicits)))
-        : typedElements;
+      const implicits = converged
+        ? await pMap(
+          typedElements.map(({ resultType }) => resultType).map((type, index) => ({
+            ...type,
+            value: applySubstitutions(substitutions[index], type.value),
+          })),
+          state.runAsyncP1(findImplicits),
+        )
+        : [];
 
-      // TODO we might also need to apply these substitutions to each of the expressions too
-      state.setScope(applyInferredSubstitutionsToScope(state.scope(), inferredSubstitutions));
+      // Collect all the implicits that we couldn't find
+      const missingImplicits = flatMap(implicits, (implicitList, elementIndex) => (
+        compact(implicitList.map((implicitArg, implicitIndex) => (
+          implicitArg === undefined
+            ? typedElements[elementIndex].resultType.constraints[implicitIndex]
+            : undefined
+        )))
+      ));
 
-      return state.wrap<ListExpression>({
+      // Replace any implicits we couldn't find with the index from the parent
+      let index = 0;
+      const carriedImplicits = implicits.map(elementImplicits => elementImplicits.map(implicit => (
+        implicit === undefined ? index++ : implicit
+      )));
+
+      return state.wrapWithSubstitutions<ListExpression>(inferredSubstitutions, {
         tokens,
         kind: ExpressionKind.List,
-        resultType: type(lazyValue(converged ? listType(converged) : nothing)),
-        elements: elementsWithImplicits,
+        resultType: type(lazyValue(converged ? listType(converged) : nothing), missingImplicits),
+        elements: typedElements.map((element, index) => ({
+          ...element,
+          implicitParameters: carriedImplicits[index],
+        })),
         implicitParameters: [],
       });
     }
@@ -147,7 +172,7 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       // Extend the scope with the new parameter types
       const childScope = createChildScope(state.scope(), {
         variables: zipObject(argumentNames, parameterVariables.map(value => ({
-          valueType: lazyValue(value),
+          valueType: type(lazyValue(value)),
         }))),
       });
       const childState = State.of(childScope);
@@ -156,6 +181,7 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       const typedBody = await childState.runAsync(typeExpression, expression.value);
 
       // Determine the type of the whole function
+      // TODO this is bugged because it assumes that every parameter's type is in the same scope
       const inferredFunctionType = await childState.runAsync(
         makeInferredFunctionType,
         typedBody.resultType,
@@ -197,7 +223,6 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
 
       // Find the result type of the function
       const resultType = applySubstitutions(substitutions.right, resultVariable);
-      state.setScope(applyInferredSubstitutionsToScope(state.scope(), substitutions.inferred));
 
       // TODO throw error if too many parameters are given
       // if (i >= expectedParameters.length) {
@@ -209,14 +234,14 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       //     ));
       // }
 
-      return state.wrap<ApplicationExpression>({
+      return state.wrapWithSubstitutions<ApplicationExpression>(substitutions.inferred, {
         resultType: type(resultType),
         kind: ExpressionKind.Application,
         tokens: expression.tokens,
         implicitParameters: [],
         parameters: typedParameters,
         callee: typedCallee,
-      })
+      });
     }
 
     case 'Unrecognized':

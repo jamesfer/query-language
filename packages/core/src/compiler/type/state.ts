@@ -85,7 +85,7 @@ export class State {
 
   private updateState(newState: StateObject, substitutions: VariableSubstitution[]) {
     this.internalState = {
-      scope: newState.scope,
+      scope: applyInferredSubstitutionsToScope(newState.scope, substitutions),
       messages: [...this.internalState.messages, ...newState.messages],
     };
   }

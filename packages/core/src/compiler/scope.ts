@@ -1,12 +1,10 @@
 import { Expression, IdentifierExpression } from './expression';
+import { Type, TypeImplementation } from './type/type';
 import {
   applyInferredSubstitutions,
-  applySubstitutions,
   VariableSubstitution,
 } from './type/variable-substitutions';
-// import { SubtypeRelationship, TypeDeclaration, TypeImplementation } from './type';
-import { LazyValue } from './value';
-import { omit, mapValues } from 'lodash';
+import { mapValues } from 'lodash';
 
 export interface TypeScopeVariableEntry {
   // The value of this variable. Each variable defined in a script should evaluate their
@@ -16,7 +14,7 @@ export interface TypeScopeVariableEntry {
   // TODO a type scope cannot contain this value because it doesn't know what values are
   // value: LazyValue;
   // The resolved type of this variable.
-  valueType: LazyValue;
+  valueType: Type;
   // Information about how the variable was declared. Currently I believe that built in
   // variables will not have a declaration block, hence it's empty.
   declaration?: {
@@ -49,12 +47,14 @@ export interface TypeScope {
    */
   inferredVariables?: string[];
 
-  // TODO I know that these will need to be implemented, just waiting until absolutely necessary
-  // /**
-  //  * List of implementations of an interface type.
-  //  */
-  // // TODO these need to be named
-  // implementations?: TypeImplementation[];
+  /**
+   * List of implementations of an interface type.
+   */
+  // TODO these need to be named
+  implementations?: {
+    [k: string]: TypeImplementation,
+  };
+
   //
   // /**
   //  * List of subtype relationships between types.
@@ -62,7 +62,7 @@ export interface TypeScope {
   // subtypeRelationships?: SubtypeRelationship[];
 }
 
-export function findVariableTypeInScope(scope: TypeScope, name: string): LazyValue | undefined {
+export function findVariableTypeInScope(scope: TypeScope, name: string): Type | undefined {
   if (scope.variables && name in scope.variables) {
     return scope.variables[name].valueType;
   }
@@ -114,7 +114,10 @@ export function applyInferredSubstitutionsToScope(
   const variables = scope.variables
     ? mapValues(scope.variables, variable => ({
         ...variable,
-        valueType: applyInferredSubstitutions(substitutions, variable.valueType),
+        valueType: {
+          ...variable.valueType,
+          value: applyInferredSubstitutions(substitutions, variable.valueType.value),
+        },
       }))
     : undefined;
   const newScope = variables ? { variables } : {};

@@ -1,7 +1,33 @@
 import { TypeScope } from '../scope';
+import { pMap } from '../utils';
+import { isSubtype } from './is-subtype';
 import { State, StateResult } from './state';
-import { Expression } from '../expression';
-import { VariableSubstitution } from './variable-substitutions';
+import { Type, TypeConstraint } from './type';
+
+async function findImplementation(
+  scope: TypeScope,
+  constraint: TypeConstraint,
+): Promise<StateResult<string | undefined>> {
+  const state = State.of(scope);
+
+  if (scope.implementations) {
+    for (const key in scope.implementations) {
+      const implementation = scope.implementations[key];
+      if (
+        await isSubtype(constraint.child, implementation.childType)
+          && await isSubtype(constraint.parent, implementation.parentType)
+      ) {
+        return state.wrap(key);
+      }
+    }
+  }
+
+  if (scope.parent) {
+    return findImplementation(scope.parent, constraint);
+  }
+
+  return state.wrap(undefined);
+}
 
 /**
  * Finds any implicit parameters that have been entirely fulfilled by the given substitutions and
@@ -10,9 +36,9 @@ import { VariableSubstitution } from './variable-substitutions';
  */
 export async function findImplicits(
   scope: TypeScope,
-  substitutions: VariableSubstitution[],
-  expression: Expression,
-): Promise<StateResult<Expression>> {
-  // TODO finish this implementation
-  return State.of(scope).wrap(expression);
+  type: Type,
+): Promise<StateResult<(string | undefined)[]>> {
+  const state = State.of(scope);
+  const implementations = await pMap(type.constraints, state.runAsyncP1(findImplementation));
+  return state.wrap(implementations);
 }
