@@ -1,73 +1,73 @@
-import { assign, map, mapValues, Dictionary } from 'lodash';
-import { FunctionType, Type } from './type/type';
-import { LazyValue, makeFunctionValue, PlainFunctionValue } from './value';
-import { Implementation, Scope } from './scope';
-import { Expression, FunctionExpression, MethodExpression } from './expression';
-import { InterfaceType } from './qlang';
+import { assign, mapValues } from 'lodash';
+import { Expression, ExpressionKind } from './compiler/expression';
+import { Type, TypeConstraints } from './compiler/type/type';
+import { UniversalScope, UniversalScopeVariableEntry } from './compiler/universal-scope';
+import { LazyValue, NativeLambdaBody } from './compiler/value';
 
-export interface LibraryFunction {
+export interface LibraryLambda {
   type: Type;
-  impl: PlainFunctionValue;
+  parameterNames: string[];
+  body: Expression;
 }
 
-export type NativeFunctionValue = (...args: LazyValue[]) => LazyValue;
-
-export interface NativeFunction {
+export interface NativeLibraryLambda {
   type: Type;
-  implementation: NativeFunctionValue;
+  parameterCount: number;
+  body: NativeLambdaBody;
+}
+
+export interface LibraryImplementation {
+  parent: LazyValue;
+  child: LazyValue;
+  constraints?: TypeConstraints;
 }
 
 export interface Library {
-  nativeFunctions?: {
-    [name: string]: NativeFunction;
+  lambdas?: {
+    [name: string]: LibraryLambda;
   };
-  interfaces?: {
-    [name: string]: InterfaceType;
+  nativeLambdas?: {
+    [name: string]: NativeLibraryLambda;
   };
   implementations?: {
-    [interfaceName: string]: Implementation[]
+    [name: string]: LibraryImplementation;
   };
 }
 
 export function mergeLibraries(...libraries: Library[]): Library {
   return {
-    nativeFunctions: assign({}, ...map(libraries, 'nativeFunctions')),
-    interfaces: assign({}, ...map(libraries, 'interfaces')),
-    implementations: assign({}, ...map(libraries, 'implementations')),
+    nativeLambdas: assign({}, ...libraries.map(({ nativeLambdas }) => nativeLambdas)),
+    implementations: assign({}, ...libraries.map(({ implementations }) => implementations)),
+    lambdas: assign({}, ...libraries.map(({ lambdas }) => lambdas)),
   };
 }
 
-export function convertNativeToExpression(native: NativeFunction): FunctionExpression {
-  // TODO native functions should be mapped to type called 'NativeFunction'
+export function convertToScope(library: Library): UniversalScope {
   return {
-    kind: 'Function',
-    tokens: [],
-    value: makeFunctionValue(() => native.implementation),
-    resultType: native.type,
-    argumentNames: [],
-    implementationNames: [],
-  };
-}
-
-export function convertToScope(library: Library): Scope {
-  const methodTypes = map(library.interfaces, 'methods').reduce(
-    (methodMap, methods) => ({...methodMap, ...methods }),
-    {} as Dictionary<FunctionType>,
-  );
-  return {
-    types: {},
     implementations: {},
-    interfaces: library.implementations || {},
     variables: {
-      ...mapValues(methodTypes, (type, name): MethodExpression => ({
-        kind: 'Method',
-        resultType: type,
-        tokens: [],
-        methodName: name,
-        argumentNames: [],
-        implementationNames: ['self'],
+      ...mapValues(library.lambdas, (lambda): UniversalScopeVariableEntry => ({
+        valueType: lambda.type,
+        value: {
+          kind: ExpressionKind.Lambda,
+          implicitParameters: [],
+          tokens: [],
+          parameterNames: lambda.parameterNames,
+          resultType: lambda.type,
+          body: lambda.body,
+        },
       })),
-      ...mapValues(library.nativeFunctions, convertNativeToExpression),
+      ...mapValues(library.nativeLambdas, (native): UniversalScopeVariableEntry => ({
+        valueType: native.type,
+        value: {
+          kind: ExpressionKind.NativeLambda,
+          implicitParameters: [],
+          tokens: [],
+          parameterCount: native.parameterCount,
+          resultType: native.type,
+          body: native.body,
+        },
+      })),
     },
   };
 }

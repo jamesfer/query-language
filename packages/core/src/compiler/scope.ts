@@ -13,14 +13,17 @@ export interface TypeScopeVariableEntry {
   // but that is out of scope for the moment.
   // TODO a type scope cannot contain this value because it doesn't know what values are
   // value: LazyValue;
+
   // The resolved type of this variable.
   valueType: Type;
+
   // Information about how the variable was declared. Currently I believe that built in
   // variables will not have a declaration block, hence it's empty.
   declaration?: {
     // The expression where this identifier was declared. Useful in case we ever want to map an
     // identifier back to where it was defined.
     identifier: IdentifierExpression;
+
     // The expression of the value of the declaration.
     value: Expression;
     // TODO consider adding to every expression, a reference to the scope where it was defined.
@@ -50,7 +53,6 @@ export interface TypeScope {
   /**
    * List of implementations of an interface type.
    */
-  // TODO these need to be named
   implementations?: {
     [k: string]: TypeImplementation,
   };

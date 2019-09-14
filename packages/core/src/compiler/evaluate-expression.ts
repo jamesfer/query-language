@@ -1,8 +1,8 @@
 import { assertNever } from '../utils';
+import { EvaluationScope, findVariableInScope2 } from './evaluation-scope';
 import { Expression, ExpressionKind } from './expression';
-import { State, StateResult } from './type/state';
 import { lazyList, pMap } from './utils';
-import { LazyValue, ValueKind } from './value';
+import { LazyValue } from './value';
 import {
   anything,
   boolean,
@@ -14,94 +14,88 @@ import {
   string,
 } from './value-constructors';
 
-// TODO add scope
-export async function evaluateExpression(scope: any, expression: Expression): Promise<StateResult<LazyValue>> {
-  const state = State.of({});
-
+export async function evaluateExpression2(
+  scope: EvaluationScope,
+  expression: Expression,
+  parameters: Expression[],
+): Promise<LazyValue> {
   switch (expression.kind) {
     case ExpressionKind.Anything:
-      return state.wrap(lazyValue(anything));
+      return lazyValue(anything);
+
     case ExpressionKind.Nothing:
-      return state.wrap(lazyValue(nothing));
+      return lazyValue(nothing);
+
     case ExpressionKind.String:
-      return state.wrap(lazyValue(string(expression.value)));
+      return lazyValue(string(expression.value));
+
     case ExpressionKind.Integer:
-      return state.wrap(lazyValue(integer(expression.value)));
+      return lazyValue(integer(expression.value));
+
     case ExpressionKind.Float:
-      return state.wrap(lazyValue(float(expression.value)));
+      return lazyValue(float(expression.value));
+
     case ExpressionKind.Boolean:
-      return state.wrap(lazyValue(boolean(expression.value)));
+      return lazyValue(boolean(expression.value));
+
     case ExpressionKind.List: {
-      const values = await pMap(expression.elements, state.runAsyncP1(evaluateExpression));
-      return state.wrap(lazyValue(list(lazyList(values))));
-    }
-    case ExpressionKind.NativeLambda:
-      return state.wrap(lazyValue({
-        kind: ValueKind.NativeLambda,
-        parameterCount: expression.parameterCount,
-        body: expression.body,
-      }));
-    case ExpressionKind.Lambda: {
-      return state.wrap(lazyValue({
-        kind: ValueKind.NativeLambda,
-        parameterCount: expression.parameterNames.length,
-        body: (...parameters) => async () => {
-          // TODO add parameters to scope under expression.parameterNames
-          // TODO messages emitted at this state are not propagated anywhere because the state has
-          //      already been returned to the caller.
-          const result = await state.runAsync(evaluateExpression, expression.body);
-          return await result();
-        },
-      }));
-    }
-    case ExpressionKind.Application: {
-      const callee = await state.runAsync(evaluateExpression, expression.callee);
-      const parameters = await pMap(expression.parameters, parameter => (
-        state.runAsync(evaluateExpression, parameter)
+      const values = await pMap(expression.elements, element => (
+        evaluateExpression2(scope, element, [])
       ));
-      return state.wrap<LazyValue>(async () => {
-        const resolvedCallee = await callee();
-        switch (resolvedCallee.kind) {
-          case ValueKind.NativeLambda: {
-            if (parameters.length === resolvedCallee.parameterCount) {
-              return await resolvedCallee.body(...parameters)();
-            }
-
-            if (parameters.length < resolvedCallee.parameterCount) {
-              return {
-                kind: ValueKind.NativeLambda,
-                parameterCount: resolvedCallee.parameterCount - parameters.length,
-                body: (...args) => resolvedCallee.body(...parameters, ...args),
-              };
-            }
-          }
-
-          case ValueKind.Anything:
-          case ValueKind.Nothing:
-          case ValueKind.Integer:
-          case ValueKind.Float:
-          case ValueKind.String:
-          case ValueKind.Boolean:
-          case ValueKind.List:
-          case ValueKind.UserDefinedLiteral:
-          case ValueKind.Application:
-          case ValueKind.UnboundVariable:
-          case ValueKind.Lambda:
-          case ValueKind.BoundVariable:
-            return nothing;
-
-          default:
-            return assertNever(resolvedCallee);
-        }
-      });
+      return lazyValue(list(lazyList(values)));
     }
 
+    case ExpressionKind.Identifier: {
+      const value = findVariableInScope2(scope, expression.name);
+      if (!value) {
+        throw new Error(`Cannot find identifier ${expression.name} in scope`);
+      }
+      return evaluateExpression2(scope, value, parameters);
+    }
 
-    case ExpressionKind.Identifier:
-      // TODO look up in scope
-      return state.wrap(lazyValue(nothing));
+    case ExpressionKind.NativeLambda:
+      return expression.body(...await pMap(parameters, parameter => (
+        evaluateExpression2(scope, parameter, [])
+      )));
+
+    case ExpressionKind.Lambda: {
+      if (parameters.length < expression.parameterNames.length) {
+        throw new Error('Not enough parameters');
+      }
+
+      const newScope = {
+        parent: scope,
+        variables: expression.parameterNames.reduce(
+          (variables, name, index) => ({
+            ...variables,
+            [name]: { value: parameters[index] },
+          }),
+          {},
+        ),
+      };
+
+      return evaluateExpression2(
+        newScope,
+        expression.body,
+        parameters.slice(expression.parameterNames.length),
+      );
+    }
+
     case ExpressionKind.PolymorphicLambda:
-      return state.wrap(lazyValue(nothing));
+      // TODO not sure how to implement this one
+      return lazyValue(nothing);
+
+    case ExpressionKind.Application: {
+      if (expression.parameters.some(parameter => parameter === null)) {
+        throw new Error('Failed to call function, some of the parameters were null');
+      }
+
+      return evaluateExpression2(
+        scope,
+        expression.callee,
+        [...expression.parameters as Expression[], ...parameters],
+      );
+    }
 
     default:
       return assertNever(expression);

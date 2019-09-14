@@ -1,13 +1,19 @@
 import { Log } from './compiler/compiler-utils/monoids/log';
 import { interpretSyntaxTree } from './compiler/interpret-expression';
 import { tokenize } from './compiler/tokenizer/tokenize';
+import {
+  convertToEvaluationScope,
+  convertToTypeScope,
+  UniversalScope,
+} from './compiler/universal-scope';
+import { convertToScope } from './library';
 import { Message } from './message';
+import standardLibrary from './standard-library/standard-library';
 import { Token } from './token';
-import { evaluateExpression } from './compiler/evaluate-expression';
+import { evaluateExpression2 } from './compiler/evaluate-expression';
 import { Expression } from './compiler/expression';
 import { typeExpression } from './compiler/type/type-expression';
 import { Value } from './compiler/value';
-
 
 export interface CompilationResult {
   messages: Message[];
@@ -24,7 +30,7 @@ export interface EvaluationResult {
 
 export interface ExecutionResult extends CompilationResult, EvaluationResult {}
 
-export async function compile(code: string): Promise<CompilationResult> {
+export async function compile(code: string, scope: UniversalScope): Promise<CompilationResult> {
   const log = Log.empty();
 
   // Parse Tokens
@@ -38,9 +44,7 @@ export async function compile(code: string): Promise<CompilationResult> {
   }
 
   // Type expression
-  // TODO standard library is not in the right format
-  // const scope: Scope = standardLibrary as any;
-  const [state, , typedExpression] = await typeExpression({}, expression);
+  const [state, , typedExpression] = await typeExpression(convertToTypeScope(scope), expression);
   log.append(state.messages);
 
   return {
@@ -51,10 +55,10 @@ export async function compile(code: string): Promise<CompilationResult> {
   };
 }
 
-export async function evaluate(expression: Expression): Promise<EvaluationResult> {
+export async function evaluate(expression: Expression, scope: UniversalScope): Promise<EvaluationResult> {
   // TODO calling evaluate should use the compiled scope to prevent mismatches in the scope between type checking and evaluation
   // TODO the standard library is in the wrong format
-  const [, , result] = await evaluateExpression({}, expression);
+  const result = await evaluateExpression2(convertToEvaluationScope(scope), expression, []);
   return {
     result: await result(),
     messages: [],
@@ -62,13 +66,16 @@ export async function evaluate(expression: Expression): Promise<EvaluationResult
   };
 }
 
-export async function execute(code: string): Promise<ExecutionResult> {
-  const compRes = await compile(code);
+export async function execute(
+  code: string,
+  scope: UniversalScope = convertToScope(standardLibrary),
+): Promise<ExecutionResult> {
+  const compRes = await compile(code, scope);
   if (!compRes.compiled || !compRes.expression) {
     return { evaluated: false, ...compRes };
   }
 
-  const evalRes = await evaluate(compRes.expression);
+  const evalRes = await evaluate(compRes.expression, scope);
   return {
     ...compRes,
     ...evalRes,

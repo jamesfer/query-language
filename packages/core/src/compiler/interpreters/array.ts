@@ -3,9 +3,7 @@ import { TokenKind } from '../../token';
 import { UntypedArrayExpression } from '../../untyped-expression';
 import { buildListInterpreter } from '../compiler-utils/interpret-list';
 import { Log } from '../compiler-utils/monoids/log';
-import { LogTypeScope } from '../compiler-utils/monoids/log-type-scope';
 import { ExpressionInterpreter } from '../interpret-expression';
-import { ExpressionTyper, typeExpression } from '../type-expression';
 
 
 const buildArrayList

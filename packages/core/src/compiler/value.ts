@@ -81,10 +81,12 @@ export interface Lambda {
   body: LazyValue;
 }
 
+export type NativeLambdaBody = (...parameters: LazyValue[]) => LazyValue;
+
 export interface NativeLambda {
   kind: ValueKind.NativeLambda;
   parameterCount: number;
-  body: (...parameters: LazyValue[]) => LazyValue;
+  body: NativeLambdaBody;
 }
 
 export interface Application {

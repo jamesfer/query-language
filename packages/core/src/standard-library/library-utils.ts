@@ -1,33 +1,26 @@
-import { map } from 'lodash';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/switch';
-import { Observable } from 'rxjs/Observable';
-import { NativeFunctionValue } from '../library';
-import {
-  LazyValue,
-  makeLazyBooleanValue,
-  makeLazyFloatValue,
-  PlainValue,
-} from '../value';
+import { Boolean, Float, LazyValue, NativeLambdaBody, Value, ValueKind } from '../compiler/value';
 
 /**
  * Returns a function that will automatically evaluate all its lazy arguments
  * and call the given function with values of them.
  */
-export function evalArgs(func: (...args: PlainValue[]) => LazyValue): NativeFunctionValue {
-  return (...args) => Observable.combineLatest(...args).switchMap((values) => (
-    func(...map(values, 'value'))
-  ));
+export function evalArgs(func: (...args: Value[]) => LazyValue): NativeLambdaBody {
+  return (...parameters) => async () => {
+    const unwrappedArgs: Value[] = await Promise.all(parameters.map(parameter => parameter()));
+    return await func(...unwrappedArgs)();
+  };
 }
 
-export function bindFloatFunction(func: (...args: number[]) => number): NativeFunctionValue {
-  return evalArgs((...args: number[]) => {
-    return makeLazyFloatValue(func(...args));
-  });
+export function bindFloatFunction(func: (...args: number[]) => number): NativeLambdaBody {
+  return evalArgs((...args: Float[]) => async () => ({
+    kind: ValueKind.Float,
+    value: func(...args.map(({ value }) => value)),
+  }));
 }
 
-export function bindBooleanFunction(func: (...args: number[]) => boolean): NativeFunctionValue {
-  return evalArgs((...args: number[]) => {
-    return makeLazyBooleanValue(func(...args));
-  });
+export function bindBooleanFunction(func: (...args: boolean[]) => boolean): NativeLambdaBody  {
+  return evalArgs((...args: Boolean[]) => async () => ({
+    kind: ValueKind.Boolean,
+    value: func(...args.map(({ value }) => value)),
+  }));
 }

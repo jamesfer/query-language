@@ -1,40 +1,48 @@
-import { Library, LibraryFunction } from '../../library';
+import { type } from '../../compiler/type/type';
+import { functionType, floatType, lazyValue } from '../../compiler/value-constructors';
+import { Library, NativeLibraryLambda } from '../../library';
 import { bindFloatFunction } from '../library-utils';
-import { floatType, makeFunctionType } from '../../type/constructors';
 
-const tan: LibraryFunction = {
-  type: makeFunctionType([floatType], floatType),
-  impl: bindFloatFunction(Math.tan),
+const floatToFloatType = type(functionType(lazyValue(floatType), lazyValue(floatType)));
+
+const tan: NativeLibraryLambda = {
+  type: type(functionType(lazyValue(floatType), lazyValue(floatType))),
+  body: bindFloatFunction(Math.tan),
+  parameterCount: 1,
 };
 
-const sin: LibraryFunction = {
-  type: makeFunctionType([floatType], floatType),
-  impl: bindFloatFunction(Math.sin),
+const sin: NativeLibraryLambda = {
+  type: floatToFloatType,
+  body: bindFloatFunction(Math.sin),
+  parameterCount: 1,
 };
 
-const cos: LibraryFunction = {
-  type: makeFunctionType([floatType], floatType),
-  impl: bindFloatFunction(Math.cos),
+const cos: NativeLibraryLambda = {
+  type: floatToFloatType,
+  body: bindFloatFunction(Math.cos),
+  parameterCount: 1,
 };
 
-const atan: LibraryFunction = {
-  type: makeFunctionType([floatType], floatType),
-  impl: bindFloatFunction(Math.atan),
+const atan: NativeLibraryLambda = {
+  type: floatToFloatType,
+  body: bindFloatFunction(Math.atan),
+  parameterCount: 1,
 };
 
-const asin: LibraryFunction = {
-  type: makeFunctionType([floatType], floatType),
-  impl: bindFloatFunction(Math.asin),
+const asin: NativeLibraryLambda = {
+  type: floatToFloatType,
+  body: bindFloatFunction(Math.asin),
+  parameterCount: 1,
 };
 
-const acos: LibraryFunction = {
-  type: makeFunctionType([floatType], floatType),
-  impl: bindFloatFunction(Math.acos),
+const acos: NativeLibraryLambda = {
+  type: floatToFloatType,
+  body: bindFloatFunction(Math.acos),
+  parameterCount: 1,
 };
-
 
 export const trigonometry: Library = {
-  functions: {
+  nativeLambdas: {
     tan,
     sin,
     cos,

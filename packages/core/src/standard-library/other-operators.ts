@@ -1,20 +1,68 @@
-import { makeFunctionType } from '../type/constructors';
-import { makeLazyFunctionValue, PlainFunctionValue } from '../value';
-import { Library, LibraryFunction } from '../library';
-import { evalArgs } from './library-utils';
+import { ExpressionKind } from '../compiler/expression';
+import { type } from '../compiler/type/type';
+import { functionType, lazyValue, unboundVariable } from '../compiler/value-constructors';
+import { Library, LibraryLambda } from '../library';
 
-const compose: LibraryFunction = {
-  type: makeFunctionType([
-    makeFunctionType(['T2'], 'R'),
-    makeFunctionType(['T1'], 'T2'),
-  ],                     makeFunctionType(['T1'],'R')),
-  impl: evalArgs((second: PlainFunctionValue, first: PlainFunctionValue) => {
-    return makeLazyFunctionValue(a => second(first(a)));
-  }),
+const compose: LibraryLambda = {
+  type: type(functionType(
+    functionType(lazyValue(unboundVariable('T2')), lazyValue(unboundVariable('R'))),
+    functionType(lazyValue(unboundVariable('T1')), lazyValue(unboundVariable('T2'))),
+    functionType(lazyValue(unboundVariable('T1')), lazyValue(unboundVariable('R'))),
+  )),
+  parameterNames: ['f', 'g'],
+  body: {
+    kind: ExpressionKind.Lambda,
+    implicitParameters: [],
+    tokens: [],
+    parameterNames: ['a'],
+    resultType: type(functionType(
+      lazyValue(unboundVariable('T1')),
+      lazyValue(unboundVariable('R')),
+    )),
+    body: {
+      kind: ExpressionKind.Application,
+      tokens: [],
+      implicitParameters: [],
+      resultType: type(lazyValue(unboundVariable('R'))),
+      callee: {
+        kind: ExpressionKind.Identifier,
+        tokens: [],
+        implicitParameters: [],
+        name: 'f',
+        resultType: type(functionType(
+          lazyValue(unboundVariable('T2')),
+          lazyValue(unboundVariable('R')),
+        )),
+      },
+      parameters: [{
+        kind: ExpressionKind.Application,
+        tokens: [],
+        implicitParameters: [],
+        resultType: type(lazyValue(unboundVariable('T2'))),
+        callee: {
+          kind: ExpressionKind.Identifier,
+          tokens: [],
+          implicitParameters: [],
+          name: 'g',
+          resultType: type(functionType(
+            lazyValue(unboundVariable('T1')),
+            lazyValue(unboundVariable('T2')),
+          )),
+        },
+        parameters: [{
+          kind: ExpressionKind.Identifier,
+          implicitParameters: [],
+          tokens: [],
+          resultType: type(lazyValue(unboundVariable('T1'))),
+          name: 'a',
+        }],
+      }],
+    },
+  },
 };
 
 export const otherOperators: Library = {
-  functions: {
+  lambdas: {
     '&': compose,
   },
 };
