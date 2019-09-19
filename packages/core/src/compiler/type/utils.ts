@@ -32,6 +32,9 @@ export async function extractUnboundVariables(unresolvedValue: LazyValue): Promi
     case ValueKind.List:
       return extractUnboundVariablesFromList(Array.from(value.values()));
 
+    case ValueKind.Record:
+      return extractUnboundVariablesFromList(Object.values(value.values));
+
     case ValueKind.Application: {
       const calleeVariables = await extractUnboundVariables(value.callee);
       const parameterVariables = await extractUnboundVariablesFromList(

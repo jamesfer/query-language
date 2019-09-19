@@ -47,13 +47,18 @@ describe('api', () => {
     });
 
     it('should include the standard library', async () => {
-      const { result } = await execute('tan(1)');
-      expect(result).toEqual(float(Math.tan(1)));
+      const { result } = await execute('tan(1.5)');
+      expect(result).toEqual(float(Math.tan(1.5)));
     });
 
     it('should handle functions well', async () => {
-      const { result } = await execute('(tan & sin)(1)');
-      expect(result).toEqual(float(Math.tan(Math.sin(1))));
+      const { result } = await execute('(tan & sin)(1.5)');
+      expect(result).toEqual(float(Math.tan(Math.sin(1.5))));
+    });
+
+    it('should handle interfaces declared in the standard library', async () => {
+      const { result } = await execute('1.5 + 2.5');
+      expect(result).toEqual(float(4));
     });
   });
 });

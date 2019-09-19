@@ -21,6 +21,7 @@ export async function isSubtype(lazyChild: LazyValue, lazyParent: LazyValue): Pr
   switch (parent.kind) {
     case ValueKind.Anything:
       return true;
+
     case ValueKind.Nothing:
       return false;
 
@@ -36,6 +37,7 @@ export async function isSubtype(lazyChild: LazyValue, lazyParent: LazyValue): Pr
     case ValueKind.Float:
     case ValueKind.Boolean:
       return child.kind === parent.kind && child.value === parent.value;
+
     case ValueKind.List: {
       if (child.kind !== ValueKind.List) {
         return false;
@@ -43,6 +45,17 @@ export async function isSubtype(lazyChild: LazyValue, lazyParent: LazyValue): Pr
 
       return isLazyListSubtype(child.values, parent.values);
     }
+
+    case ValueKind.Record: {
+      if (child.kind !== ValueKind.Record) {
+        return false;
+      }
+
+      return pEvery(Object.keys(parent.values), async key => (
+        child.values[key] && await isSubtype(child.values[key], parent.values[key])
+      ));
+    }
+
     case ValueKind.Application: {
       if (child.kind !== ValueKind.Application) {
         return false;

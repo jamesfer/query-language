@@ -1,4 +1,12 @@
-import { Boolean, Float, LazyValue, NativeLambdaBody, Value, ValueKind } from '../compiler/value';
+import {
+  Boolean,
+  Float,
+  Integer,
+  LazyValue,
+  NativeLambdaBody, String,
+  Value,
+  ValueKind,
+} from '../compiler/value';
 
 /**
  * Returns a function that will automatically evaluate all its lazy arguments
@@ -11,16 +19,16 @@ export function evalArgs(func: (...args: Value[]) => LazyValue): NativeLambdaBod
   };
 }
 
-export function bindFloatFunction(func: (...args: number[]) => number): NativeLambdaBody {
-  return evalArgs((...args: Float[]) => async () => ({
-    kind: ValueKind.Float,
+function buildFunctionBinder<A extends Float | Integer | String | Boolean>(
+  kind: A['kind'],
+): (func: (...args: A['value'][]) => A['value']) => NativeLambdaBody {
+  return func => evalArgs((...args: A[]) => async () => ({
+    kind,
     value: func(...args.map(({ value }) => value)),
-  }));
+  } as A));
 }
 
-export function bindBooleanFunction(func: (...args: boolean[]) => boolean): NativeLambdaBody  {
-  return evalArgs((...args: Boolean[]) => async () => ({
-    kind: ValueKind.Boolean,
-    value: func(...args.map(({ value }) => value)),
-  }));
-}
+export const bindFloatFunction = buildFunctionBinder<Float>(ValueKind.Float);
+export const bindIntegerFunction = buildFunctionBinder<Integer>(ValueKind.Integer);
+export const bindBooleanFunction = buildFunctionBinder<Boolean>(ValueKind.Boolean);
+export const bindStringFunction = buildFunctionBinder<String>(ValueKind.String);

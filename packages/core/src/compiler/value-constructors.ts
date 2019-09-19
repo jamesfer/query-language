@@ -12,8 +12,9 @@ import {
   UnboundVariable,
   UserDefinedLiteral,
   ValueKind,
-  Value, BoundVariable,
+  Value, BoundVariable, Record,
 } from './value';
+import { sortBy } from 'lodash';
 
 export function lazyValue<V extends Value>(value: V): LazyValue<V> {
   return () => Promise.resolve(value);
@@ -99,6 +100,13 @@ export function list(values: LazyValueList): List {
   };
 }
 
+export function record(values: { [k: string]: LazyValue }): Record {
+  return {
+    values,
+    kind: ValueKind.Record,
+  };
+}
+
 export const anything: Anything = {
   kind: ValueKind.Anything,
 };
@@ -118,30 +126,38 @@ export const booleanType = userDefinedLiteral('boolean');
 export const listLiteralType = userDefinedLiteral('list');
 
 export function listType(elementType: LazyValue) {
-  return application(async () => listLiteralType, lazyList([elementType]));
+  return application(lazyValue(listLiteralType), lazyList([elementType]));
 }
+
+// export const recordLiteralType = userDefinedLiteral('record');
+//
+// export const recordPairLiteralType = userDefinedLiteral('recordPair');
+//
+// export function recordType(properties: { [k: string]: LazyValue }) {
+//   const keys = sortBy(Object.keys(properties));
+//   return application(lazyValue(recordLiteralType), lazyList(keys.map(key => (
+//     lazyValue(application(lazyValue(recordPairLiteralType), lazyList([
+//       lazyValue(string(key)),
+//       properties[key],
+//     ])))
+//   ))));
+// }
 
 export const functionLiteralType = userDefinedLiteral('function');
 
 export function functionType(...parameters: LazyValue[]): LazyValue {
-  // return application(lazyValue(functionLiteralType), lazyList(parameters))
-
-  // if (parameters.length < 2) {
-  //   throw new Error('Cannot create lambda type with less than two parameters');
-  // }
-
-  const [first, second, ...rest] = parameters;
+  const [first, ...rest] = parameters;
   if (!first) {
     throw new Error('Cannot create a lambda type with no parameters');
   }
 
-  if (!second) {
-    return first;
-  }
+  // if (!second) {
+  //   return first;
+  // }
 
   return lazyValue(application(lazyValue(functionLiteralType), rest.length === 0
-    ? lazyList([first, second])
-    : lazyList([first, functionType(second, ...rest)]),
+    ? lazyList([first])
+    : lazyList([first, functionType(...rest)]),
   ));
 }
 

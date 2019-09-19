@@ -1,4 +1,4 @@
-import { zipObject, zip, spread, flatMap, compact } from 'lodash';
+import { compact, flatMap, zipObject } from 'lodash';
 import { makeMessage } from '../../message';
 import { UntypedExpression } from '../../untyped-expression';
 import { assertNever } from '../../utils';
@@ -15,34 +15,65 @@ import {
   NothingExpression,
   StringExpression,
 } from '../expression';
-import {
-  applyInferredSubstitutionsToScope,
-  createChildScope,
-  findVariableTypeInScope,
-  TypeScope,
-} from '../scope';
-import { pMap } from '../utils';
+import { createChildScope, findVariableTypeInScope, TypeScope } from '../scope';
+import { pMap, pMapWithIndex } from '../utils';
+import { LazyValue, ValueKind } from '../value';
 import {
   booleanType,
-  floatType,
-  functionType,
+  floatType, functionLiteralType, functionType,
   integerType,
   lazyValue,
   listType,
   nothing,
   stringType,
 } from '../value-constructors';
-import { convergeManyTypes, convergeTypes } from './converge-types';
+import { convergeManyTypes, ConvergeManyTypesResult, convergeTypes } from './converge-types';
 import { findImplicits } from './find-implicits';
 import { makeInferredFunctionType } from './make-inferred-function-type';
 import { State, StateResult } from './state';
-import { Type, type } from './type';
-import { freeBoundVariable, freeVariable } from './utils';
+import { serializeValue } from './test-utils';
+import { type } from './type';
+import { freeBoundVariable } from './utils';
 import {
+  applyInferredSubstitutions, applyReplacementsToType,
   applySubstitutions,
   VariableSubstitution,
-  VariableSubstitutions,
 } from './variable-substitutions';
+
+async function isCallable(value: LazyValue): Promise<boolean> {
+  const strictValue = await value();
+  if (strictValue.kind !== ValueKind.Application) {
+    return false;
+  }
+
+  const strictCallee = await strictValue.callee();
+  return strictCallee.kind === ValueKind.UserDefinedLiteral
+    && strictCallee.name === functionLiteralType.name;
+}
+
+async function extractParameterTypes(value: LazyValue, previous: LazyValue[] = []): Promise<[LazyValue[], LazyValue]> {
+  const strictValue = await value();
+  if (strictValue.kind !== ValueKind.Application) {
+    return [previous, value];
+  }
+
+  const callee = await strictValue.callee();
+  if (callee.kind !== ValueKind.UserDefinedLiteral || callee.name !== functionLiteralType.name) {
+    return [previous, value];
+  }
+
+  const [left, right] = await Promise.all(Array.from(
+    strictValue.parameters(),
+    parameter => parameter(),
+  ));
+
+  if (!right) {
+    return [previous, lazyValue(left)];
+  }
+
+  return extractParameterTypes(lazyValue(right), [...previous, lazyValue(left)]);
+}
+
 
 export async function typeExpression(scope: TypeScope, expression: UntypedExpression): Promise<StateResult<Expression>> {
   const state = State.of(scope);
@@ -129,6 +160,7 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
         ? await pMap(
           typedElements.map(({ resultType }) => resultType).map((type, index) => ({
             ...type,
+            // TODO should also apply inferred substitutions to this type
             value: applySubstitutions(substitutions[index], type.value),
           })),
           state.runAsyncP1(findImplicits),
@@ -201,46 +233,138 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
     case 'FunctionCall': {
       // Type the callee expression
       const typedCallee = await state.runAsync(typeExpression, expression.functionExpression);
-      // TODO throw error if callee is not callable
 
       // Type each of the arguments
       const typedParameters = await pMap(expression.args, state.runAsyncP1(typeExpression));
 
-      // Create a variable to represent the return value of the function
-      const parameterTypes = typedParameters.map(parameter => parameter.resultType.value);
-      const resultVariable = lazyValue(await freeVariable('result', [
-        typedCallee.resultType.value,
-        ...parameterTypes,
-      ]));
+      const calleeTypeValue = typedCallee.resultType.value;
+      if (!await isCallable(calleeTypeValue)) {
+        state.log(makeMessage(
+          'Error',
+          'Cannot call that expression',
+          expression.tokens[0],
+          expression.tokens[expression.tokens.length - 1],
+        ));
+        return state.wrap<ApplicationExpression>({
+          resultType: type(lazyValue(nothing)),
+          kind: ExpressionKind.Application,
+          tokens: expression.tokens,
+          implicitParameters: [],
+          parameters: typedParameters,
+          callee: typedCallee,
+        });
+      }
 
-      // Converge the callee type with the parameter types
-      // TODO check if the value actually converged and throw error if it didn't
-      const [substitutions,] = await state.runAsync(
-        convergeTypes,
-        typedCallee.resultType.value,
-        functionType(...parameterTypes, resultVariable),
+      const [expectedParameters, expectedResult] = await extractParameterTypes(calleeTypeValue);
+      const inferredSubstitutions: VariableSubstitution[] = [];
+      const calleeSubstitutions: VariableSubstitution[] = [];
+      const elementResults = await pMapWithIndex(typedParameters.slice(0, expectedParameters.length), async (parameter, index): Promise<[{ left: VariableSubstitution[], right: VariableSubstitution[] }, LazyValue | undefined]> => {
+        // Converge the current parameter with the expected parameter
+        const [{ inferred, ...substitutions }, converged] = await state.runAsync(
+          convergeTypes,
+          applyInferredSubstitutions(
+            inferredSubstitutions,
+            applySubstitutions(calleeSubstitutions, expectedParameters[index]),
+          ),
+          applyInferredSubstitutions(inferredSubstitutions, parameter.resultType.value),
+        );
+
+        // Update the callee's and inferred substitutions
+        inferredSubstitutions.push(...inferred);
+        calleeSubstitutions.push(...substitutions.left);
+
+        return [substitutions, converged];
+      });
+
+      const convergedParameters = elementResults.map(([, parameter]) => parameter);
+      const successful = convergedParameters.every(result => result !== undefined);
+      if (!successful) {
+        state.log(makeMessage(
+          'Error',
+          'One of the parameters failed to converge',
+          expression.tokens[0],
+          expression.tokens[expression.tokens.length - 1],
+        ));
+        return state.wrap<ApplicationExpression>({
+          resultType: type(lazyValue(nothing)),
+          kind: ExpressionKind.Application,
+          tokens: expression.tokens,
+          implicitParameters: [],
+          parameters: typedParameters,
+          callee: typedCallee,
+        });
+      }
+
+      // Combine all replacements together for each element
+      const leftSubstitutions = elementResults.map(([{ left }]) => left);
+      const parameterSubstitutions = elementResults.map(([{ right }], index) => (
+        right.concat(...leftSubstitutions.slice(index))
+      ));
+
+      // Check if we can imply any interfaces for each of the elements
+      const implicits = await pMap(
+        typedParameters.map(({ resultType }, index) => (
+          applyReplacementsToType(parameterSubstitutions[index], inferredSubstitutions, resultType)
+        )),
+        state.runAsyncP1(findImplicits),
       );
 
-      // Find the result type of the function
-      const resultType = applySubstitutions(substitutions.right, resultVariable);
+      // Check if we can imply any interfaces for the callee
+      const calleeImplicits = await state.runAsync(
+        findImplicits,
+        applyReplacementsToType(calleeSubstitutions, inferredSubstitutions, typedCallee.resultType),
+      );
+
+      // Collect all the implicits that we couldn't find
+      const missingImplicits = flatMap(
+        [calleeImplicits, ...implicits],
+        (implicitList, elementIndex) => compact(implicitList.map((implicitArg, implicitIndex) => (
+          implicitArg === undefined
+            ? [typedCallee, ...typedParameters][elementIndex].resultType.constraints[implicitIndex]
+            : undefined
+        )))
+      );
+
+      // Replace any implicits we couldn't find with the index from the parent
+      let index = 0;
+      const [carriedCalleeImplicits, ...carriedImplicits] = [calleeImplicits, ...implicits].map(
+        elementImplicits => elementImplicits.map(implicit => (
+          implicit === undefined ? index++ : implicit
+        ))
+      );
+
 
       // TODO throw error if too many parameters are given
-      // if (i >= expectedParameters.length) {
-      //     // TODO correctly place this error message
-      //     state.log(makeMessage(
-      //       'Error',
-      //       `Too many parameters passed to function. Expected ${expectedParameters.length}, given ${parameters.length}.`,
-      //       [0, 0],
-      //     ));
-      // }
 
-      return state.wrapWithSubstitutions<ApplicationExpression>(substitutions.inferred, {
-        resultType: type(resultType),
+      // Find the result type of the function
+      // TODO I don't think implicits aren't applied to the return value which might cause bugs
+      //      with return type polymorphism
+      const substitutedResult = applySubstitutions(calleeSubstitutions, applyInferredSubstitutions(inferredSubstitutions, expectedResult));
+      const resultType = !successful
+        ? type(lazyValue(nothing))
+        : expectedParameters.length === typedParameters.length
+          ? type(substitutedResult, missingImplicits)
+          : type(
+            functionType(
+              ...expectedParameters.slice(typedParameters.length).map(parameter => applySubstitutions(calleeSubstitutions, applyInferredSubstitutions(inferredSubstitutions, parameter))),
+              substitutedResult,
+            ),
+            missingImplicits,
+          );
+
+      return state.wrapWithSubstitutions<ApplicationExpression>(inferredSubstitutions, {
+        resultType,
         kind: ExpressionKind.Application,
-        tokens: expression.tokens,
         implicitParameters: [],
-        parameters: typedParameters,
-        callee: typedCallee,
+        tokens: expression.tokens,
+        parameters: typedParameters.map((element, index) => ({
+          ...element,
+          implicitParameters: carriedImplicits[index],
+        })),
+        callee: {
+          ...typedCallee,
+          implicitParameters: carriedCalleeImplicits,
+        },
       });
     }
 

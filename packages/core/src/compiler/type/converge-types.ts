@@ -1,9 +1,16 @@
-import { intersectionBy, flatMap } from 'lodash';
+import { intersectionBy, flatMap, zipObject } from 'lodash';
 import { assertNever } from '../../utils';
 import { TypeScope } from '../scope';
 import { lazyList, pMap, reduceInto, zipIterators } from '../utils';
 import { LazyValue, LazyValueList, ValueKind } from '../value';
-import { application, lazyValue, list, nothing, unboundVariable } from '../value-constructors';
+import {
+  application,
+  lazyValue,
+  list,
+  nothing,
+  record,
+  unboundVariable,
+} from '../value-constructors';
 import { State, StateResult } from './state';
 import {
   extractUnboundVariables,
@@ -187,7 +194,7 @@ export async function convergeTypes(
 
     case ValueKind.List: {
       if (right.kind !== ValueKind.List) {
-        return state.wrap<ConvergeResult>([noSubstitutions, undefined]);
+        return state.wrap(emptyConvergeResult);
       }
 
       // Converge each of the list values together
@@ -202,6 +209,42 @@ export async function convergeTypes(
         substitutions,
         // Return undefined if any of the elements don't converge
         !convergedElements ? undefined : lazyValue(list(convergedElements))
+      ]);
+    }
+
+    case ValueKind.Record: {
+      if (right.kind !== ValueKind.Record) {
+        return state.wrap(emptyConvergeResult);
+      }
+
+      const leftKeys = Object.keys(left.values);
+      const rightKeys = Object.keys(right.values);
+      if (leftKeys.length !== rightKeys.length) {
+        return state.wrap(emptyConvergeResult);
+      }
+
+      const inferredSubstitutions: VariableSubstitution[] = [];
+      const convergedElements = [];
+      for (const key of leftKeys) {
+        if (!right.values[key]) {
+          return state.wrap(emptyConvergeResult);
+        }
+
+        const [newSubstitutions, converged] = await state.runAsync(
+          convergeTypes,
+          applyInferredSubstitutions(inferredSubstitutions, left.values[key]),
+          applyInferredSubstitutions(inferredSubstitutions, right.values[key]),
+        );
+        if (!converged) {
+          return state.wrap(emptyConvergeResult);
+        }
+
+        inferredSubstitutions.push(...newSubstitutions.inferred);
+        convergedElements.push(converged);
+      }
+      return state.wrap<ConvergeResult>([
+        makeSubstitutions([], [], inferredSubstitutions),
+        lazyValue(record(zipObject(leftKeys, convergedElements))),
       ]);
     }
 

@@ -1,46 +1,225 @@
-import { floatType, makeFunctionType } from '../../type/constructors';
-import { Library, LibraryFunction, NativeFunction } from '../../library';
+import { ExpressionKind } from '../../compiler/expression';
+import { type } from '../../compiler/type/type';
+import { LazyValue, Record, String } from '../../compiler/value';
+import {
+  anything,
+  floatType,
+  functionType,
+  integerType,
+  lazyValue,
+  stringType,
+  unboundVariable,
+  userDefinedLiteral,
+} from '../../compiler/value-constructors';
+import { Library, LibraryImplementation, LibraryLambda, NativeLibraryLambda } from '../../library';
 import { bindFloatFunction } from '../library-utils';
 
-const add: NativeFunction = {
-  type: makeFunctionType([], [floatType, floatType], floatType),
-  implementation: bindFloatFunction((a, b) => a + b),
+const floatFunctionType = type(functionType(
+  lazyValue(floatType),
+  lazyValue(floatType),
+  lazyValue(floatType),
+));
+
+const integerFunctionType = type(functionType(
+  lazyValue(integerType),
+  lazyValue(integerType),
+  lazyValue(integerType),
+));
+
+const addFloat: NativeLibraryLambda = {
+  type: floatFunctionType,
+  body: bindFloatFunction((a, b) => a + b),
+  parameterCount: 2,
 };
 
-const subtract: NativeFunction = {
-  type: makeFunctionType([], [floatType, floatType], floatType),
-  implementation: bindFloatFunction((a, b) => a - b),
+const subtractFloat: NativeLibraryLambda = {
+  type: floatFunctionType,
+  body: bindFloatFunction((a, b) => a - b),
+  parameterCount: 2,
 };
 
-const multiply: NativeFunction = {
-  type: makeFunctionType([], [floatType, floatType], floatType),
-  implementation: bindFloatFunction((a, b) => a * b),
+const multiplyFloat: NativeLibraryLambda = {
+  type: floatFunctionType,
+  body: bindFloatFunction((a, b) => a * b),
+  parameterCount: 2,
 };
 
-const divide: NativeFunction = {
-  type: makeFunctionType([], [floatType, floatType], floatType),
-  implementation: bindFloatFunction((a, b) => a / b),
+const divideFloat: NativeLibraryLambda = {
+  type: floatFunctionType,
+  body: bindFloatFunction((a, b) => a / b),
+  parameterCount: 2,
 };
 
-const modulo: NativeFunction = {
-  type: makeFunctionType([], [floatType, floatType], floatType),
-  implementation: bindFloatFunction((a, b) => a % b),
+const addInteger: NativeLibraryLambda = {
+  type: integerFunctionType,
+  body: bindFloatFunction((a, b) => a + b),
+  parameterCount: 2,
 };
 
-const power: NativeFunction = {
-  type: makeFunctionType([], [floatType, floatType], floatType),
-  implementation: bindFloatFunction((a, b) => a ** b),
+const subtractInteger: NativeLibraryLambda = {
+  type: integerFunctionType,
+  body: bindFloatFunction((a, b) => a - b),
+  parameterCount: 2,
 };
 
+const multiplyInteger: NativeLibraryLambda = {
+  type: integerFunctionType,
+  body: bindFloatFunction((a, b) => a * b),
+  parameterCount: 2,
+};
+
+const divideInteger: NativeLibraryLambda = {
+  type: integerFunctionType,
+  body: bindFloatFunction((a, b) => a / b),
+  parameterCount: 2,
+};
+
+// const moduloFloat: NativeLibraryLambda = {
+//   type: makeFunctionType([], [floatType, floatType], floatType),
+//   body: bindFloatFunction((a, b) => a % b),
+// };
+//
+// const powerFloat: NativeLibraryLambda = {
+//   type: makeFunctionType([], [floatType, floatType], floatType),
+//   body: bindFloatFunction((a, b) => a ** b),
+// };
+
+
+const propertyAccess: NativeLibraryLambda = {
+  type: type(functionType(lazyValue(anything), lazyValue(stringType), lazyValue(anything))),
+  parameterCount: 2,
+  body: (record: LazyValue<Record>, key: LazyValue<String>) => async () => (
+    (await record()).values[(await key()).value]()
+  ),
+};
+
+const add: LibraryLambda = {
+  type: type(
+    functionType(lazyValue(unboundVariable('a')), lazyValue(unboundVariable('a')), lazyValue(unboundVariable('a'))),
+    [{
+      kind: 'TypeConstraint',
+      child: lazyValue(unboundVariable('a')),
+      parent: lazyValue(userDefinedLiteral('Numeric')),
+    }],
+  ),
+  parameterNames: ['interface', 'a', 'b'],
+  body: {
+    kind: ExpressionKind.Application,
+    implicitParameters: [],
+    tokens: [],
+    resultType: type(lazyValue(unboundVariable('a'))),
+    callee: {
+      kind: ExpressionKind.Application,
+      implicitParameters: [],
+      tokens: [],
+      resultType: type(functionType(lazyValue(unboundVariable('a')), lazyValue(unboundVariable('a')), lazyValue(unboundVariable('a')))),
+      callee: {
+        kind: ExpressionKind.Identifier,
+        implicitParameters: [],
+        tokens: [],
+        resultType: type(functionType(lazyValue(anything), lazyValue(stringType), lazyValue(anything))),
+        name: '.',
+      },
+      parameters: [
+        {
+          kind: ExpressionKind.Identifier,
+          implicitParameters: [],
+          tokens: [],
+          resultType: type(lazyValue(anything)),
+          name: 'interface',
+        },
+        {
+          kind: ExpressionKind.String,
+          implicitParameters: [],
+          tokens: [],
+          resultType: type(lazyValue(stringType)),
+          value: '+',
+        },
+      ],
+    },
+    parameters: [
+      {
+        kind: ExpressionKind.Identifier,
+        implicitParameters: [],
+        tokens: [],
+        resultType: type(lazyValue(unboundVariable('a'))),
+        name: 'a',
+      },
+      {
+        kind: ExpressionKind.Identifier,
+        implicitParameters: [],
+        tokens: [],
+        resultType: type(lazyValue(unboundVariable('a'))),
+        name: 'b',
+      },
+    ],
+  },
+};
+
+
+const floatNumberImplementation: LibraryImplementation = {
+  child: lazyValue(floatType),
+  parent: lazyValue(userDefinedLiteral('Numeric')),
+  constraints: [],
+  values: {
+    '+': {
+      kind: ExpressionKind.Lambda,
+      implicitParameters: [],
+      tokens: [],
+      parameterNames: ['a', 'b'],
+      resultType: floatFunctionType,
+      body: {
+        kind: ExpressionKind.Application,
+        implicitParameters: [],
+        tokens: [],
+        resultType: type(lazyValue(floatType)),
+        callee: {
+          kind: ExpressionKind.Identifier,
+          implicitParameters: [],
+          tokens: [],
+          resultType: floatFunctionType,
+          name: 'addFloat',
+        },
+        parameters: [
+          {
+            kind: ExpressionKind.Identifier,
+            implicitParameters: [],
+            tokens: [],
+            resultType: type(lazyValue(floatType)),
+            name: 'a',
+          },
+          {
+            kind: ExpressionKind.Identifier,
+            implicitParameters: [],
+            tokens: [],
+            resultType: type(lazyValue(floatType)),
+            name: 'b',
+          },
+        ],
+      }
+    }
+  },
+};
 
 export const operators: Library = {
-  nativeFunctions: {
+  lambdas: {
     '+': add,
-    '*': multiply,
-    '/': divide,
-    '-': subtract,
-    '%': modulo,
-    '**': power,
+  },
+  nativeLambdas: {
+    addFloat,
+    addInteger,
+    multiplyFloat,
+    multiplyInteger,
+    divideFloat,
+    divideInteger,
+    subtractFloat,
+    subtractInteger,
+    // '%': modulo,
+    // '**': power,
+    '.': propertyAccess,
+  },
+  implementations: {
+    floatNumberImplementation,
   },
 };
 

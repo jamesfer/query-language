@@ -1,5 +1,7 @@
 import { assertNever } from '../../utils';
 import { BoundVariable, LazyValue, LazyValueList, ValueKind, UnboundVariable } from '../value';
+import { mapValues } from 'lodash';
+import { Type, TypeConstraint } from './type';
 
 export interface VariableSubstitution {
   from: string;
@@ -106,6 +108,12 @@ export function applySubstitutions(
           values: applySubstitutionsToValueList(substitutions, value.values, applySubstitutions),
         };
 
+      case ValueKind.Record:
+        return {
+          ...value,
+          values: mapValues(value.values, property => applySubstitutions(substitutions, property)),
+        };
+
       case ValueKind.Application:
         return {
           ...value,
@@ -176,6 +184,15 @@ export function applyInferredSubstitutions(
           ),
         };
 
+      case ValueKind.Record:
+        return {
+          ...value,
+          values: mapValues(value.values, property => applyInferredSubstitutions(
+            substitutions,
+            property,
+          )),
+        };
+
       case ValueKind.Application:
         return {
           ...value,
@@ -202,5 +219,30 @@ export function applyInferredSubstitutions(
       default:
         return assertNever(value);
     }
+  };
+}
+
+export function applyReplacementsToType(
+  substitutions: VariableSubstitution[],
+  inferredSubstitutions: VariableSubstitution[],
+  type: Type,
+): Type {
+  return {
+    kind: 'Type',
+    value: applySubstitutions(
+      substitutions,
+      applyInferredSubstitutions(inferredSubstitutions, type.value),
+    ),
+    constraints: type.constraints.map<TypeConstraint>(constraint => ({
+      kind: 'TypeConstraint',
+      child: applySubstitutions(
+        substitutions,
+        applyInferredSubstitutions(inferredSubstitutions, constraint.child),
+      ),
+      parent: applySubstitutions(
+        substitutions,
+        applyInferredSubstitutions(inferredSubstitutions, constraint.parent),
+      ),
+    })),
   };
 }

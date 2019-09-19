@@ -1,6 +1,5 @@
 import { Token } from '../token';
 import { Type } from './type/type';
-// import { Type } from './type';
 import { LazyValue } from './value';
 
 export enum ExpressionKind {
@@ -16,6 +15,7 @@ export enum ExpressionKind {
   String,
   Boolean,
   List,
+  Record,
 }
 
 export type NativeLambda = (...parameters: LazyValue[]) => LazyValue;
@@ -49,6 +49,12 @@ export interface BooleanExpression extends BaseExpression<ExpressionKind.Boolean
 
 export interface ListExpression extends BaseExpression<ExpressionKind.List> {
   elements: Expression[];
+}
+
+export interface RecordExpression extends BaseExpression<ExpressionKind.Record> {
+  properties: {
+    [k: string]: Expression;
+  };
 }
 
 export interface ApplicationExpression extends BaseExpression<ExpressionKind.Application> {
@@ -87,4 +93,5 @@ export type Expression =
   | IntegerExpression
   | FloatExpression
   | BooleanExpression
-  | ListExpression;
+  | ListExpression
+  | RecordExpression;

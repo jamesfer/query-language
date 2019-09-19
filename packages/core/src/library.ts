@@ -1,8 +1,10 @@
 import { assign, mapValues } from 'lodash';
 import { Expression, ExpressionKind } from './compiler/expression';
-import { Type, TypeConstraints } from './compiler/type/type';
+import { type, Type, TypeConstraints, TypeImplementation } from './compiler/type/type';
 import { UniversalScope, UniversalScopeVariableEntry } from './compiler/universal-scope';
 import { LazyValue, NativeLambdaBody } from './compiler/value';
+import { lazyValue, record } from './compiler/value-constructors';
+import { evaluateExpression2 } from './compiler/evaluate-expression';
 
 export interface LibraryLambda {
   type: Type;
@@ -20,6 +22,9 @@ export interface LibraryImplementation {
   parent: LazyValue;
   child: LazyValue;
   constraints?: TypeConstraints;
+  values: {
+    [k: string]: Expression;
+  };
 }
 
 export interface Library {
@@ -44,8 +49,27 @@ export function mergeLibraries(...libraries: Library[]): Library {
 
 export function convertToScope(library: Library): UniversalScope {
   return {
-    implementations: {},
+    implementations: mapValues(library.implementations, (implementation): TypeImplementation => ({
+      kind: 'TypeImplementation',
+      childType: implementation.child,
+      parentType: implementation.parent,
+      constraints: implementation.constraints || [],
+      values: implementation.values,
+    })),
     variables: {
+      ...mapValues(library.implementations, (implementation): UniversalScopeVariableEntry => {
+        const resultType = type(lazyValue(record(mapValues(implementation.values, value => async () => (await evaluateExpression2({}, value, [], []))()))));
+        return {
+          valueType: resultType,
+          value: {
+            resultType,
+            kind: ExpressionKind.Record,
+            implicitParameters: [],
+            tokens: [],
+            properties: implementation.values,
+          },
+        };
+      }),
       ...mapValues(library.lambdas, (lambda): UniversalScopeVariableEntry => ({
         valueType: lambda.type,
         value: {

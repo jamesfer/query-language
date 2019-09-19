@@ -115,7 +115,8 @@ export type Value =
   | Lambda
   | NativeLambda
   | Application
-  | List;
+  | List
+  | Record;
 
 export type LazyValue<V extends Value = Value> = () => Promise<V>;
 

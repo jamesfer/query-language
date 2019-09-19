@@ -1,3 +1,4 @@
+import { Expression } from '../expression';
 import { LazyValue, UnboundVariable } from '../value';
 
 export interface TypeConstraint {
@@ -33,4 +34,7 @@ export interface TypeImplementation {
   parentType: LazyValue;
   childType: LazyValue;
   constraints: TypeConstraints;
+  values: {
+    [k: string]: Expression;
+  };
 }

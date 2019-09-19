@@ -10,7 +10,7 @@ import { convertToScope } from './library';
 import { Message } from './message';
 import standardLibrary from './standard-library/standard-library';
 import { Token } from './token';
-import { evaluateExpression2 } from './compiler/evaluate-expression';
+import { evaluateExpression2, evaluateExpression3 } from './compiler/evaluate-expression';
 import { Expression } from './compiler/expression';
 import { typeExpression } from './compiler/type/type-expression';
 import { Value } from './compiler/value';
@@ -58,7 +58,7 @@ export async function compile(code: string, scope: UniversalScope): Promise<Comp
 export async function evaluate(expression: Expression, scope: UniversalScope): Promise<EvaluationResult> {
   // TODO calling evaluate should use the compiled scope to prevent mismatches in the scope between type checking and evaluation
   // TODO the standard library is in the wrong format
-  const result = await evaluateExpression2(convertToEvaluationScope(scope), expression, []);
+  const result = await evaluateExpression3(convertToEvaluationScope(scope), expression, []);
   return {
     result: await result(),
     messages: [],

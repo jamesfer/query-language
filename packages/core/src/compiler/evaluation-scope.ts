@@ -60,3 +60,15 @@ export function findVariableInScope2(scope: EvaluationScope, name: string): Expr
 
   return undefined;
 }
+
+// export function findImplementationInScope(scope: EvaluationScope, name: string): Expression | undefined {
+//   if (scope.implementations && name in scope.implementations) {
+//     return scope.implementations[name].values;
+//   }
+//
+//   if (scope.parent) {
+//     return findImplementationInScope(scope.parent, name);
+//   }
+//
+//   return undefined;
+// }

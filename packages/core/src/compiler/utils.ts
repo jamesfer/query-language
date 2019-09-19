@@ -90,6 +90,17 @@ export async function pMap<T, U>(
   return result;
 }
 
+export async function pMapWithIndex<T, U>(
+  list: T[],
+  iteratee: (element: T, index: number) => Promise<U>,
+): Promise<U[]> {
+  const result = [];
+  for (let i = 0; i < list.length; i++) {
+    result.push(await iteratee(list[i], i));
+  }
+  return result;
+}
+
 export async function pMapValues<T, U>(
   obj: { [k: string]: T },
   iteratee: (element: T) => Promise<U>,

@@ -260,6 +260,7 @@ describe('typeExpression', () => {
               childType: lazyValue(integerType),
               parentType: lazyValue(userDefinedLiteral('Monad')),
               constraints: [],
+              values: {},
             },
           },
         };
