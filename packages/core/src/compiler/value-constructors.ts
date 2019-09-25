@@ -146,18 +146,33 @@ export function listType(elementType: LazyValue) {
 export const functionLiteralType = userDefinedLiteral('function');
 
 export function functionType(...parameters: LazyValue[]): LazyValue {
-  const [first, ...rest] = parameters;
+  // const [first, ...rest] = parameters;
+  // if (!first) {
+  //   throw new Error('Cannot create a lambda type with no parameters');
+  // }
+  //
+  // // if (!second) {
+  // //   return first;
+  // // }
+  //
+  // return lazyValue(application(lazyValue(functionLiteralType), rest.length === 0
+  //   ? lazyList([first])
+  //   : lazyList([first, functionType(...rest)]),
+  // ));
+
+
+  const [first, second, ...rest] = parameters;
   if (!first) {
     throw new Error('Cannot create a lambda type with no parameters');
   }
 
-  // if (!second) {
-  //   return first;
-  // }
+  if (!second) {
+    return first;
+  }
 
   return lazyValue(application(lazyValue(functionLiteralType), rest.length === 0
-    ? lazyList([first])
-    : lazyList([first, functionType(...rest)]),
+    ? lazyList([first, second])
+    : lazyList([first, functionType(second, ...rest)]),
   ));
 }
 

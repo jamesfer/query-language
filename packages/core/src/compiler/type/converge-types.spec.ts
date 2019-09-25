@@ -215,24 +215,24 @@ describe('convergeTypes', () => {
 
   describe('when given two function types', () => {
     it('converges when one is a partial application of the other', async () => {
+      const lazyLeft = functionType(
+        lazyValue(integerType),
+        lazyValue(unboundVariable('T')),
+      );
+      const lazyRight = functionType(
+        lazyValue(integerType),
+        lazyValue(integerType),
+        lazyValue(integerType),
+      );
+      // const a = await serializeValue(lazyLeft);
+      // const b = await serializeValue(lazyRight);
       const [, converged] = State.unwrap(await convergeTypes(
         {},
-        functionType(
-          lazyValue(integerType),
-          lazyValue(unboundVariable('T')),
-        ),
-        functionType(
-          lazyValue(integerType),
-          lazyValue(integerType),
-          lazyValue(integerType),
-        ),
+        lazyLeft,
+        lazyRight,
       ));
       expect(await serializeValue(converged)).toEqual(await serializeValue(
-        functionType(
-          lazyValue(integerType),
-          lazyValue(integerType),
-          lazyValue(integerType),
-        )),
+        lazyRight),
       );
     });
 

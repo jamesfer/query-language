@@ -2,6 +2,7 @@ import { assertNever } from '../../utils';
 import { pMap } from '../utils';
 import { LazyValue, LazyValueList, Value, ValueKind } from '../value';
 import { Type } from './type';
+import { zipObject } from 'lodash';
 // import { AsymmetricMatcher } from 'expect/build/asymmetricMatchers';
 
 // class VariableMatching extends AsymmetricMatcher<string> {
@@ -77,6 +78,16 @@ async function serializeValueWithState(lazyValue: LazyValue | Value | undefined,
         ...value,
         callee: await serializeValueWithState(value.callee, state),
         parameters: await serializeValueListWithState(value.parameters, state),
+      };
+
+    case ValueKind.Record:
+      return {
+        ...value,
+        values: zipObject(
+          Object.keys(value.values),
+          await pMap(Object.values(value.values), property => (
+            serializeValueWithState(property, state))
+        )),
       };
 
     case ValueKind.NativeLambda:

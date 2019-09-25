@@ -222,6 +222,17 @@ export function applyInferredSubstitutions(
   };
 }
 
+export function applyAllSubstitutions(
+  substitutions: VariableSubstitution[],
+  inferredSubstitutions: VariableSubstitution[],
+  value: LazyValue,
+): LazyValue {
+  return applySubstitutions(
+    substitutions,
+    applyInferredSubstitutions(inferredSubstitutions, value),
+  );
+}
+
 export function applyReplacementsToType(
   substitutions: VariableSubstitution[],
   inferredSubstitutions: VariableSubstitution[],
@@ -229,20 +240,11 @@ export function applyReplacementsToType(
 ): Type {
   return {
     kind: 'Type',
-    value: applySubstitutions(
-      substitutions,
-      applyInferredSubstitutions(inferredSubstitutions, type.value),
-    ),
+    value: applyAllSubstitutions(substitutions, inferredSubstitutions, type.value),
     constraints: type.constraints.map<TypeConstraint>(constraint => ({
       kind: 'TypeConstraint',
-      child: applySubstitutions(
-        substitutions,
-        applyInferredSubstitutions(inferredSubstitutions, constraint.child),
-      ),
-      parent: applySubstitutions(
-        substitutions,
-        applyInferredSubstitutions(inferredSubstitutions, constraint.parent),
-      ),
+      child: applyAllSubstitutions(substitutions, inferredSubstitutions, constraint.child),
+      parent: applyAllSubstitutions(substitutions, inferredSubstitutions, constraint.parent),
     })),
   };
 }
