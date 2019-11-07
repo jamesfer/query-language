@@ -265,9 +265,9 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       const blankVariable = lazyValue(unboundVariable('T'));
       const converges = [
         fullConverge(blankVariable, blankVariable),
-        ...typedParameters.map((parameter, index) => (
-          fullConverge(expectedParameters[index], parameter[0].value)
-        ))
+        ...typedParameters.map((typedParameter, index) => (
+          fullConverge(expectedParameters[index], typedParameter.resultType.value)
+        )),
       ];
       const [combinedSubstitutions, ...substitutions] = runM(await state.runAsync(sequenceConverges, converges));
 
