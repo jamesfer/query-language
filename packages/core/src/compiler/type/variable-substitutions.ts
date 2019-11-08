@@ -1,5 +1,5 @@
 import { assertNever } from '../../utils';
-import { BoundVariable, LazyValue, LazyValueList, ValueKind, UnboundVariable } from '../value';
+import { LazyValue, LazyValueList, ValueKind } from '../value';
 import { mapValues } from 'lodash';
 import { Type, TypeConstraint } from './type';
 
@@ -231,6 +231,16 @@ export function applyAllSubstitutions(
     substitutions,
     applyInferredSubstitutions(inferredSubstitutions, value),
   );
+}
+
+export function applySubstitutionsToSubstitutions(
+  substitutions: VariableSubstitution[][],
+  previousSubstitutions: VariableSubstitution[],
+): VariableSubstitution[] {
+  return previousSubstitutions.map(({ from, to }) => ({
+    from,
+    to: substitutions.reduce((value, substitution) => applySubstitutions(substitution, value), to),
+  }));
 }
 
 export function applyReplacementsToType(

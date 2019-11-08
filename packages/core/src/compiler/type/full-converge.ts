@@ -3,58 +3,57 @@ import { LazyValue } from '../value';
 import { convergeTypes } from './converge-types';
 import { State, StateResult } from './state';
 import {
-  applyInferredSubstitutions,
-  applySubstitutions,
+  applyAllSubstitutions,
+  applySubstitutionsToSubstitutions,
   VariableSubstitution,
 } from './variable-substitutions';
 
-type Result = ({ substitutions: VariableSubstitution[], inferred: VariableSubstitution[] });
+type Result = { left: VariableSubstitution[], right: VariableSubstitution[], inferred: VariableSubstitution[] };
 
-type P<T> = [
-  { left: VariableSubstitution[], inferred: VariableSubstitution[] },
-  (nextLeft: VariableSubstitution[], nextInferred: VariableSubstitution[]) => T
-];
+type ConvergeResult = Promise<StateResult<Result>>;
 
-type M<T> = Promise<StateResult<P<T>>>;
+type PartialConverge = (
+  scope: TypeScope,
+  previousLeft: VariableSubstitution[],
+  previousRight: VariableSubstitution[],
+  previousInferred: VariableSubstitution[],
+) => ConvergeResult;
 
-type N<T> = (scope: TypeScope, previousLeft: VariableSubstitution[], previousInferred: VariableSubstitution[]) => Promise<StateResult<P<T>>>;
-
-export function fullConverge(leftValue: LazyValue, rightValue: LazyValue): N<Result> {
-  return async (scope: TypeScope, previousLeft: VariableSubstitution[], previousInferences: VariableSubstitution[]) => {
+export function fullConverge(leftValue: LazyValue, rightValue: LazyValue): PartialConverge {
+  return async (
+    scope: TypeScope,
+    previousLeft: VariableSubstitution[],
+    previousRight: VariableSubstitution[],
+    previousInferences: VariableSubstitution[],
+  ): ConvergeResult => {
     const state = State.of(scope);
 
-    const newLeft = applySubstitutions(previousLeft, applyInferredSubstitutions(previousInferences, leftValue));
-    const newRight = applyInferredSubstitutions(previousInferences, rightValue);
-
+    const newLeft = applyAllSubstitutions(previousLeft, previousInferences, leftValue);
+    const newRight = applyAllSubstitutions(previousRight, previousInferences, rightValue);
     const [{ left, right, inferred }] = await state.runAsync(convergeTypes, newLeft, newRight);
 
-    return state.wrap<P<Result>>([
-      { left, inferred },
-      (nextLeft, nextInferred) => ({
-        // TODO safely combine subs
-        substitutions: [...right, ...nextLeft],
-        inferred: nextInferred,
-      }),
-    ]);
+    // TODO check if left and right had different replacements for the same value and throw an error
+
+    // TODO We might not need to do this if we restructured substitutions to be a dictionary where
+    //      from is the key
+    return state.wrap({
+      left: [...previousLeft, ...right, ...left],
+      right: [...previousRight, ...right, ...left],
+      inferred: [
+        ...applySubstitutionsToSubstitutions([left, right], previousInferences),
+        ...inferred,
+      ],
+    });
   };
 }
 
-export async function sequenceConverges(scope: TypeScope, converges: N<Result>[]): M<Result[]> {
-    const state = State.of(scope);
+export async function sequenceConverges(scope: TypeScope, converges: PartialConverge[]): ConvergeResult {
+  const state = State.of(scope);
+  if (converges.length === 0) {
+    return state.wrap({ left: [], right: [], inferred: [] });
+  }
 
-    // TODO check if the array is empty
-
-    const [top, ...rest] = converges;
-    const [{ left, inferred }, func] = await state.runAsync(sequenceConverges, rest);
-    const [{ left: topLeft, inferred: topInferred }, topFunc] = await state.runAsync(top, left, inferred);
-
-    return state.wrap<P<Result[]>>([
-      { left: [...left, ...topLeft], inferred: [...inferred, ...topInferred] },
-      (nextLeft, nextInferred) => [topFunc(nextLeft, nextInferred), ...func(nextLeft, nextInferred)],
-    ]);
-}
-
-export function runM<T>(sequenceResult: P<T>): T {
-  const [{ left, inferred }, func] = sequenceResult;
-  return func(left, inferred);
+  const [top, ...rest] = converges;
+  const { left, right, inferred } = await state.runAsync(sequenceConverges, rest);
+  return state.wrap(await state.runAsync(top, left, right, inferred));
 }

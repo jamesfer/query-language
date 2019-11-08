@@ -25,7 +25,7 @@ import {
   boundVariable, userDefinedLiteral,
 } from '../value-constructors';
 import { serializeType } from './test-utils';
-import { type, TypeConstraint, TypeConstraints } from './type';
+import { type, TypeConstraint } from './type';
 import { typeExpression } from './type-expression';
 import { State } from './state';
 
@@ -228,8 +228,8 @@ describe('typeExpression', () => {
         const { resultType } = State.unwrap(await typeExpression(scope, untypedExpression));
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(lazyValue(listType(functionType(
-            lazyValue(unboundVariable('b')),
             lazyValue(unboundVariable('a')),
+            lazyValue(unboundVariable('b')),
           ))))
         ));
       });
