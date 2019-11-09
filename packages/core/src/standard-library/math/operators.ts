@@ -12,7 +12,7 @@ import {
   userDefinedLiteral,
 } from '../../compiler/value-constructors';
 import { Library, LibraryImplementation, LibraryLambda, NativeLibraryLambda } from '../../library';
-import { bindFloatFunction } from '../library-utils';
+import { bindFloatFunction, bindIntegerFunction } from '../library-utils';
 
 const floatFunctionType = type(functionType(
   lazyValue(floatType),
@@ -52,25 +52,25 @@ const divideFloat: NativeLibraryLambda = {
 
 const addInteger: NativeLibraryLambda = {
   type: integerFunctionType,
-  body: bindFloatFunction((a, b) => a + b),
+  body: bindIntegerFunction((a, b) => a + b),
   parameterCount: 2,
 };
 
 const subtractInteger: NativeLibraryLambda = {
   type: integerFunctionType,
-  body: bindFloatFunction((a, b) => a - b),
+  body: bindIntegerFunction((a, b) => a - b),
   parameterCount: 2,
 };
 
 const multiplyInteger: NativeLibraryLambda = {
   type: integerFunctionType,
-  body: bindFloatFunction((a, b) => a * b),
+  body: bindIntegerFunction((a, b) => a * b),
   parameterCount: 2,
 };
 
 const divideInteger: NativeLibraryLambda = {
   type: integerFunctionType,
-  body: bindFloatFunction((a, b) => a / b),
+  body: bindIntegerFunction((a, b) => a / b),
   parameterCount: 2,
 };
 
@@ -196,8 +196,52 @@ const floatNumberImplementation: LibraryImplementation = {
             name: 'b',
           },
         ],
-      }
-    }
+      },
+    },
+  },
+};
+
+const integerNumberImplementation: LibraryImplementation = {
+  child: lazyValue(integerType),
+  parent: lazyValue(userDefinedLiteral('Numeric')),
+  constraints: [],
+  values: {
+    '+': {
+      kind: ExpressionKind.Lambda,
+      implicitParameters: [],
+      tokens: [],
+      parameterNames: ['a', 'b'],
+      resultType: integerFunctionType,
+      body: {
+        kind: ExpressionKind.Application,
+        implicitParameters: [],
+        tokens: [],
+        resultType: type(lazyValue(integerType)),
+        callee: {
+          kind: ExpressionKind.Identifier,
+          implicitParameters: [],
+          tokens: [],
+          resultType: integerFunctionType,
+          name: 'addInteger',
+        },
+        parameters: [
+          {
+            kind: ExpressionKind.Identifier,
+            implicitParameters: [],
+            tokens: [],
+            resultType: type(lazyValue(integerType)),
+            name: 'a',
+          },
+          {
+            kind: ExpressionKind.Identifier,
+            implicitParameters: [],
+            tokens: [],
+            resultType: type(lazyValue(integerType)),
+            name: 'b',
+          },
+        ],
+      },
+    },
   },
 };
 
@@ -220,6 +264,7 @@ export const operators: Library = {
   },
   implementations: {
     floatNumberImplementation,
+    integerNumberImplementation,
   },
 };
 

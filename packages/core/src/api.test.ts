@@ -60,5 +60,10 @@ describe('api', () => {
       const { result } = await execute('1.5 + 2.5');
       expect(result).toEqual(float(4));
     });
+
+    it('should handle multiple interfaces declared in the standard library', async () => {
+      const { result } = await execute('1 + 2');
+      expect(result).toEqual(integer(3));
+    });
   });
 });
