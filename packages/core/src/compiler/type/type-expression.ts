@@ -1,4 +1,4 @@
-import { zipObject } from 'lodash';
+import { zipObject, unzip } from 'lodash';
 import { makeMessage } from '../../message';
 import { UntypedExpression } from '../../untyped-expression';
 import { assertNever } from '../../utils';
@@ -19,6 +19,7 @@ import { createChildScope, findVariableTypeInScope, TypeScope } from '../scope';
 import { pMap } from '../utils';
 import { LazyValue, ValueKind } from '../value';
 import {
+  anything,
   booleanType,
   floatType, functionLiteralType, functionType,
   integerType,
@@ -72,73 +73,119 @@ async function extractParameterTypes(value: LazyValue, previous: LazyValue[] = [
   return extractParameterTypes(lazyValue(right), [...previous, lazyValue(left)]);
 }
 
+function expressionResult(
+  resultType: Type,
+  expression: Expression,
+): TypeExpressionResult {
+  return [resultType, (implicits) => {
+    return implicits.length > 0
+      ? {
+        resultType: type(lazyValue(nothing)),
+        kind: ExpressionKind.Application,
+        tokens: expression.tokens,
+        implicitParameters: [],
+        parameters: implicits,
+        callee: expression,
+      }
+      : expression;
+  }];
+}
 
-export async function typeExpression(scope: TypeScope, expression: UntypedExpression): Promise<StateResult<Expression>> {
+function convertImplicitToExpression(implicits: Expression[]) {
+  return (reference: string | number): Expression => {
+    switch (typeof reference) {
+      case 'number':
+        return implicits[reference];
+
+      case 'string':
+        return {
+          kind: ExpressionKind.Identifier,
+          // TODO correctly type the implicit
+          resultType: type(lazyValue(anything)),
+          tokens: [],
+          name: reference,
+        }
+    }
+  };
+}
+
+export type TypeExpressionResult = [Type, (implicitParameters: Expression[]) => Expression];
+
+export async function typeExpression(
+  scope: TypeScope,
+  expression: UntypedExpression,
+): Promise<StateResult<TypeExpressionResult>> {
   const state = State.of(scope);
   switch (expression.kind) {
-    case 'Boolean':
-      return state.wrap<BooleanExpression>({
+    case 'Boolean': {
+      const resultType = type(lazyValue(booleanType));
+      return state.wrap(expressionResult(resultType, {
+        resultType,
         kind: ExpressionKind.Boolean,
-        resultType: type(lazyValue(booleanType)),
         tokens: expression.tokens,
         value: expression.value,
-        implicitParameters: [],
-      });
+      }));
+    }
 
-    case 'String':
-      return state.wrap<StringExpression>({
+    case 'String': {
+      const resultType = type(lazyValue(stringType));
+      return state.wrap(expressionResult(resultType, {
+        resultType,
         kind: ExpressionKind.String,
-        resultType: type(lazyValue(stringType)),
         tokens: expression.tokens,
         value: expression.value,
-        implicitParameters: [],
-      });
+      }));
+    }
 
-    case 'Float':
-      return state.wrap<FloatExpression>({
+    case 'Float': {
+      const resultType = type(lazyValue(floatType));
+      return state.wrap(expressionResult(resultType, {
+        resultType,
         kind: ExpressionKind.Float,
-        resultType: type(lazyValue(floatType)),
         tokens: expression.tokens,
         value: expression.value,
-        implicitParameters: [],
-      });
+      }));
+    }
 
-    case 'Integer':
-      return state.wrap<IntegerExpression>({
+    case 'Integer': {
+      const resultType = type(lazyValue(integerType));
+      return state.wrap(expressionResult(resultType, {
+        resultType,
         kind: ExpressionKind.Integer,
-        resultType: type(lazyValue(integerType)),
         tokens: expression.tokens,
         value: expression.value,
-        implicitParameters: [],
-      });
+      }));
+    }
 
-    case 'None':
-      return state.wrap<NothingExpression>({
+    case 'None': {
+      const resultType = type(lazyValue(nothing));
+      return state.wrap(expressionResult(resultType, {
+        resultType,
         kind: ExpressionKind.Nothing,
-        resultType: type(lazyValue(nothing)),
         tokens: expression.tokens,
-        implicitParameters: [],
-      });
+      }));
+    }
 
     case 'Identifier': {
       const variable = findVariableTypeInScope(state.scope(), expression.value);
-      return state.wrap<IdentifierExpression>({
+      const resultType = variable || type(lazyValue(nothing));
+      return state.wrap(expressionResult(resultType, {
+        resultType,
         kind: ExpressionKind.Identifier,
-        resultType: variable || type(lazyValue(nothing)),
         tokens: expression.tokens,
         name: expression.value,
-        implicitParameters: [],
-      });
+      }));
     }
 
     case 'Array': {
       const { elements, tokens } = expression;
-      const typedElements = await pMap(elements, state.runAsyncP1(typeExpression));
+      const [elementTypes, typedElements] = unzip(
+        await pMap(elements, state.runAsyncP1(typeExpression))
+      ) as [Type[], ((i: Expression[]) => Expression)[]];
+
       const blankVariable = lazyValue(unboundVariable('T'));
-      const converges = [
-        // TODO ensure each of the element resultTypes belong to the same context
-        ...typedElements.map(element => fullConverge(blankVariable, element.resultType.value)),
-      ];
+      // TODO ensure each of the element resultTypes belong to the same context
+      const converges = elementTypes.map(({ value }) => fullConverge(blankVariable, value));
       const { left, right, inferred } = await state.runAsync(sequenceConverges, converges);
 
       // TODO
@@ -153,22 +200,25 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       }
 
       // Resolve any implicit parameters
-      const elementTypes: Type[] = typedElements.map(typedElement => (
-        applyReplacementsToType(right, inferred, typedElement.resultType)
+      const resolvedElementTypes = elementTypes.map(type => (
+        applyReplacementsToType(right, inferred, type)
       ));
-      const { missing, carried } = await state.runAsync(resolveImplicits, elementTypes);
+      const { missing, carried } = await state.runAsync(resolveImplicits, resolvedElementTypes);
 
       const result = applyAllSubstitutions(left, inferred, blankVariable);
-      return state.wrapWithSubstitutions<ListExpression>(inferred, {
-        tokens,
-        kind: ExpressionKind.List,
-        resultType: type(lazyValue(converged ? listType(result) : nothing), missing),
-        elements: typedElements.map((element, index) => ({
-          ...element,
-          implicitParameters: carried[index],
-        })),
-        implicitParameters: [],
-      });
+      const resultType = type(lazyValue(converged ? listType(result) : nothing), missing);
+      const continuation = (implicits: Expression[]): Expression => {
+        const convertImplicit = convertImplicitToExpression(implicits);
+        return ({
+          tokens,
+          resultType,
+          kind: ExpressionKind.List,
+          elements: typedElements.map((element, index) => (
+            element(carried[index].map(convertImplicit))
+          )),
+        });
+      };
+      return state.wrapWithSubstitutions<TypeExpressionResult>(inferred, [resultType, continuation]);
     }
 
     case 'Function': {
@@ -187,35 +237,37 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       const childState = State.of(childScope);
 
       // Type the function body which will attempt to infer the parameter types and update the scope
-      const typedBody = await childState.runAsync(typeExpression, expression.value);
+      const [bodyType, typedBody] = await childState.runAsync(typeExpression, expression.value);
 
       // Determine the type of the whole function
       // TODO this is bugged because it assumes that every parameter's type is in the same scope
       const inferredFunctionType = await childState.runAsync(
         makeInferredFunctionType,
-        typedBody.resultType,
+        bodyType,
         argumentNames,
       );
 
-      return state.wrap<LambdaExpression>({
+      return state.wrap<TypeExpressionResult>([inferredFunctionType, (implicits): LambdaExpression => ({
         kind: ExpressionKind.Lambda,
         parameterNames: argumentNames,
-        body: typedBody,
+        // TODO this is probably a bug because we don't do anything with the implicits
+        body: typedBody(implicits),
         resultType: inferredFunctionType,
         tokens: expression.tokens,
-        implicitParameters: [],
-      });
+      })]);
     }
 
     case 'FunctionCall': {
       // Type the callee expression
-      const typedCallee = await state.runAsync(typeExpression, expression.functionExpression);
+      const [calleeType, typedCallee] = await state.runAsync(typeExpression, expression.functionExpression);
 
       // Type each of the arguments
-      const typedParameters = await pMap(expression.args, state.runAsyncP1(typeExpression));
+      const [parameterTypes, typedParameters] = unzip(
+        await pMap(expression.args, state.runAsyncP1(typeExpression))
+      ) as [Type[], ((i: Expression[]) => Expression)[]];
 
       // Check if the callee is callable
-      const calleeTypeValue = typedCallee.resultType.value;
+      const calleeTypeValue = calleeType.value;
       if (!await isCallable(calleeTypeValue)) {
         state.log(makeMessage(
           'Error',
@@ -223,14 +275,14 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
           expression.tokens[0],
           expression.tokens[expression.tokens.length - 1],
         ));
-        return state.wrap<ApplicationExpression>({
-          resultType: type(lazyValue(nothing)),
+        const resultType = type(lazyValue(nothing));
+        return state.wrap<TypeExpressionResult>([resultType, (): ApplicationExpression => ({
+          resultType,
           kind: ExpressionKind.Application,
           tokens: expression.tokens,
-          implicitParameters: [],
-          parameters: typedParameters,
-          callee: typedCallee,
-        });
+          parameters: typedParameters.map(parameter => parameter([])),
+          callee: typedCallee([]),
+        })]);
       }
 
       // Check if too many parameters were supplied
@@ -247,8 +299,8 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
       // TODO handle partial application
       // Converge all parameters with their expected type
       const expectedParameters = acceptedParameters.slice(0, typedParameters.length);
-      const converges = typedParameters.map((typedParameter, index) => (
-        fullConverge(expectedParameters[index], typedParameter.resultType.value)
+      const converges = parameterTypes.map((parameterTypes, index) => (
+        fullConverge(expectedParameters[index], parameterTypes.value)
       ));
       const { left, right, inferred } = await state.runAsync(sequenceConverges, converges);
 
@@ -262,26 +314,26 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
           expression.tokens[0],
           expression.tokens[expression.tokens.length - 1],
         ));
-        return state.wrap<ApplicationExpression>({
-          resultType: type(lazyValue(nothing)),
+        const resultType = type(lazyValue(nothing));
+        return state.wrap<TypeExpressionResult>([resultType, (): ApplicationExpression => ({
+          resultType,
           kind: ExpressionKind.Application,
           tokens: expression.tokens,
-          implicitParameters: [],
-          parameters: typedParameters,
-          callee: typedCallee,
-        });
+          parameters: typedParameters.map(parameter => parameter([])),
+          callee: typedCallee([]),
+        })]);
       }
 
       // Find any implicits
       const callee = applyReplacementsToType(
         left,
         inferred,
-        typedCallee.resultType,
+        calleeType,
       );
-      const parameters = typedParameters.map(typedParameter => applyReplacementsToType(
+      const parameters = parameterTypes.map(parameterType => applyReplacementsToType(
         right,
         inferred,
-        typedParameter.resultType,
+        parameterType,
       ));
 
       const types = [
@@ -310,20 +362,18 @@ export async function typeExpression(scope: TypeScope, expression: UntypedExpres
           missing,
         );
 
-      return state.wrapWithSubstitutions<ApplicationExpression>(inferred, {
-        resultType,
-        kind: ExpressionKind.Application,
-        implicitParameters: [],
-        tokens: expression.tokens,
-        parameters: typedParameters.map((element, index) => ({
-          ...element,
-          implicitParameters: carriedImplicits[index],
-        })),
-        callee: {
-          ...typedCallee,
-          implicitParameters: carriedCalleeImplicits,
-        },
-      });
+      return state.wrapWithSubstitutions<TypeExpressionResult>(inferred, [resultType, (implicits): ApplicationExpression => {
+        const convertImplicit = convertImplicitToExpression(implicits);
+        return ({
+          resultType,
+          kind: ExpressionKind.Application,
+          tokens: expression.tokens,
+          parameters: typedParameters.map((typedParameter, index) => (
+            typedParameter(carriedImplicits[index].map(convertImplicit))
+          )),
+          callee: typedCallee(carriedCalleeImplicits.map(convertImplicit)),
+        });
+      }]);
     }
 
     case 'Unrecognized':

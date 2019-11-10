@@ -4,7 +4,7 @@ import { type, Type, TypeConstraints, TypeImplementation } from './compiler/type
 import { UniversalScope, UniversalScopeVariableEntry } from './compiler/universal-scope';
 import { LazyValue, NativeLambdaBody } from './compiler/value';
 import { lazyValue, record } from './compiler/value-constructors';
-import { evaluateExpression2 } from './compiler/evaluate-expression';
+import { evaluateExpression3 } from './compiler/evaluate-expression';
 
 export interface LibraryLambda {
   type: Type;
@@ -58,13 +58,12 @@ export function convertToScope(library: Library): UniversalScope {
     })),
     variables: {
       ...mapValues(library.implementations, (implementation): UniversalScopeVariableEntry => {
-        const resultType = type(lazyValue(record(mapValues(implementation.values, value => async () => (await evaluateExpression2({}, value, [], []))()))));
+        const resultType = type(lazyValue(record(mapValues(implementation.values, value => async () => (await evaluateExpression3({}, value))()))));
         return {
           valueType: resultType,
           value: {
             resultType,
             kind: ExpressionKind.Record,
-            implicitParameters: [],
             tokens: [],
             properties: implementation.values,
           },
@@ -74,7 +73,6 @@ export function convertToScope(library: Library): UniversalScope {
         valueType: lambda.type,
         value: {
           kind: ExpressionKind.Lambda,
-          implicitParameters: [],
           tokens: [],
           parameterNames: lambda.parameterNames,
           resultType: lambda.type,
@@ -85,7 +83,6 @@ export function convertToScope(library: Library): UniversalScope {
         valueType: native.type,
         value: {
           kind: ExpressionKind.NativeLambda,
-          implicitParameters: [],
           tokens: [],
           parameterCount: native.parameterCount,
           resultType: native.type,

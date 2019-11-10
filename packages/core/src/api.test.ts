@@ -28,7 +28,6 @@ describe('api', () => {
       const plusExpression: NativeLambdaExpression = {
         kind: ExpressionKind.NativeLambda,
         tokens: [],
-        implicitParameters: [],
         parameterCount: 2,
         resultType: plusType,
         body: (a: LazyValue<Integer>, b: LazyValue<Integer>) => async () => (

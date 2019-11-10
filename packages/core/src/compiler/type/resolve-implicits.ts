@@ -1,3 +1,4 @@
+import { Expression } from '../expression';
 import { TypeScope } from '../scope';
 import { pMap } from '../utils';
 import { findImplicits } from './find-implicits';
