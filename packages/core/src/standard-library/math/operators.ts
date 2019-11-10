@@ -105,17 +105,14 @@ const add: LibraryLambda = {
   parameterNames: ['interface', 'a', 'b'],
   body: {
     kind: ExpressionKind.Application,
-    implicitParameters: [],
     tokens: [],
     resultType: type(lazyValue(unboundVariable('a'))),
     callee: {
       kind: ExpressionKind.Application,
-      implicitParameters: [],
       tokens: [],
       resultType: type(functionType(lazyValue(unboundVariable('a')), lazyValue(unboundVariable('a')), lazyValue(unboundVariable('a')))),
       callee: {
         kind: ExpressionKind.Identifier,
-        implicitParameters: [],
         tokens: [],
         resultType: type(functionType(lazyValue(anything), lazyValue(stringType), lazyValue(anything))),
         name: '.',
@@ -123,14 +120,12 @@ const add: LibraryLambda = {
       parameters: [
         {
           kind: ExpressionKind.Identifier,
-          implicitParameters: [],
           tokens: [],
           resultType: type(lazyValue(anything)),
           name: 'interface',
         },
         {
           kind: ExpressionKind.String,
-          implicitParameters: [],
           tokens: [],
           resultType: type(lazyValue(stringType)),
           value: '+',
@@ -140,14 +135,12 @@ const add: LibraryLambda = {
     parameters: [
       {
         kind: ExpressionKind.Identifier,
-        implicitParameters: [],
         tokens: [],
         resultType: type(lazyValue(unboundVariable('a'))),
         name: 'a',
       },
       {
         kind: ExpressionKind.Identifier,
-        implicitParameters: [],
         tokens: [],
         resultType: type(lazyValue(unboundVariable('a'))),
         name: 'b',
@@ -164,18 +157,15 @@ const floatNumberImplementation: LibraryImplementation = {
   values: {
     '+': {
       kind: ExpressionKind.Lambda,
-      implicitParameters: [],
       tokens: [],
       parameterNames: ['a', 'b'],
       resultType: floatFunctionType,
       body: {
         kind: ExpressionKind.Application,
-        implicitParameters: [],
         tokens: [],
         resultType: type(lazyValue(floatType)),
         callee: {
           kind: ExpressionKind.Identifier,
-          implicitParameters: [],
           tokens: [],
           resultType: floatFunctionType,
           name: 'addFloat',
@@ -183,14 +173,12 @@ const floatNumberImplementation: LibraryImplementation = {
         parameters: [
           {
             kind: ExpressionKind.Identifier,
-            implicitParameters: [],
             tokens: [],
             resultType: type(lazyValue(floatType)),
             name: 'a',
           },
           {
             kind: ExpressionKind.Identifier,
-            implicitParameters: [],
             tokens: [],
             resultType: type(lazyValue(floatType)),
             name: 'b',
@@ -208,18 +196,15 @@ const integerNumberImplementation: LibraryImplementation = {
   values: {
     '+': {
       kind: ExpressionKind.Lambda,
-      implicitParameters: [],
       tokens: [],
       parameterNames: ['a', 'b'],
       resultType: integerFunctionType,
       body: {
         kind: ExpressionKind.Application,
-        implicitParameters: [],
         tokens: [],
         resultType: type(lazyValue(integerType)),
         callee: {
           kind: ExpressionKind.Identifier,
-          implicitParameters: [],
           tokens: [],
           resultType: integerFunctionType,
           name: 'addInteger',
@@ -227,14 +212,12 @@ const integerNumberImplementation: LibraryImplementation = {
         parameters: [
           {
             kind: ExpressionKind.Identifier,
-            implicitParameters: [],
             tokens: [],
             resultType: type(lazyValue(integerType)),
             name: 'a',
           },
           {
             kind: ExpressionKind.Identifier,
-            implicitParameters: [],
             tokens: [],
             resultType: type(lazyValue(integerType)),
             name: 'b',
