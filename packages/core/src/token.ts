@@ -33,6 +33,7 @@ export enum TokenKind {
   ComposeOperator = 'ComposeOperator',
   BooleanLiteral = 'BooleanLiteral',
   Comment = 'Comment',
+  Keyword = 'Keyword',
 }
 
 export class Token {

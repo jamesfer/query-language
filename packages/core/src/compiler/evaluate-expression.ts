@@ -291,6 +291,9 @@ export function evaluateExpression3(
       };
     }
 
+    case ExpressionKind.Binding:
+      return async () => nothing;
+
     default:
       return assertNever(expression);
   }

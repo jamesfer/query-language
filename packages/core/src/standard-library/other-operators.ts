@@ -12,7 +12,6 @@ const compose: LibraryLambda = {
   parameterNames: ['f', 'g'],
   body: {
     kind: ExpressionKind.Lambda,
-    implicitParameters: [],
     tokens: [],
     parameterNames: ['a'],
     resultType: type(functionType(
@@ -22,12 +21,10 @@ const compose: LibraryLambda = {
     body: {
       kind: ExpressionKind.Application,
       tokens: [],
-      implicitParameters: [],
       resultType: type(lazyValue(unboundVariable('R'))),
       callee: {
         kind: ExpressionKind.Identifier,
         tokens: [],
-        implicitParameters: [],
         name: 'f',
         resultType: type(functionType(
           lazyValue(unboundVariable('T2')),
@@ -37,12 +34,10 @@ const compose: LibraryLambda = {
       parameters: [{
         kind: ExpressionKind.Application,
         tokens: [],
-        implicitParameters: [],
         resultType: type(lazyValue(unboundVariable('T2'))),
         callee: {
           kind: ExpressionKind.Identifier,
           tokens: [],
-          implicitParameters: [],
           name: 'g',
           resultType: type(functionType(
             lazyValue(unboundVariable('T1')),
@@ -51,7 +46,6 @@ const compose: LibraryLambda = {
         },
         parameters: [{
           kind: ExpressionKind.Identifier,
-          implicitParameters: [],
           tokens: [],
           resultType: type(lazyValue(unboundVariable('T1'))),
           name: 'a',

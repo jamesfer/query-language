@@ -1,19 +1,13 @@
-import { zipObject, unzip } from 'lodash';
+import { unzip, zipObject } from 'lodash';
 import { makeMessage } from '../../message';
 import { UntypedExpression } from '../../untyped-expression';
 import { assertNever } from '../../utils';
 import {
   ApplicationExpression,
-  BooleanExpression,
+  BindingExpression,
   Expression,
   ExpressionKind,
-  FloatExpression,
-  IdentifierExpression,
-  IntegerExpression,
   LambdaExpression,
-  ListExpression,
-  NothingExpression,
-  StringExpression,
 } from '../expression';
 import { createChildScope, findVariableTypeInScope, TypeScope } from '../scope';
 import { pMap } from '../utils';
@@ -21,23 +15,23 @@ import { LazyValue, ValueKind } from '../value';
 import {
   anything,
   booleanType,
-  floatType, functionLiteralType, functionType,
+  floatType,
+  functionLiteralType,
+  functionType,
   integerType,
   lazyValue,
   listType,
   nothing,
-  stringType, unboundVariable,
+  stringType,
+  unboundVariable,
 } from '../value-constructors';
-import { sequenceConverges, fullConverge } from './full-converge';
+import { fullConverge, sequenceConverges } from './full-converge';
 import { makeInferredFunctionType } from './make-inferred-function-type';
 import { resolveImplicits } from './resolve-implicits';
 import { State, StateResult } from './state';
 import { Type, type } from './type';
 import { freeBoundVariable } from './utils';
-import {
-  applyAllSubstitutions,
-  applyReplacementsToType,
-} from './variable-substitutions';
+import { applyAllSubstitutions, applyReplacementsToType } from './variable-substitutions';
 
 async function isCallable(value: LazyValue): Promise<boolean> {
   const strictValue = await value();
@@ -374,6 +368,31 @@ export async function typeExpression(
           callee: typedCallee(carriedCalleeImplicits.map(convertImplicit)),
         });
       }]);
+    }
+
+    case 'Binding': {
+      const [valueType, typedValue] = await state.runAsync(typeExpression, expression.value);
+
+      const childScope = createChildScope(state.scope(), {
+        variables: { [expression.name]: { valueType } },
+      });
+      const childState = State.of(childScope);
+
+      // Type the rest of the script after the let binding
+      const [bodyType, typedBody] = await childState.runAsync(typeExpression, expression.body);
+
+      return state.wrap<TypeExpressionResult>([
+        bodyType,
+        (inferred): BindingExpression => ({
+          kind: ExpressionKind.Binding,
+          name: expression.name,
+          tokens: expression.tokens,
+          resultType: bodyType,
+          body: typedBody(inferred),
+          // TODO this breaks if the variable value requires inferred variables
+          value: typedValue([]),
+        })
+      ]);
     }
 
     case 'Unrecognized':

@@ -1,7 +1,9 @@
 import { Token } from '../token';
 import { makeUntypedUnrecognizedExpression, UntypedExpression } from '../untyped-expression';
+import { coalesceLogs } from './coalesce-logs';
 import { Log, LogValue } from './compiler-utils/monoids/log';
 import { interpretArray } from './interpreters/array';
+import { interpretBinding } from './interpreters/binding';
 import { interpretBoolean } from './interpreters/boolean';
 import { interpretFunction } from './interpreters/function';
 import { interpretFunctionCall } from './interpreters/function-call';
@@ -11,27 +13,17 @@ import { interpretOperatorExpression } from './interpreters/operators/operator';
 import { interpretParenthesis } from './interpreters/parenthesis';
 import { interpretString } from './interpreters/string';
 
+export type InterpretExpression = (
+  tokens: Token[],
+  previous?: UntypedExpression | null,
+  precedence?: number,
+) => LogValue<UntypedExpression | undefined>;
+
 export type ExpressionInterpreter = (
   tokens: Token[],
   previous: UntypedExpression | null,
   precedence: number,
 ) => LogValue<UntypedExpression | undefined>;
-
-export function coalesceLogs<R>(functions: (() => LogValue<R | undefined>)[]): LogValue<R | undefined>;
-export function coalesceLogs<R, P1>(functions: ((p1: P1) => LogValue<R | undefined>)[], p1: P1): LogValue<R | undefined>;
-export function coalesceLogs<R, P1, P2>(functions: ((p1: P1, p2: P2) => LogValue<R | undefined>)[], p1: P1, p2: P2): LogValue<R | undefined>;
-export function coalesceLogs<R, P1, P2, P3>(functions: ((p1: P1, p2: P2, p3: P3) => LogValue<R | undefined>)[], p1: P1, p2: P2, p3: P3): LogValue<R | undefined>;
-export function coalesceLogs<R, P1, P2, P3, P4>(functions: ((p1: P1, p2: P2, p3: P3, p4: P4) => LogValue<R | undefined>)[], p1: P1, p2: P2, p3: P3, p4: P4): LogValue<R | undefined>;
-export function coalesceLogs<R>(functions: ((...args: any[]) => LogValue<R | undefined>)[], ...args: any[]): LogValue<R | undefined> {
-  const log = Log.empty();
-  for (const func of functions) {
-    const result = log.combine(func(...args));
-    if (result !== undefined) {
-      return log.wrap(result);
-    }
-  }
-  return log.wrap(undefined);
-}
 
 
 const interpretLiteral: ExpressionInterpreter = (tokens, previous, precedence) => {
@@ -45,6 +37,7 @@ const interpretLiteral: ExpressionInterpreter = (tokens, previous, precedence) =
         interpretBoolean,
         interpretFunction,
         interpretIdentifier,
+        interpretBinding,
       ],
       tokens,
       previous,

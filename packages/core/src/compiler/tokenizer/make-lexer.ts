@@ -1,13 +1,13 @@
 import { compile, Lexer, Token as MooToken } from 'moo';
 import { TokenKind } from '../../token';
-import { mooRules } from './rules';
+import rules from './rules';
 
 function shouldSkip({ type }: MooToken): boolean {
   return type === TokenKind.WhiteSpace || type === TokenKind.Comment;
 }
 
 export function makeLexer(): Lexer {
-  const mooLexer = compile(mooRules);
+  const mooLexer = compile(rules);
 
   // Replace the next function to skip whitespace
   const next = mooLexer.next.bind(mooLexer);

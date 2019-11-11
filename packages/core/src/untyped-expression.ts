@@ -41,6 +41,12 @@ export interface UntypedFunctionExpression extends UntypedExpressionInterface<'F
 
 export interface UntypedNoneExpression extends UntypedExpressionInterface<'None'> {}
 
+export interface UntypedBindingExpression extends UntypedExpressionInterface<'Binding'> {
+  name: string;
+  value: UntypedExpression;
+  body: UntypedExpression;
+}
+
 export interface UntypedUnrecognizedExpression extends UntypedExpressionInterface<'Unrecognized'> {}
 
 export type UntypedExpression = UntypedFunctionCallExpression
@@ -52,7 +58,8 @@ export type UntypedExpression = UntypedFunctionCallExpression
   | UntypedIdentifierExpression
   | UntypedUnrecognizedExpression
   | UntypedNoneExpression
-  | UntypedFunctionExpression;
+  | UntypedFunctionExpression
+  | UntypedBindingExpression;
 
 export function makeUntypedNoneExpression(): UntypedNoneExpression {
   return {

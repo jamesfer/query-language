@@ -1,7 +1,11 @@
-import { Rule } from 'moo';
+import { Rule, keywords } from 'moo';
 import { TokenKind } from '../../token';
 
-export const mooRules: { [k in TokenKind]: RegExp | string | string[] | Rule | Rule[] } = {
+export type Rules = { [k in TokenKind]: RegExp | string | string[] | Rule | Rule[] };
+
+const keywordsRules = { Keyword: ['let'] };
+
+const rules: Rules = {
   WhiteSpace: { match: /\s+/, lineBreaks: true },
   Comment: /--[^\n\r]*/,
 
@@ -41,5 +45,14 @@ export const mooRules: { [k in TokenKind]: RegExp | string | string[] | Rule | R
   StringLiteral: /(?:'(?:\\\\|\\'|(?!').)*'?|"(?:\\\\|\\"|(?!").)*"?)/,
 
   // Identifiers
-  Identifier: /[_a-zA-Z][_a-zA-Z0-9]*/,
+  Identifier: {
+    type: keywords(keywordsRules),
+    match: /[_a-zA-Z][_a-zA-Z0-9]*/,
+  },
+
+  // TODO this is unneeded as keywords are handled by the identifier type. However, it is required
+  //      because of the limitations of enum types. TokenKind should be changed to a union.
+  ...keywordsRules,
 };
+
+export default rules;

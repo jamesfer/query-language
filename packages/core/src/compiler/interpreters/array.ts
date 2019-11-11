@@ -1,4 +1,3 @@
-import { makeMessage } from '../../message';
 import { TokenKind } from '../../token';
 import { UntypedArrayExpression } from '../../untyped-expression';
 import { buildListInterpreter } from '../compiler-utils/interpret-list';

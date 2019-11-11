@@ -1,10 +1,11 @@
+import { flatten, uniq } from 'lodash';
 import { assertNever } from '../../../utils';
 import { Expression, ExpressionKind } from '../../expression';
-import { flatten, uniq } from 'lodash';
 
 export type BackendExpression = {
   value: string,
   dependents: string[],
+  blockStatements: string[],
 };
 
 export type BackendLibraryEntry = {
@@ -14,7 +15,7 @@ export type BackendLibraryEntry = {
 }
 
 function result(value: string, ...dependents: string[]): BackendExpression {
-  return { value, dependents };
+  return { value, dependents, blockStatements: [] };
 }
 
 function map(result: BackendExpression, f: (value: string) => string): BackendExpression {
@@ -22,6 +23,7 @@ function map(result: BackendExpression, f: (value: string) => string): BackendEx
   return {
     value,
     dependents: result.dependents,
+    blockStatements: result.blockStatements,
   };
 }
 
@@ -29,6 +31,16 @@ function mapN(results: BackendExpression[], f: (values: string[]) => string): Ba
   return {
     value: f(results.map(result => result.value)),
     dependents: uniq(flatten(results.map(result => result.dependents))),
+    blockStatements: flatten(results.map(result => result.blockStatements)),
+  };
+}
+
+function bind(result: BackendExpression, f: (value: string) => BackendExpression): BackendExpression {
+  const { value, dependents, blockStatements } = f(result.value);
+  return {
+    value,
+    dependents: uniq([...result.dependents, ...dependents]),
+    blockStatements: [...result.blockStatements, ...blockStatements],
   };
 }
 
@@ -70,12 +82,21 @@ export function generateJavascriptExpression(expression: Expression): BackendExp
       return result(`${expression.value}`);
     case ExpressionKind.Boolean:
       return result(`${expression.value}`);
-    case ExpressionKind.Identifier:
+    case ExpressionKind.Identifier: {
       const entry = javascriptStandardLibrary[expression.name];
+      if (entry) {
+        return {
+          value: entry.name || expression.name,
+          dependents: [...(entry.dependents || []), expression.name],
+          blockStatements: [],
+        };
+      }
       return {
-        value: entry.name || expression.name,
-        dependents: [...(entry.dependents || []), expression.name],
+        value: expression.name,
+        dependents: [],
+        blockStatements: [],
       };
+    }
     case ExpressionKind.List: {
       const elements = expression.elements.map(generateJavascriptExpression);
       return mapN(elements, values => `[${values.join(',')}]`);
@@ -90,6 +111,18 @@ export function generateJavascriptExpression(expression: Expression): BackendExp
     case ExpressionKind.Lambda: {
       const parameters = expression.parameterNames.join(',');
       const body = generateJavascriptExpression(expression.body);
+
+      if (body.blockStatements.length > 0) {
+        const statements = body.blockStatements.join(';\n');
+        return {
+          value: `(${parameters}) => {
+            ${statements}
+            return ${body.value};
+          }`,
+          dependents: body.dependents,
+          blockStatements: [],
+        };
+      }
       return map(body, value => `(${parameters}) => ${value}`);
     }
     case ExpressionKind.Application: {
@@ -104,6 +137,15 @@ export function generateJavascriptExpression(expression: Expression): BackendExp
       return mapN([callee, ...parameters], ([calleeValue, ...parameterValues]) => (
         `${calleeValue}(${parameterValues.join(',')})`
       ));
+    }
+    case ExpressionKind.Binding: {
+      const value = generateJavascriptExpression(expression.value);
+      const body = generateJavascriptExpression(expression.body);
+      return bind(value, value => bind(body, body => ({
+        value: body,
+        dependents: [],
+        blockStatements: [`const ${expression.name} = ${value}`],
+      })));
     }
     case ExpressionKind.NativeLambda:
       throw new Error('Not sure how to generate native lambda');
@@ -121,5 +163,5 @@ export function generateJavascript(expression: Expression): string {
   const dependents = result.dependents.map(dependent => (
     javascriptStandardLibrary[dependent].value
   ));
-  return [...dependents, value].join('\n');
+  return [...dependents, ...result.blockStatements, value].join('\n');
 }

@@ -20,7 +20,8 @@ export class Log extends Monoid<Message[]> {
     return this.messages;
   }
 
-  append(messages: Message[]): void {
+  append(message: Message[] | Message): void {
+    const messages = Array.isArray(message) ? message : [message];
     const initialLength = this.messages.length;
     const messagesLength = messages.length;
     this.messages.length = initialLength + messagesLength;

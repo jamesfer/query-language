@@ -15,6 +15,11 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "target": "es6"
+    "target": "es6",
+    "typeRoots": [
+      "./typings",
+      "./node_modules/@types",
+      "../../node_modules/@types"
+    ]
   }
 }

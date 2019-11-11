@@ -8,7 +8,6 @@ import { generateJavascript } from './generate-javascript';
 
 const writeFilePromise = promisify(writeFile);
 const mkdirPromise = promisify(mkdir);
-const rmdirPromise = promisify(rmdir);
 const unlinkPromise = promisify(unlink);
 
 
@@ -31,7 +30,7 @@ describe('generate-javascript', () => {
   });
 
   it('can do stuff', async () => {
-    const result = await compile('1 + 1', convertToScope(standardLibrary));
+    const result = await compile('let a = 5 a + 1', convertToScope(standardLibrary));
     const script = generateJavascript(result.expression as Expression);
     console.log(script);
     const actual = await execModule(script);

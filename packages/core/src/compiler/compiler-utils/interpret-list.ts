@@ -2,7 +2,7 @@ import { UntypedExpression } from '../../untyped-expression';
 import { makeMessage } from '../../message';
 import { Token, TokenKind } from '../../token';
 import { tokenArrayMatches } from '../../utils';
-import { interpretExpression } from '../interpret-expression';
+import { interpretExpression, InterpretExpression } from '../interpret-expression';
 import { first, last } from 'lodash';
 import { LogValue, Log } from './monoids/log';
 
@@ -76,8 +76,9 @@ function consumeList(
   return log.wrap({ expressions, tokens: usedTokens });
 }
 
-export type ListInterpreter = (tokens: Token[])
-  => LogValue<{ expressions: UntypedExpression[], tokens: Token[] } | undefined>;
+export type ListInterpreter = (
+  tokens: Token[],
+) => LogValue<{ expressions: UntypedExpression[], tokens: Token[] } | undefined>;
 
 export function buildListInterpreter(
   openToken: TokenKind,
