@@ -68,7 +68,7 @@ const javascriptStandardLibrary: { [k: string]: BackendLibraryEntry } = {
   },
 };
 
-export function generateJavascriptExpression(expression: Expression): BackendExpression {
+function generateJavascriptExpression(expression: Expression): BackendExpression {
   switch (expression.kind) {
     case ExpressionKind.Nothing:
       return result('null');

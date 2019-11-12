@@ -30,7 +30,10 @@ export interface EvaluationResult {
 
 export interface ExecutionResult extends CompilationResult, EvaluationResult {}
 
-export async function compile(code: string, scope: UniversalScope): Promise<CompilationResult> {
+export async function compile(
+  code: string,
+  scope: UniversalScope = convertToScope(standardLibrary),
+): Promise<CompilationResult> {
   const log = Log.empty();
 
   // Parse Tokens

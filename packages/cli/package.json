@@ -1,0 +1,39 @@
+{
+  "name": "query-language-cli",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "license": "MIT",
+  "repository": "github:jamesfer/query-language",
+  "homepage": "jamesfer.me/query-language",
+  "bugs": {
+    "url": "https://github.com/jamesfer/query-language/issues"
+  },
+  "keywords": [
+    "query",
+    "language",
+    "functional",
+    "lazy"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.json"
+  },
+  "jest": {
+    "preset": "ts-jest"
+  },
+  "dependencies": {
+    "@types/jest": "^24.0.17",
+    "@types/node": "^12.12.7",
+    "@types/yargs": "^13.0.3",
+    "get-stdin": "^7.0.0",
+    "jest": "^24.8.0",
+    "query-language": "^0.1.0",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^3.3.0",
+    "tslib": "^1.9.0",
+    "tslint": "^5.5.0",
+    "tslint-config-airbnb": "^5.8.0",
+    "typescript": "^3.3.1",
+    "yargs": "^14.2.0"
+  }
+}

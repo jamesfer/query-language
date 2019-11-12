@@ -18,7 +18,8 @@
     "lazy"
   ],
   "scripts": {
-    "build": "webpack --progress",
+    "build": "tsc --project tsconfig.json",
+    "build-old": "webpack --progress",
     "watch": "webpack --progress --watch",
     "prod": "webpack --progress --env.production",
     "lint": "tslint -p tsconfig.json",
