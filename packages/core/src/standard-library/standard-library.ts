@@ -1,3 +1,6 @@
+import { ExpressionKind, IdentifierExpression } from '../compiler/expression';
+import { type } from '../compiler/type/type';
+import { lazyValue, userDefinedLiteral } from '../compiler/value-constructors';
 import { Library, mergeLibraries } from '../library';
 // import branching from './branching/branching';
 import { math } from './math/math';
@@ -10,6 +13,22 @@ const standardLibrary: Library = mergeLibraries(
   otherOperators,
   // array,
   // branching,
+  {
+    variables: {
+      String: {
+        kind: ExpressionKind.Identifier,
+        tokens: [],
+        resultType: type(lazyValue(userDefinedLiteral('String'))),
+        name: 'String',
+      },
+      Integer: {
+        kind: ExpressionKind.Identifier,
+        tokens: [],
+        resultType: type(lazyValue(userDefinedLiteral('Integer'))),
+        name: 'Integer',
+      },
+    }
+  }
 );
 
 export default standardLibrary;

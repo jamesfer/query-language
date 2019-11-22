@@ -47,6 +47,20 @@ export interface UntypedBindingExpression extends UntypedExpressionInterface<'Bi
   body: UntypedExpression;
 }
 
+export interface UntypedInterfaceExpression extends UntypedExpressionInterface<'Interface'> {
+  name: string;
+  typeParameters: Token[];
+  memberFunctions: { name: string; expression: UntypedExpression }[];
+  body: UntypedExpression;
+}
+
+export interface UntypedImplementationExpression extends UntypedExpressionInterface<'Implementation'> {
+  parentName: string;
+  parentTypeParameters: Token[];
+  memberFunctions: { name: string; expression: UntypedExpression }[];
+  body: UntypedExpression;
+}
+
 export interface UntypedUnrecognizedExpression extends UntypedExpressionInterface<'Unrecognized'> {}
 
 export type UntypedExpression = UntypedFunctionCallExpression
@@ -59,7 +73,9 @@ export type UntypedExpression = UntypedFunctionCallExpression
   | UntypedUnrecognizedExpression
   | UntypedNoneExpression
   | UntypedFunctionExpression
-  | UntypedBindingExpression;
+  | UntypedBindingExpression
+  | UntypedInterfaceExpression
+  | UntypedImplementationExpression;
 
 export function makeUntypedNoneExpression(): UntypedNoneExpression {
   return {

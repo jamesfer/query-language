@@ -28,6 +28,9 @@ export interface LibraryImplementation {
 }
 
 export interface Library {
+  variables?: {
+    [name: string]: Expression;
+  };
   lambdas?: {
     [name: string]: LibraryLambda;
   };
@@ -44,6 +47,7 @@ export function mergeLibraries(...libraries: Library[]): Library {
     nativeLambdas: assign({}, ...libraries.map(({ nativeLambdas }) => nativeLambdas)),
     implementations: assign({}, ...libraries.map(({ implementations }) => implementations)),
     lambdas: assign({}, ...libraries.map(({ lambdas }) => lambdas)),
+    variables: assign({}, ...libraries.map(({ variables }) => variables)),
   };
 }
 
@@ -88,6 +92,10 @@ export function convertToScope(library: Library): UniversalScope {
           resultType: native.type,
           body: native.body,
         },
+      })),
+      ...mapValues(library.variables, (variable): UniversalScopeVariableEntry => ({
+        valueType: variable.resultType,
+        value: variable,
       })),
     },
   };

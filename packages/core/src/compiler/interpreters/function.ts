@@ -8,7 +8,7 @@ import { Log } from '../compiler-utils/monoids/log';
 import { ExpressionInterpreter, interpretExpression } from '../interpret-expression';
 
 
-export const interpretFunction: ExpressionInterpreter = (incomingTokens) => {
+export const interpretFunction: ExpressionInterpreter<UntypedFunctionExpression> = (incomingTokens) => {
   if (tokenArrayMatches(incomingTokens, TokenKind.Identifier)) {
     const log = Log.empty();
     // TODO support multiple arguments

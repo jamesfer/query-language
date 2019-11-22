@@ -294,6 +294,12 @@ export function evaluateExpression3(
     case ExpressionKind.Binding:
       return async () => nothing;
 
+    case ExpressionKind.Interface:
+      return async () => nothing;
+
+    case ExpressionKind.Implementation:
+      return async () => nothing;
+
     default:
       return assertNever(expression);
   }

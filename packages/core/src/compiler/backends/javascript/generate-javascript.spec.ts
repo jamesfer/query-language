@@ -30,11 +30,26 @@ describe('generate-javascript', () => {
   });
 
   it('can do stuff', async () => {
-    const result = await compile('let a = 5 a + 1', convertToScope(standardLibrary));
-    const script = generateJavascript(result.expression as Expression);
+    const code = `
+      interface Size(A) { 
+        getStrength: A => Integer
+      } 
+      
+      implement Size(Integer) {
+        getStrength: a => 4
+      }
+      
+      implement Size(String) {
+        getStrength: a => 1
+      }
+      
+      getStrength(100)
+    `;
+    const result = await compile(code, convertToScope(standardLibrary));
+    const script = await generateJavascript(result.expression as Expression);
     console.log(script);
     const actual = await execModule(script);
     console.log(actual);
-    expect(actual).toBe(2);
+    expect(actual).toBe(4);
   });
 });

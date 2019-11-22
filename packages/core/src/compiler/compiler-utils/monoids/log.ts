@@ -8,8 +8,8 @@ export class Log extends Monoid<Message[]> {
     return new Log([]);
   }
 
-  static of<T>(value: T): LogValue<T> {
-    return { value, state: [] };
+  static of<T>(value: T, state: Message[] = []): LogValue<T> {
+    return { value, state };
   }
 
   protected constructor(protected messages: Message[]) {

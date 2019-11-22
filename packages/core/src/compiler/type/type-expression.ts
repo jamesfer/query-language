@@ -1,4 +1,4 @@
-import { unzip, zipObject } from 'lodash';
+import { fromPairs, unzip, zipObject } from 'lodash';
 import { makeMessage } from '../../message';
 import { UntypedExpression } from '../../untyped-expression';
 import { assertNever } from '../../utils';
@@ -7,13 +7,21 @@ import {
   BindingExpression,
   Expression,
   ExpressionKind,
+  ImplementationExpression,
+  InterfaceExpression,
   LambdaExpression,
 } from '../expression';
-import { createChildScope, findVariableTypeInScope, TypeScope } from '../scope';
-import { pMap } from '../utils';
+import {
+  createChildScope,
+  findInterfaceInScope,
+  findVariableTypeInScope,
+  TypeScope,
+} from '../scope';
+import { lazyElementList, pMap } from '../utils';
 import { LazyValue, ValueKind } from '../value';
 import {
   anything,
+  application,
   booleanType,
   floatType,
   functionLiteralType,
@@ -24,12 +32,14 @@ import {
   nothing,
   stringType,
   unboundVariable,
+  userDefinedLiteral,
 } from '../value-constructors';
+import { convertToType } from './convert-to-type';
 import { fullConverge, sequenceConverges } from './full-converge';
 import { makeInferredFunctionType } from './make-inferred-function-type';
 import { resolveImplicits } from './resolve-implicits';
 import { State, StateResult } from './state';
-import { Type, type } from './type';
+import { Type, type, TypeConstraint, TypeImplementation } from './type';
 import { freeBoundVariable } from './utils';
 import { applyAllSubstitutions, applyReplacementsToType } from './variable-substitutions';
 
@@ -395,6 +405,151 @@ export async function typeExpression(
       ]);
     }
 
+    case 'Interface': {
+      // TODO I think I need to ditch the whole parent child thing. I don't remember why I thought
+      //      it was a good idea.
+      const constraint: TypeConstraint = {
+        kind: 'TypeConstraint',
+        parent: lazyValue(anything),
+        child: lazyValue(application(
+          lazyValue(userDefinedLiteral(expression.name)),
+          lazyElementList(expression.typeParameters.map(typeParameter => (
+            unboundVariable(typeParameter.value))
+          )),
+        )),
+      };
+      const typedMemberFunctions = expression.memberFunctions.map(({ name, expression }) => ({
+          name,
+          type: type(convertToType(expression), [constraint]),
+      }));
+
+      // Construct child scope with functions in interface included
+      const childState = State.of(createChildScope(state.scope(), {
+        variables: fromPairs(typedMemberFunctions.map(({ name, type }) => (
+          [name, { valueType: type }]
+        ))),
+        interfaces: {
+          [expression.name]: {
+            memberFunctions: typedMemberFunctions,
+            typeParameters: expression.typeParameters,
+          },
+        },
+      }));
+
+      // Type the rest of the script after the interface declaration
+      const [bodyType, typedBody] = await childState.runAsync(typeExpression, expression.body);
+
+      return state.wrap<TypeExpressionResult>([
+        bodyType,
+        (inferred): InterfaceExpression => ({
+          kind: ExpressionKind.Interface,
+          resultType: bodyType,
+          body: typedBody(inferred),
+          tokens: expression.tokens,
+          name: expression.name,
+          memberFunctions: typedMemberFunctions,
+          typeParameters: expression.typeParameters,
+        }),
+      ]);
+    }
+
+    case 'Implementation': {
+      const typedMemberFunctions: { name: string, implementation: Expression }[] = [];
+      for (const memberFunction of expression.memberFunctions) {
+        typedMemberFunctions.push({
+          name: memberFunction.name,
+          // TODO how to handle inferred parameters for member functions
+          implementation: (await state.runAsync(typeExpression, memberFunction.expression))[1]([]),
+        });
+      }
+
+      // Attempt to converge each of the member functions with their parent definition to correctly
+      // match up unbound variables in the function with the constraints.
+      let convergedMemberFunctions = typedMemberFunctions;
+      const parent = findInterfaceInScope(state.scope(), expression.parentName);
+      if (!parent) {
+        state.log(makeMessage('Error', 'Interface parent does not exist', expression.tokens[0]))
+      } else {
+        if (expression.parentTypeParameters.length !== parent.typeParameters.length) {
+          state.log(makeMessage('Error', 'Incorrect number of arguments to interface', expression.tokens[0]));
+        }
+
+        convergedMemberFunctions = await Promise.all(
+          typedMemberFunctions.map(async ({ name, implementation }) => {
+            const parentFunction = parent.memberFunctions.find(({ name: parentName }) => (
+              parentName === name
+            ));
+            if (!parentFunction) {
+              state.log(makeMessage(
+                'Error',
+                'Function defined in implementation does not exist in parent',
+                implementation.tokens[0],
+              ));
+              return { name, implementation };
+            }
+
+            const replacements = await state.runAsync(sequenceConverges, [
+              fullConverge(parentFunction.type.value, implementation.resultType.value)
+            ]);
+            return {
+              name,
+              implementation: {
+                ...implementation,
+                resultType: applyReplacementsToType(
+                  replacements.right,
+                  replacements.inferred,
+                  implementation.resultType,
+                ),
+              },
+            };
+          }),
+        );
+      }
+
+      // Construct child scope with functions in interface included
+      const name = [
+        expression.parentName,
+        ...expression.parentTypeParameters.map(token => token.value),
+        'Implementation',
+      ].join('');
+      const childState = State.of(createChildScope(state.scope(), {
+        implementations: {
+          [name]: {
+            kind: 'TypeImplementation',
+            parentType: lazyValue(anything),
+            childType: lazyValue(application(
+              lazyValue(userDefinedLiteral(expression.parentName)),
+              lazyElementList(expression.parentTypeParameters.map(typeParameter => (
+                findVariableTypeInScope(scope, typeParameter.value)
+                  ? userDefinedLiteral(typeParameter.value)
+                  : unboundVariable(typeParameter.value))
+              )),
+            )),
+            constraints: [],
+            values: fromPairs(convergedMemberFunctions.map(({ name, implementation }) => (
+              [name, implementation]
+            ))),
+          },
+        },
+      }));
+
+      // Type the rest of the script after the interface declaration
+      const [bodyType, typedBody] = await childState.runAsync(typeExpression, expression.body);
+
+      return state.wrap<TypeExpressionResult>([
+        bodyType,
+        (inferred): ImplementationExpression => ({
+          kind: ExpressionKind.Implementation,
+          resultType: bodyType,
+          body: typedBody(inferred),
+          tokens: expression.tokens,
+          parentName: expression.parentName,
+          parentTypeParameters: expression.parentTypeParameters,
+          memberFunctions: typedMemberFunctions,
+        }),
+      ]);
+    }
+
     case 'Unrecognized':
       // TODO handle errors better
       throw new Error('Cannot type unrecognized expression');
@@ -403,3 +558,10 @@ export async function typeExpression(
       return assertNever(expression);
   }
 }
+
+// export async function typeBaseExpression(scope: TypeScope, expression: UntypedExpression): Promise<StateResult<Expression>> {
+//   const state = State.of(scope);
+//   const [type, func] = await state.runAsync(typeExpression, expression);
+//
+// }
+

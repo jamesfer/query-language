@@ -17,6 +17,8 @@ export enum ExpressionKind {
   List,
   Record,
   Binding,
+  Interface,
+  Implementation,
 }
 
 export type NativeLambda = (...parameters: LazyValue[]) => LazyValue;
@@ -88,6 +90,20 @@ export interface BindingExpression extends BaseExpression<ExpressionKind.Binding
   body: Expression;
 }
 
+export interface InterfaceExpression extends BaseExpression<ExpressionKind.Interface> {
+  name: string;
+  typeParameters: Token[];
+  memberFunctions: { name: string, type: Type }[];
+  body: Expression;
+}
+
+export interface ImplementationExpression extends BaseExpression<ExpressionKind.Implementation> {
+  parentName: string;
+  parentTypeParameters: Token[];
+  memberFunctions: { name: string, implementation: Expression }[];
+  body: Expression;
+}
+
 export type Expression =
   | AnythingExpression
   | NothingExpression
@@ -102,4 +118,6 @@ export type Expression =
   | BooleanExpression
   | ListExpression
   | RecordExpression
-  | BindingExpression;
+  | BindingExpression
+  | InterfaceExpression
+  | ImplementationExpression;

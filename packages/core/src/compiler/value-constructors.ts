@@ -14,7 +14,6 @@ import {
   ValueKind,
   Value, BoundVariable, Record,
 } from './value';
-import { sortBy } from 'lodash';
 
 export function lazyValue<V extends Value>(value: V): LazyValue<V> {
   return () => Promise.resolve(value);
@@ -115,15 +114,15 @@ export const nothing: Nothing = {
   kind: ValueKind.Nothing,
 };
 
-export const stringType = userDefinedLiteral('string');
+export const stringType = userDefinedLiteral('String');
 
-export const integerType = userDefinedLiteral('integer');
+export const integerType = userDefinedLiteral('Integer');
 
-export const floatType = userDefinedLiteral('float');
+export const floatType = userDefinedLiteral('Float');
 
-export const booleanType = userDefinedLiteral('boolean');
+export const booleanType = userDefinedLiteral('Boolean');
 
-export const listLiteralType = userDefinedLiteral('list');
+export const listLiteralType = userDefinedLiteral('List');
 
 export function listType(elementType: LazyValue) {
   return application(lazyValue(listLiteralType), lazyList([elementType]));

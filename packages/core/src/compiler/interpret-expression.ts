@@ -8,6 +8,8 @@ import { interpretBoolean } from './interpreters/boolean';
 import { interpretFunction } from './interpreters/function';
 import { interpretFunctionCall } from './interpreters/function-call';
 import { interpretIdentifier } from './interpreters/identifier';
+import { interpretImplementation } from './interpreters/implementation';
+import { interpretInterface } from './interpreters/interface';
 import { interpretNumber } from './interpreters/number';
 import { interpretOperatorExpression } from './interpreters/operators/operator';
 import { interpretParenthesis } from './interpreters/parenthesis';
@@ -19,11 +21,11 @@ export type InterpretExpression = (
   precedence?: number,
 ) => LogValue<UntypedExpression | undefined>;
 
-export type ExpressionInterpreter = (
+export type ExpressionInterpreter<T = UntypedExpression> = (
   tokens: Token[],
   previous: UntypedExpression | null,
   precedence: number,
-) => LogValue<UntypedExpression | undefined>;
+) => LogValue<T | undefined>;
 
 
 const interpretLiteral: ExpressionInterpreter = (tokens, previous, precedence) => {
@@ -51,6 +53,8 @@ const runInterpreters: ExpressionInterpreter = (tokens, previous, precedence) =>
   if (tokens.length) {
     return coalesceLogs(
       [
+        interpretInterface,
+        interpretImplementation,
         interpretLiteral,
         interpretFunctionCall,
         interpretOperatorExpression,

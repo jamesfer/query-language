@@ -1,4 +1,4 @@
-import { Expression, IdentifierExpression } from './expression';
+import { Expression, IdentifierExpression, InterfaceExpression } from './expression';
 import { Type, TypeImplementation } from './type/type';
 import {
   applyInferredSubstitutions,
@@ -51,6 +51,13 @@ export interface TypeScope {
   inferredVariables?: string[];
 
   /**
+   * List of interfaces.
+   */
+  interfaces?: {
+    [k: string]: Pick<InterfaceExpression, 'memberFunctions' | 'typeParameters'>;
+  };
+
+  /**
    * List of implementations of an interface type.
    */
   implementations?: {
@@ -76,7 +83,19 @@ export function findVariableTypeInScope(scope: TypeScope, name: string): Type | 
   return undefined;
 }
 
-export function createChildScope(parent: TypeScope, child: Pick<TypeScope, 'variables'>) {
+export function findInterfaceInScope(scope: TypeScope, name: string): Pick<InterfaceExpression, 'memberFunctions' | 'typeParameters'> | undefined {
+  if (scope.interfaces && name in scope.interfaces) {
+    return scope.interfaces[name];
+  }
+
+  if (scope.parent) {
+    return findInterfaceInScope(scope.parent, name);
+  }
+
+  return undefined;
+}
+
+export function createChildScope(parent: TypeScope, child: Pick<TypeScope, 'variables' | 'implementations' | 'interfaces'>) {
   return {
     parent,
     ...child,
