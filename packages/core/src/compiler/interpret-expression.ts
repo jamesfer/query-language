@@ -5,6 +5,7 @@ import { Log, LogValue } from './compiler-utils/monoids/log';
 import { interpretArray } from './interpreters/array';
 import { interpretBinding } from './interpreters/binding';
 import { interpretBoolean } from './interpreters/boolean';
+import { interpretDataType } from './interpreters/data-type';
 import { interpretFunction } from './interpreters/function';
 import { interpretFunctionCall } from './interpreters/function-call';
 import { interpretIdentifier } from './interpreters/identifier';
@@ -55,6 +56,7 @@ const runInterpreters: ExpressionInterpreter = (tokens, previous, precedence) =>
       [
         interpretInterface,
         interpretImplementation,
+        interpretDataType,
         interpretLiteral,
         interpretFunctionCall,
         interpretOperatorExpression,

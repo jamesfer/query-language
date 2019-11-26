@@ -23,7 +23,10 @@ async function findImplementation(
   }
 
   if (scope.parent) {
-    return findImplementation(scope.parent, constraint);
+    // TODO This caused the parent scope to become the current one. The fix I applied is ugly and
+    //      hopefully temporary
+    const [, , result] = await findImplementation(scope.parent, constraint);
+    return state.wrap(result);
   }
 
   return state.wrap(undefined);

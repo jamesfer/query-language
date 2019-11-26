@@ -209,6 +209,22 @@ async function generateJavascriptExpression(expression: Expression): Promise<Bac
       })));
     }
 
+    case ExpressionKind.DataType: {
+      const constructors = expression.constructors.map(({ name, parameters }) => {
+        const parameterValues = parameters.map(({ value }) => value).join(', ');
+        const object = `{ kind: '${name}', parameters: [${parameterValues}] }`;
+        return parameters.length === 0
+          ? `const ${name} = ${object};`
+          : `const ${name} = (${parameterValues}) => (${object})`;
+      });
+      const body = await generateJavascriptExpression(expression.body);
+      return bind(body, body => ({
+        value: body,
+        dependents: [],
+        blockStatements: constructors,
+      }))
+    }
+
     case ExpressionKind.NativeLambda:
       throw new Error('Not sure how to generate native lambda');
     case ExpressionKind.PolymorphicLambda:

@@ -61,6 +61,13 @@ export interface UntypedImplementationExpression extends UntypedExpressionInterf
   body: UntypedExpression;
 }
 
+export interface UntypedDataTypeExpression extends UntypedExpressionInterface<'DataType'> {
+  name: string;
+  parameters: Token[];
+  constructors: { name: string; parameters: Token[] }[];
+  body: UntypedExpression;
+}
+
 export interface UntypedUnrecognizedExpression extends UntypedExpressionInterface<'Unrecognized'> {}
 
 export type UntypedExpression = UntypedFunctionCallExpression
@@ -75,7 +82,8 @@ export type UntypedExpression = UntypedFunctionCallExpression
   | UntypedFunctionExpression
   | UntypedBindingExpression
   | UntypedInterfaceExpression
-  | UntypedImplementationExpression;
+  | UntypedImplementationExpression
+  | UntypedDataTypeExpression;
 
 export function makeUntypedNoneExpression(): UntypedNoneExpression {
   return {

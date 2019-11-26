@@ -1,4 +1,4 @@
-import { mkdir, writeFile, rmdir, unlink } from 'fs';
+import { mkdir, writeFile, unlink } from 'fs';
 import { promisify } from 'util';
 import { compile } from '../../../api';
 import { convertToScope } from '../../../library';
@@ -31,19 +31,25 @@ describe('generate-javascript', () => {
 
   it('can do stuff', async () => {
     const code = `
+      datatype Color = Red | Green | Blue
+      
       interface Size(A) { 
-        getStrength: A => Integer
+        getSize: A => Integer
       } 
       
       implement Size(Integer) {
-        getStrength: a => 4
+        getSize: a => 4
       }
       
       implement Size(String) {
-        getStrength: a => 1
+        getSize: a => 1
       }
       
-      getStrength(100)
+      implement Size(Color) {
+        getSize: a => 10
+      }
+      
+      getSize(Red) + getSize(Green)
     `;
     const result = await compile(code, convertToScope(standardLibrary));
     const script = await generateJavascript(result.expression as Expression);

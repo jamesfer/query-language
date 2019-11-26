@@ -38,6 +38,8 @@ export function convertToType(expression: UntypedExpression): LazyValue {
       // break;
     case 'Interface':
       // break;
+    case 'DataType':
+      // break;
     case 'Implementation':
       // break;
       throw new Error('Not sure how to type these expressions right now');

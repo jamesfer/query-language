@@ -1,3 +1,4 @@
+import { Position } from '../../position';
 import { Token } from '../../token';
 
 export function firstToken(
@@ -44,4 +45,10 @@ export function lastToken(
   }
 
   return undefined;
+}
+
+export function firstPosition(
+  ...tokens: (undefined | null | Token | (undefined | null | Token)[])[]
+): Position {
+  return firstToken(...tokens)?.begin || [0, 0];
 }

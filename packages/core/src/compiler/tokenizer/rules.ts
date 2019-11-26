@@ -3,7 +3,7 @@ import { TokenKind } from '../../token';
 
 export type Rules = { [k in TokenKind]: RegExp | string | string[] | Rule | Rule[] };
 
-const keywordsRules = { Keyword: ['let', 'interface', 'implement'] };
+const keywordsRules = { Keyword: ['let', 'interface', 'implement', 'datatype'] };
 
 const rules: Rules = {
   WhiteSpace: { match: /\s+/, lineBreaks: true },
@@ -18,6 +18,7 @@ const rules: Rules = {
   CloseBracket: ']',
   Comma: ',',
   Colon: ':',
+  Pipe: '|',
 
   // Operators
   FatArrow: '=>',

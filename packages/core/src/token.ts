@@ -14,6 +14,7 @@ export enum TokenKind {
   CloseBracket = 'CloseBracket',
   Comma = 'Comma',
   Colon = 'Colon',
+  Pipe = 'Pipe',
   AddOperator = 'AddOperator',
   SubtractOperator = 'SubtractOperator',
   MultiplyOperator = 'MultiplyOperator',

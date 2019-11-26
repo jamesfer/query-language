@@ -1,10 +1,10 @@
-import { fromPairs, unzip, zipObject } from 'lodash';
+import { fromPairs, unzip, zipObject, zipWith } from 'lodash';
 import { makeMessage } from '../../message';
 import { UntypedExpression } from '../../untyped-expression';
 import { assertNever } from '../../utils';
 import {
   ApplicationExpression,
-  BindingExpression,
+  BindingExpression, DataTypeExpression,
   Expression,
   ExpressionKind,
   ImplementationExpression,
@@ -39,6 +39,7 @@ import { fullConverge, sequenceConverges } from './full-converge';
 import { makeInferredFunctionType } from './make-inferred-function-type';
 import { resolveImplicits } from './resolve-implicits';
 import { State, StateResult } from './state';
+import { serializeType, serializeValue } from './test-utils';
 import { Type, type, TypeConstraint, TypeImplementation } from './type';
 import { freeBoundVariable } from './utils';
 import { applyAllSubstitutions, applyReplacementsToType } from './variable-substitutions';
@@ -536,6 +537,8 @@ export async function typeExpression(
       // Type the rest of the script after the interface declaration
       const [bodyType, typedBody] = await childState.runAsync(typeExpression, expression.body);
 
+      // TODO implicit parameters are not correctly carried for member functions. If on of the
+      //      member functions required an implicit, it would be ignored.
       return state.wrap<TypeExpressionResult>([
         bodyType,
         (inferred): ImplementationExpression => ({
@@ -550,6 +553,62 @@ export async function typeExpression(
       ]);
     }
 
+    case 'DataType': {
+      // TODO 1. We have to treat constructors with no parameters differently than those with
+      //         parameters because the type system does.
+      //      2. The parser lets us specify a separate parameter list for constructors that is
+      //         independent to the parameter list for the overall type but I'm not exactly sure how
+      //         to combine that with the type parameters.
+      const constructorTypes = expression.constructors.map(({ parameters }) => type(
+        parameters.length === 0 ? lazyValue(userDefinedLiteral(expression.name)) : functionType(
+          ...parameters.map(parameter => lazyValue(unboundVariable(parameter.value))),
+          lazyValue(userDefinedLiteral(expression.name)),
+        ))
+      );
+
+      // Construct child scope with parts of the data type present
+      const childState = State.of(createChildScope(state.scope(), {
+        variables: {
+          [expression.name]: {
+            // TODO there is currently no way to type check the number of arguments in a user
+            //      defined literal
+            valueType: type(lazyValue(userDefinedLiteral(expression.name))),
+          },
+          ...zipObject(
+            expression.constructors.map(({ name }) => name),
+            constructorTypes.map(valueType => ({ valueType })),
+          ),
+        },
+      }));
+
+      // Type the rest of the script after the interface declaration
+      const [bodyType, typedBody] = await childState.runAsync(typeExpression, expression.body);
+
+      // TODO implicit values aren't correctly carried for constructors.
+      //      There isn't a need for them at the moment since you can't specify constraints on a
+      //      data type, but it will turn into a bug when that is enabled.
+      return state.wrap<TypeExpressionResult>([
+        bodyType,
+        (inferred): DataTypeExpression => ({
+          kind: ExpressionKind.DataType,
+          resultType: bodyType,
+          body: typedBody(inferred),
+          tokens: expression.tokens,
+          name: expression.name,
+          parameters: expression.parameters,
+          constructors: zipWith(
+            expression.constructors,
+            constructorTypes,
+            ({ name, parameters }, type) => ({
+              name,
+              parameters,
+              type,
+            }),
+          ),
+        }),
+      ]);
+    }
+
     case 'Unrecognized':
       // TODO handle errors better
       throw new Error('Cannot type unrecognized expression');
@@ -558,10 +617,3 @@ export async function typeExpression(
       return assertNever(expression);
   }
 }
-
-// export async function typeBaseExpression(scope: TypeScope, expression: UntypedExpression): Promise<StateResult<Expression>> {
-//   const state = State.of(scope);
-//   const [type, func] = await state.runAsync(typeExpression, expression);
-//
-// }
-
