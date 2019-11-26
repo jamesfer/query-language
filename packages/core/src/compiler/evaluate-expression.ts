@@ -300,6 +300,9 @@ export function evaluateExpression3(
     case ExpressionKind.Implementation:
       return async () => nothing;
 
+    case ExpressionKind.DataType:
+      return async () => nothing;
+
     default:
       return assertNever(expression);
   }
