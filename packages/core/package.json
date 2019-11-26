@@ -23,7 +23,8 @@
     "test": "jest"
   },
   "jest": {
-    "preset": "ts-jest"
+    "preset": "ts-jest",
+    "testPathIgnorePatterns": ["tests", "standard-library"]
   },
   "dependencies": {
     "@types/jest": "^24.0.23",

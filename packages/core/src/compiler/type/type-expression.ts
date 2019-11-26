@@ -184,9 +184,9 @@ export async function typeExpression(
 
     case 'Array': {
       const { elements, tokens } = expression;
-      const [elementTypes, typedElements] = unzip(
+      const [elementTypes = [], typedElements = []] = unzip(
         await pMap(elements, state.runAsyncP1(typeExpression))
-      ) as [Type[], ((i: Expression[]) => Expression)[]];
+      ) as [Type[], ((i: Expression[]) => Expression)[]] | [];
 
       const blankVariable = lazyValue(unboundVariable('T'));
       // TODO ensure each of the element resultTypes belong to the same context
@@ -267,9 +267,9 @@ export async function typeExpression(
       const [calleeType, typedCallee] = await state.runAsync(typeExpression, expression.functionExpression);
 
       // Type each of the arguments
-      const [parameterTypes, typedParameters] = unzip(
+      const [parameterTypes = [], typedParameters = []] = unzip(
         await pMap(expression.args, state.runAsyncP1(typeExpression))
-      ) as [Type[], ((i: Expression[]) => Expression)[]];
+      ) as [Type[], ((i: Expression[]) => Expression)[]] | [];
 
       // Check if the callee is callable
       const calleeTypeValue = calleeType.value;

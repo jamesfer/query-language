@@ -50,16 +50,11 @@ async function serializeValueWithState(lazyValue: LazyValue | Value | undefined,
       return value;
 
     case ValueKind.UnboundVariable:
-      return {
-        ...value,
-        uniqueIdentifier: expect.any(String)
-      };
+      const { uniqueIdentifier, ...props } = value;
+      return props;
 
     case ValueKind.BoundVariable:
-      return {
-        ...value,
-        uniqueIdentifier: expect.any(String)
-      };
+      return value;
 
     case ValueKind.List:
       return {
@@ -118,7 +113,7 @@ export async function serializeType(type: Type): Promise<any> {
     constraints: await pMap(type.constraints, async constraint => ({
       ...constraint,
       child: await serializeValueWithState(constraint.child, state),
-      parents: await serializeValueWithState(constraint.parent, state),
+      parent: await serializeValueWithState(constraint.parent, state),
     })),
   };
 }

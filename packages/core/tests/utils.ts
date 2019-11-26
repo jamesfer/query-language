@@ -6,8 +6,9 @@ import {
   ValueExpressionExpectation,
 } from './runner';
 import {
+  type,
   Type,
-  } from '../src/compiler/type/type';
+} from '../src/compiler/type/type';
 import { addPositions, Position } from '../src/position';
 import {
   booleanType, floatType, integerType, lazyValue, listType,
@@ -112,10 +113,10 @@ function valueExpression(
   };
 }
 
-export const stringExpression = partial(valueExpression, 'String', stringType);
-export const integerExpression = partial(valueExpression, 'Integer', integerType);
-export const floatExpression = partial(valueExpression, 'Float', floatType);
-export const booleanExpression = partial(valueExpression, 'Boolean', booleanType);
+export const stringExpression = partial(valueExpression, 'String', type(lazyValue(stringType)));
+export const integerExpression = partial(valueExpression, 'Integer', type(lazyValue(integerType)));
+export const floatExpression = partial(valueExpression, 'Float', type(lazyValue(floatType)));
+export const booleanExpression = partial(valueExpression, 'Boolean', type(lazyValue(booleanType)));
 // Needs explicit type annotation to prevent "Exported variable X has
 // or is using name Y from external module, but cannot be named" errors.
 export const identifierExpression: Function2<Type | null, any, ValueExpressionExpectation> = partial(valueExpression, 'Identifier');

@@ -56,6 +56,6 @@ describe('generate-javascript', () => {
     console.log(script);
     const actual = await execModule(script);
     console.log(actual);
-    expect(actual).toBe(4);
+    expect(actual).toBe(20);
   });
 });

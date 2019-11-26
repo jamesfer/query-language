@@ -5,13 +5,12 @@ import {
   UntypedFunctionExpression,
 } from '../../untyped-expression';
 import {
-  ApplicationExpression,
+  ApplicationExpression, Expression,
   ExpressionKind,
   LambdaExpression,
-  ListExpression,
 } from '../expression';
 import { TypeScope } from '../scope';
-import { LazyValue, Value } from '../value';
+import { Value } from '../value';
 import {
   booleanType,
   floatType,
@@ -25,11 +24,18 @@ import {
   boundVariable, userDefinedLiteral,
 } from '../value-constructors';
 import { serializeType } from './test-utils';
-import { type, TypeConstraint } from './type';
+import { Type, type, TypeConstraint } from './type';
 import { typeExpression } from './type-expression';
-import { State } from './state';
 
-describe('typeExpression', () => {
+async function typeBaseExpression(
+  scope: TypeScope,
+  expression: UntypedExpression
+): Promise<[Type, Expression]> {
+  const [, , [type, continuation]] = await typeExpression(scope, expression);
+  return [type, continuation([])];
+}
+
+describe('typeBaseExpression', () => {
   const emptyScope: TypeScope = {};
 
   describe('with simple literal expressions', () => {
@@ -62,12 +68,11 @@ describe('typeExpression', () => {
     it.each(simpleExpressions)(
       'converts untyped %s expression to a typed one',
       async (kind, _, untypedExpression) => {
-        const [, , expression] = await typeExpression(emptyScope, untypedExpression);
+        const [, expression] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(expression).toEqual({
           ...untypedExpression,
           kind: ExpressionKind[kind],
-          resultType: type(expect.any(Function) as any),
-          implicitParameters: [],
+          resultType: type(expect.anything() as any),
         });
       },
     );
@@ -75,7 +80,7 @@ describe('typeExpression', () => {
     it.each(simpleExpressions)(
       'types a %s expression correctly',
       async (kind, resultValue, untypedExpression) => {
-        const [, , expression] = await typeExpression(emptyScope, untypedExpression);
+        const [, expression] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(await expression.resultType.value()).toEqual(resultValue);
       },
     );
@@ -89,7 +94,7 @@ describe('typeExpression', () => {
           name: { valueType },
         },
       };
-      const [, , { resultType }] = await typeExpression(
+      const [, { resultType }] = await typeBaseExpression(
         scopeWithIdentifier,
         {
           kind: 'Identifier',
@@ -125,18 +130,17 @@ describe('typeExpression', () => {
       };
 
       it('returns a typed expression', async () => {
-        const [, , expression] = await typeExpression(emptyScope, untypedExpression);
+        const [, expression] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(expression).toEqual({
           kind: ExpressionKind.List,
           tokens: [],
           elements: expect.any(Array),
           resultType: expect.any(Object),
-          implicitParameters: [],
         });
       });
 
       it('types the expression as an array of integers', async () => {
-        const [, , { resultType }] = await typeExpression(emptyScope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(lazyValue(listType(lazyValue(integerType))))
         ));
@@ -151,7 +155,7 @@ describe('typeExpression', () => {
       };
 
       it('types the expression as an unbound type', async () => {
-        const [, , { resultType }] = await typeExpression(emptyScope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(lazyValue(listType(lazyValue(unboundVariable('T')))))
         ));
@@ -183,7 +187,7 @@ describe('typeExpression', () => {
       };
 
       it('types the list elements as the concrete type', async () => {
-        const [, , { resultType }] = await typeExpression(scope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(scope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(lazyValue(listType(lazyValue(integerType))))
         ));
@@ -225,7 +229,7 @@ describe('typeExpression', () => {
           kind: 'Array',
           tokens: [],
         };
-        const { resultType } = State.unwrap(await typeExpression(scope, untypedExpression));
+        const [, { resultType }] = await typeBaseExpression(scope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(lazyValue(listType(functionType(
             lazyValue(unboundVariable('a')),
@@ -276,7 +280,7 @@ describe('typeExpression', () => {
           kind: 'Array',
           tokens: [],
         };
-        const { resultType, elements: [{ implicitParameters }] } = State.unwrap(await typeExpression(scope, untypedExpression)) as ListExpression;
+        const [, { resultType }] = await typeBaseExpression(scope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(
             lazyValue(listType(functionType(
@@ -285,7 +289,6 @@ describe('typeExpression', () => {
             ))),
           )
         ));
-        expect(implicitParameters).toEqual(['monadInteger']);
       });
 
       it('lifts constraints that cannot be resolved', async () => {
@@ -319,7 +322,7 @@ describe('typeExpression', () => {
           kind: 'Array',
           tokens: [],
         };
-        const { resultType } = State.unwrap(await typeExpression(scope, untypedExpression));
+        const [, { resultType }] = await typeBaseExpression(scope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(
             lazyValue(listType(functionType(
@@ -351,22 +354,20 @@ describe('typeExpression', () => {
           kind: ExpressionKind.Lambda,
           tokens: [],
           parameterNames: [],
-          implicitParameters: [],
           resultType: expect.any(Object),
           body: {
             kind: ExpressionKind.Integer,
             tokens: [],
             value: 1,
-            implicitParameters: [],
             resultType: expect.any(Object),
           },
         };
-        const [, , actualExpression] = await typeExpression(emptyScope, untypedExpression);
+        const [, actualExpression] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(actualExpression).toEqual(expectedExpression);
       });
 
       it('types the expression based on the body', async () => {
-        const [, , { resultType }] = await typeExpression(emptyScope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(functionType(lazyValue(integerType)))
         ));
@@ -385,7 +386,7 @@ describe('typeExpression', () => {
             value: 'a',
           },
         };
-        const [, , { resultType }] = await typeExpression(emptyScope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(functionType(lazyValue(boundVariable('aT0')), lazyValue(boundVariable('aT0'))))
         ));
@@ -413,7 +414,7 @@ describe('typeExpression', () => {
             ],
           },
         };
-        const [, , { resultType }] = await typeExpression(emptyScope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(functionType(
             lazyValue(integerType),
@@ -448,30 +449,27 @@ describe('typeExpression', () => {
         const expectedExpression: ApplicationExpression = {
           kind: ExpressionKind.Application,
           tokens: [],
-          implicitParameters: [],
           resultType: expect.any(Object),
           parameters: [],
           callee: {
             kind: ExpressionKind.Lambda,
             tokens: [],
-            implicitParameters: [],
             resultType: expect.any(Object),
             parameterNames: [],
             body: {
               kind: ExpressionKind.Integer,
               tokens: [],
               value: 1,
-              implicitParameters: [],
               resultType: expect.any(Object),
             },
           },
         };
-        const [, , actualExpression] = await typeExpression(emptyScope, untypedExpression);
+        const [, actualExpression] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(actualExpression).toEqual(expectedExpression);
       });
 
       it('types the expression based on the function body', async () => {
-        const [, , { resultType }] = await typeExpression(emptyScope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(
           await serializeType(type(lazyValue(integerType)))
         );
@@ -507,7 +505,7 @@ describe('typeExpression', () => {
       };
 
       it('types the expression based on the function body', async () => {
-        const [, , { resultType }] = await typeExpression(emptyScope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(emptyScope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(
           await serializeType(type(lazyValue(integerType)))
         );
@@ -518,7 +516,7 @@ describe('typeExpression', () => {
           ...untypedExpression,
           args: [],
         };
-        const [, , { resultType }] = await typeExpression(emptyScope, partialUntypedExpression);
+        const [, { resultType }] = await typeBaseExpression(emptyScope, partialUntypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(functionType(
             lazyValue(boundVariable('aT0')),
@@ -555,7 +553,7 @@ describe('typeExpression', () => {
             value: 'add',
           },
         };
-        const [, , { resultType }] = await typeExpression(scope, partialUntypedExpression);
+        const [, { resultType }] = await typeBaseExpression(scope, partialUntypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(functionType(
             lazyValue(integerType),
@@ -590,7 +588,7 @@ describe('typeExpression', () => {
             }
           ],
         };
-        const { resultType } = State.unwrap(await typeExpression(scope, partialUntypedExpression));
+        const [, { resultType }] = await typeBaseExpression(scope, partialUntypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(lazyValue(integerType)),
         ));
@@ -623,7 +621,7 @@ describe('typeExpression', () => {
             ],
           },
         };
-        const [, , { resultType }] = await typeExpression(scope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(scope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(functionType(lazyValue(integerType), lazyValue(integerType))),
         ));
@@ -667,7 +665,7 @@ describe('typeExpression', () => {
             ],
           },
         };
-        const [, , { resultType }] = await typeExpression(scope, untypedExpression);
+        const [, { resultType }] = await typeBaseExpression(scope, untypedExpression);
         expect(await serializeType(resultType)).toEqual(await serializeType(
           type(functionType(lazyValue(integerType), lazyValue(integerType))),
         ));

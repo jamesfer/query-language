@@ -1,6 +1,6 @@
 import { executeExpect } from '../../test-utils';
 
-describe('operators', function() {
+describe.skip('operators', function() {
   describe('greaterThan', function () {
     it('should return true when the first operand is greater', function () {
       return executeExpect('15 > 5', true);

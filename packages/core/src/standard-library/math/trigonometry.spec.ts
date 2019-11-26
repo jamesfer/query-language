@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { executeExpect, testExecute } from '../../test-utils';
 
 describe('trigonometry', function() {
@@ -17,7 +16,7 @@ describe('trigonometry', function() {
   describe('tan', function() {
     it('should calculate the tan of a number', function() {
       return testExecute('tan(0.5)', value => {
-        expect(value).to.equal(Math.tan(0.5));
+        expect(value).toEqual(Math.tan(0.5));
       });
     });
   });
@@ -25,7 +24,7 @@ describe('trigonometry', function() {
   describe('asin', function() {
     it('should calculate the arcsin of a number', function() {
       return testExecute('asin(0.5)', value => {
-        expect(value).to.equal(Math.asin(0.5));
+        expect(value).toEqual(Math.asin(0.5));
       });
     });
   });
@@ -33,7 +32,7 @@ describe('trigonometry', function() {
   describe('acos', function() {
     it('should calculate the arccos of a number', function() {
       return testExecute('acos(0.5)', value => {
-        expect(value).to.equal(Math.acos(0.5));
+        expect(value).toEqual(Math.acos(0.5));
       });
     });
   });
@@ -41,7 +40,7 @@ describe('trigonometry', function() {
   describe('atan', function() {
     it('should calculate the arctan of a number', function() {
       return testExecute('atan(0.5)', value => {
-        expect(value).to.equal(Math.atan(0.5));
+        expect(value).toEqual(Math.atan(0.5));
       });
     });
   });

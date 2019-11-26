@@ -1,8 +1,7 @@
 import { execute } from './api';
-import { expect } from 'chai';
 
-export function testExecute(code: string, cb?: (value: any) => void): Promise<any> {
-  const program = execute(code);
+export async function testExecute(code: string, cb?: (value: any) => void): Promise<any> {
+  const program = await execute(code);
   if (!program.compiled) {
     throw new Error('Code failed to compile.');
   }
@@ -12,13 +11,11 @@ export function testExecute(code: string, cb?: (value: any) => void): Promise<an
   if (!program.result) {
     throw new Error('Code failed to produce a result.');
   }
-  return program.result
-    .map(value => cb ? cb(value) : value)
-    .toPromise();
+  cb(program.result);
 }
 
 export function executeExpect(code: string, expected: any): Promise<any> {
   return testExecute(code, (actual) => {
-    expect(actual).to.deep.equal(expected);
+    expect(actual).toEqual(expected);
   });
 }
