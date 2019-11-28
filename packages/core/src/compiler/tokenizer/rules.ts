@@ -7,7 +7,7 @@ const keywordsRules = { Keyword: ['let', 'interface', 'implement', 'datatype'] }
 
 const rules: Rules = {
   WhiteSpace: { match: /\s+/, lineBreaks: true },
-  Comment: /--[^\n\r]*/,
+  Comment: /--.*?$/,
 
   // Structure Characters
   OpenBrace: '{',
@@ -39,7 +39,7 @@ const rules: Rules = {
 
   // Literals
   BooleanLiteral: ['true', 'false'],
-  FloatLiteral: /[0-9]+(?:(?:\.[0-9]*)?[eE]-?[0-9]+|\.[0-9]*)(?!\.)/,
+  FloatLiteral: /[0-9]+(?:\.?[0-9]*[eE]-?[0-9]+)|(?:\.[0-9]*[eE]-?[0-9]+)|[0-9]*\.[0-9]+/,
   IntegerLiteral: /[0-9]+/,
   StringLiteral: /(?:'(?:\\\\|\\'|(?!').)*'?|"(?:\\\\|\\"|(?!").)*"?)/,
 

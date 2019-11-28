@@ -1,6 +1,6 @@
 import { Log } from './compiler/compiler-utils/monoids/log';
 import { interpretSyntaxTree } from './compiler/interpret-expression';
-import { tokenize } from './compiler/tokenizer/tokenize';
+import tokenize from './compiler/tokenizer/tokenize';
 import {
   convertToEvaluationScope,
   convertToTypeScope,

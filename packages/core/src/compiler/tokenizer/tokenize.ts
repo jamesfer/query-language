@@ -1,9 +1,20 @@
-import { Token as MooToken } from 'moo';
-import { makeLexer } from './make-lexer';
-import { Token, TokenKind } from '../../token';
+import { compile, Lexer, Token as MooToken } from 'moo';
 import { Position } from '../../position';
+import { Token, TokenKind } from '../../token';
+import rules from './rules';
 
-export function positionOf(
+function shouldSkipToken({ type }: MooToken): boolean {
+  return type === TokenKind.WhiteSpace || type === TokenKind.Comment;
+}
+
+/**
+ * Moo doesn't count carriage returns in new lines so we need to convert all of them to just \n
+ */
+function normalizeLineEndings(code: string): string {
+  return code.replace(/(\n\r|\r)/g, '\n');
+}
+
+function positionOf(
   { value, lineBreaks, col, line }: MooToken,
 ): { begin: Position, end: Position } {
   const endCol = lineBreaks === 0
@@ -27,18 +38,24 @@ function convertToken(token: MooToken): Token {
   };
 }
 
-// TODO add messages (maybe)
-// TODO add some way to check for failure
-export function tokenize(code: string): Token[] {
-  const lexer = makeLexer();
+function eatTokens(lexer: Lexer, code: string): Token[] {
   lexer.reset(code);
 
   const tokens = [];
   let nextToken = lexer.next();
   while (nextToken !== undefined) {
-    tokens.push(convertToken(nextToken));
+    if (!shouldSkipToken(nextToken)) {
+      tokens.push(convertToken(nextToken));
+    }
     nextToken = lexer.next();
   }
 
   return tokens;
+}
+
+// TODO add messages (maybe)
+// TODO add some way to check for failure. Currently the next function throws an error when an
+//      unknown token is encountered
+export default function tokenize(code: string): Token[] {
+  return eatTokens(compile(rules), normalizeLineEndings(code));
 }
