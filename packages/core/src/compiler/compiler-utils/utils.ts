@@ -52,3 +52,13 @@ export function firstPosition(
 ): Position {
   return firstToken(...tokens)?.begin || [0, 0];
 }
+
+export function lazy<A extends any[], R>(constructor: () => (...args: A) => R): (...args: A) => R {
+  let func: ((...args: A) => R) | undefined = undefined;
+  return (...args) => {
+    if (!func) {
+      func = constructor();
+    }
+    return func(...args);
+  }
+}

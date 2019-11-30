@@ -1,42 +1,20 @@
-import { Token, TokenKind } from '../../token';
+import { TokenKind } from '../../token';
 import {
-  makeUntypedUnrecognizedExpression, UntypedDataTypeExpression,
-  UntypedFunctionExpression,
+  UntypedDataTypeExpression,
 } from '../../untyped-expression';
 import {
   bindInterpreter,
   matchAll,
-  matchList, matchNothing, matchSeparatedList,
+  matchList, matchSeparatedList,
   matchSome,
-  matchToken, optionallyMatch,
+  matchToken,
 } from '../compiler-utils/matchers';
-import { Log, LogValue } from '../compiler-utils/monoids/log';
+import { Log } from '../compiler-utils/monoids/log';
+import { lazy } from '../compiler-utils/utils';
 import { ExpressionInterpreter, interpretExpression } from '../interpret-expression';
-import { interpretFunction } from './function';
-
-interface FunctionDeclaration {
-  identifier?: Token;
-  colon?: Token;
-  func?: UntypedFunctionExpression;
-  tokens: Token[];
-}
-
-const interpretDataTypeDeclaration: ExpressionInterpreter<FunctionDeclaration> = bindInterpreter(
-  matchSome([
-    matchToken(TokenKind.Identifier),
-    matchToken(TokenKind.Colon),
-    interpretFunction,
-  ]),
-  ({ tokens, results: [identifier, colon, func] }) => Log.of({
-    func,
-    tokens,
-    identifier: identifier?.tokens?.[0],
-    colon: colon?.tokens?.[0],
-  }),
-);
 
 // TODO We have to wrap this in a pointless function because of circular import issues
-export const interpretDataType: ExpressionInterpreter = (t, p, pre) => bindInterpreter(
+export const interpretDataType: ExpressionInterpreter = lazy(() => bindInterpreter(
   matchAll([
     matchAll([
       matchToken(TokenKind.Keyword, ({ value }) => value === 'datatype'),
@@ -102,4 +80,4 @@ export const interpretDataType: ExpressionInterpreter = (t, p, pre) => bindInter
       parameters: parameters?.items.map(({ tokens: [token] }) => token) || [],
     })),
   }),
-)(t, p, pre);
+));

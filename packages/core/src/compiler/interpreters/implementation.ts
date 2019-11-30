@@ -12,6 +12,7 @@ import {
   matchToken,
 } from '../compiler-utils/matchers';
 import { Log } from '../compiler-utils/monoids/log';
+import { lazy } from '../compiler-utils/utils';
 import { ExpressionInterpreter, interpretExpression } from '../interpret-expression';
 import { interpretFunction } from './function';
 
@@ -36,7 +37,7 @@ const interpretFunctionImplementation: ExpressionInterpreter<FunctionImplementat
   }),
 );
 
-export const interpretImplementation: ExpressionInterpreter = (t, p, pre) => bindInterpreter(
+export const interpretImplementation: ExpressionInterpreter = lazy(() => bindInterpreter(
   matchAll([
     matchAll([
       matchToken(TokenKind.Keyword, ({ value }) => value === 'implement'),
@@ -87,4 +88,4 @@ export const interpretImplementation: ExpressionInterpreter = (t, p, pre) => bin
       expression: func || makeUntypedUnrecognizedExpression([]),
     })) || [],
   }),
-)(t, p, pre);
+));

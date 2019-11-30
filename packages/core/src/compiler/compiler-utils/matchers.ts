@@ -1,4 +1,4 @@
-import { flatten } from 'lodash';
+import { flatten, maxBy } from 'lodash';
 import { makeMessage, Message } from '../../message';
 import { Token, TokenKind } from '../../token';
 import { tokenArrayMatches } from '../../utils';
@@ -87,7 +87,7 @@ export function matchAll<T1 extends { tokens: Token[] }, T2 extends { tokens: To
 ): ExpressionInterpreter<{ tokens: Token[], results: [T1, T2] }>;
 export function matchAll<T1 extends { tokens: Token[] }, T2 extends { tokens: Token[] }, T3 extends { tokens: Token[] }>(
   matchers: [ExpressionInterpreter<T1>, ExpressionInterpreter<T2>, ExpressionInterpreter<T3>],
-): ExpressionInterpreter<{ tokens: Token[], results: [T1, T3] }>;
+): ExpressionInterpreter<{ tokens: Token[], results: [T1, T2, T3] }>;
 export function matchAll<T1 extends { tokens: Token[] }, T2 extends { tokens: Token[] }, T3 extends { tokens: Token[] }, T4 extends { tokens: Token[] }>(
   matchers: [ExpressionInterpreter<T1>, ExpressionInterpreter<T2>, ExpressionInterpreter<T3>, ExpressionInterpreter<T4>],
 ): ExpressionInterpreter<{ tokens: Token[], results: [T1, T2, T3, T4] }>;
@@ -122,6 +122,37 @@ export function matchAll<T extends { tokens: Token[] }>(
       results,
       tokens: tokens.slice(0, tokenCount),
     });
+  };
+}
+
+export function matchOneOf<T1 extends { tokens: Token[] }>(
+  matchers: [ExpressionInterpreter<T1>],
+): ExpressionInterpreter<T1>;
+export function matchOneOf<T1 extends { tokens: Token[] }, T2 extends { tokens: Token[] }>(
+  matchers: [ExpressionInterpreter<T1>, ExpressionInterpreter<T2>],
+): ExpressionInterpreter<T1 | T2>;
+export function matchOneOf<T1 extends { tokens: Token[] }, T2 extends { tokens: Token[] }, T3 extends { tokens: Token[] }>(
+  matchers: [ExpressionInterpreter<T1>, ExpressionInterpreter<T2>, ExpressionInterpreter<T3>],
+): ExpressionInterpreter<T1 | T2 | T3>;
+export function matchOneOf<T1 extends { tokens: Token[] }, T2 extends { tokens: Token[] }, T3 extends { tokens: Token[] }, T4 extends { tokens: Token[] }>(
+  matchers: [ExpressionInterpreter<T1>, ExpressionInterpreter<T2>, ExpressionInterpreter<T3>, ExpressionInterpreter<T4>],
+): ExpressionInterpreter<T1 | T2 | T3 | T4>;
+export function matchOneOf<T1 extends { tokens: Token[] }, T2 extends { tokens: Token[] }, T3 extends { tokens: Token[] }, T4 extends { tokens: Token[] }, T5 extends { tokens: Token[] }>(
+  matchers: [ExpressionInterpreter<T1>, ExpressionInterpreter<T2>, ExpressionInterpreter<T3>, ExpressionInterpreter<T4>, ExpressionInterpreter<T5>],
+): ExpressionInterpreter<T1 | T2 | T3 | T4 | T5>;
+export function matchOneOf<T1 extends { tokens: Token[] }, T2 extends { tokens: Token[] }, T3 extends { tokens: Token[] }, T4 extends { tokens: Token[] }, T5 extends { tokens: Token[] }, T6 extends { tokens: Token[] }>(
+  matchers: [ExpressionInterpreter<T1>, ExpressionInterpreter<T2>, ExpressionInterpreter<T3>, ExpressionInterpreter<T4>, ExpressionInterpreter<T5>, ExpressionInterpreter<T6>],
+): ExpressionInterpreter<T1 | T2 | T3 | T4 | T5 | T6>;
+export function matchOneOf<T extends { tokens: Token[] }>(
+  matchers: ExpressionInterpreter<T>[],
+): ExpressionInterpreter<T>;
+export function matchOneOf<T extends { tokens: Token[] }>(
+  matchers: ExpressionInterpreter<T>[],
+): ExpressionInterpreter<T> {
+  return (tokens, previous, precedences) => {
+    const results = matchers.map(matcher => matcher(tokens, previous, precedences));
+    return maxBy(results, ({ value }) => value === undefined ? -1 : value.tokens.length)
+      || Log.of(undefined);
   };
 }
 
@@ -335,4 +366,8 @@ export function matchSeparatedList<T extends { tokens: Token[] }, S extends { to
       return log.wrap({ tokens, items });
     },
   );
+}
+
+export function assignType<T>(type: T): <E>(interpreter: ExpressionInterpreter<E>) => ExpressionInterpreter<E & { type: T }> {
+  return interpreter => bindInterpreter(interpreter, result => Log.of({ ...result, type }));
 }

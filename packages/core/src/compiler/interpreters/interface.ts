@@ -12,6 +12,7 @@ import {
   matchToken,
 } from '../compiler-utils/matchers';
 import { Log } from '../compiler-utils/monoids/log';
+import { lazy } from '../compiler-utils/utils';
 import { ExpressionInterpreter, interpretExpression } from '../interpret-expression';
 import { interpretFunction } from './function';
 
@@ -37,7 +38,7 @@ const interpretFunctionDeclaration: ExpressionInterpreter<FunctionDeclaration> =
 );
 
 // TODO We have to wrap this in a pointless function because of circular import issues
-export const interpretInterface: ExpressionInterpreter = (t, p, pre) => bindInterpreter(
+export const interpretInterface: ExpressionInterpreter = lazy(() => bindInterpreter(
   matchAll([
     matchAll([
       matchToken(TokenKind.Keyword, ({ value }) => value === 'interface'),
@@ -88,4 +89,4 @@ export const interpretInterface: ExpressionInterpreter = (t, p, pre) => bindInte
       expression: func || makeUntypedUnrecognizedExpression([]),
     })) || [],
   }),
-)(t, p, pre);
+));

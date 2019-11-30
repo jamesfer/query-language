@@ -49,6 +49,14 @@ describe('generate-javascript', () => {
         getSize: a => 10
       }
       
+      interface Orderable(A) {
+        greaterThan: (A, A) => Boolean
+      }
+      
+      implement Orderable(Color) {
+        greaterThan: (left, right) => right
+      }
+      
       getSize(Red) + getSize(Green)
     `;
     const result = await compile(code, convertToScope(standardLibrary));
