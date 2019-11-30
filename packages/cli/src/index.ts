@@ -1,4 +1,6 @@
-import yargs from 'yargs';
-import compileCommand from './compile/compile';
+import runner from './cli';
 
-yargs.command(compileCommand).help().argv;
+runner().parse(process.argv.slice(2)).catch((error) => {
+  console.log(error);
+  process.exit(1);
+});

@@ -69,11 +69,11 @@ const runInterpreters: ExpressionInterpreter = (tokens, previous, precedence) =>
   return Log.of(undefined);
 };
 
-export const interpretExpression: ExpressionInterpreter = (
+export function interpretExpression(
   tokens: Token[],
   previous: UntypedExpression | null = null,
   precedence: number = 0,
-): LogValue<UntypedExpression | undefined> => {
+): LogValue<UntypedExpression | undefined> {
   const log = Log.empty();
   let result: UntypedExpression | undefined;
   let expressionPart = log.combine(runInterpreters(tokens, previous, precedence));

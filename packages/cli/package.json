@@ -16,7 +16,7 @@
     "lazy"
   ],
   "scripts": {
-    "build": "tsc --project tsconfig.json"
+    "build": "tsc --project tsconfig.build.json"
   },
   "jest": {
     "preset": "ts-jest"
