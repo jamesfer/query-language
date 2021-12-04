@@ -38,16 +38,23 @@ function convertToken(token: MooToken): Token {
   };
 }
 
-function eatTokens(lexer: Lexer, code: string): Token[] {
+export function createLexer(): Lexer {
+  return compile(rules);
+}
+
+export function nextToken(lexer: Lexer): Token | undefined {
+  const nextToken = lexer.next();
+  return nextToken ? convertToken(nextToken) : undefined;
+}
+
+function eatTokens(code: string): Token[] {
+  const lexer = createLexer();
   lexer.reset(code);
 
   const tokens = [];
-  let nextToken = lexer.next();
-  while (nextToken !== undefined) {
-    if (!shouldSkipToken(nextToken)) {
-      tokens.push(convertToken(nextToken));
-    }
-    nextToken = lexer.next();
+  let token = nextToken(lexer);
+  while (token) {
+    tokens.push(token);
   }
 
   return tokens;
@@ -57,5 +64,5 @@ function eatTokens(lexer: Lexer, code: string): Token[] {
 // TODO add some way to check for failure. Currently the next function throws an error when an
 //      unknown token is encountered
 export default function tokenize(code: string): Token[] {
-  return eatTokens(compile(rules), normalizeLineEndings(code));
+  return eatTokens(normalizeLineEndings(code));
 }

@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "baseUrl": "src",
+    "importHelpers": true,
+    "lib": [
+      "es2018",
+      "esnext.asynciterable",
+      "dom"
+    ],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "target": "es6",
+    "typeRoots": [
+      "./typings",
+      "./node_modules/@types",
+      "../../node_modules/@types"
+    ],
+    "types": [
+      "jest",
+      "lodash",
+      "moo",
+      "node"
+    ]
+  },
+  "files": [
+    "src/index.ts"
+  ]
+}
